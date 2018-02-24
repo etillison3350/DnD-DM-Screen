@@ -1,8 +1,7 @@
-package dmscreen.data;
+package dmscreen.data.creature;
 
 public enum SpeedType {
 
-	WALK,
 	SWIM,
 	FLY,
 	CLIMB,

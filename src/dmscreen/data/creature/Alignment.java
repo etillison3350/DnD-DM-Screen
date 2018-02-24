@@ -1,4 +1,4 @@
-package dmscreen.data;
+package dmscreen.data.creature;
 
 public enum Alignment {
 	LAWFUL_GOOD,
@@ -9,5 +9,6 @@ public enum Alignment {
 	NEUTRAL_EVIL,
 	CHAOTIC_GOOD,
 	CHAOTIC_NEUTRAL,
-	CHAOTIC_EVIL;
+	CHAOTIC_EVIL,
+	UNALIGNED;
 }

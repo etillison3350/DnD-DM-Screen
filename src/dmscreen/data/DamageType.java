@@ -16,9 +16,4 @@ public enum DamageType {
 	SLASHING,
 	THUNDER;
 
-	@Override
-	public String toString() {
-		return name().toLowerCase();
-	}
-
 }

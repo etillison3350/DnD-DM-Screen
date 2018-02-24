@@ -1,6 +1,10 @@
-package dmscreen.data;
+package dmscreen.data.creature;
 
-public class Feature {
+import dmscreen.StatBlockUtils;
+import dmscreen.data.BlockEntry;
+import javafx.scene.Node;
+
+public class Feature implements BlockEntry {
 
 	private final String name, note, description;
 
@@ -14,6 +18,10 @@ public class Feature {
 		this.description = description;
 	}
 
+	public String getTitle() {
+		return note == null || note.isEmpty() ? name : String.format("%s (%s)", name, note);
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -24,6 +32,11 @@ public class Feature {
 
 	public String getDescription() {
 		return description;
+	}
+
+	@Override
+	public Node getNode() {
+		return StatBlockUtils.dataLine(getTitle() + ".", description + "\n", true);
 	}
 
 }

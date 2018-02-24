@@ -1,6 +1,6 @@
 package dmscreen.data;
 
-public enum SizeClass {
+public enum Size {
 	TINY(4),
 	SMALL(6),
 	MEDIUM(8),
@@ -10,7 +10,7 @@ public enum SizeClass {
 
 	public transient final int hitDie;
 
-	private SizeClass(final int hitDie) {
+	private Size(final int hitDie) {
 		this.hitDie = hitDie;
 	}
 }

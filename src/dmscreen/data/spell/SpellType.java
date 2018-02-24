@@ -1,0 +1,14 @@
+package dmscreen.data.spell;
+
+public enum SpellType {
+
+	ABJURATION,
+	CONJURATION,
+	DIVINATION,
+	ENCHANTMENT,
+	EVOCATION,
+	ILLUSION,
+	NECROMANCY,
+	TRANSMUTATION;
+
+}

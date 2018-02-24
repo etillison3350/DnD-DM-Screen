@@ -1,4 +1,4 @@
-package dmscreen.data;
+package dmscreen.data.creature;
 
 public enum CreatureType {
 	ABERRATION,
