@@ -24,6 +24,7 @@ import dmscreen.data.creature.feature.Action;
 import dmscreen.data.creature.feature.Attack;
 import dmscreen.data.creature.feature.Feature;
 import dmscreen.data.creature.feature.InnateSpellcasting;
+import dmscreen.data.creature.feature.Spellcasting;
 
 public class TestCreatures {
 
@@ -68,15 +69,15 @@ public class TestCreatures {
 		vampire.legendaryActions = Arrays.asList(new LegendaryAction("Move", "The vampire moves up to half its speed without provoking opportunity attacks."), new LegendaryAction("Unarmed Strike", "The vampire makes one unarmed strike."), new LegendaryAction("Bite", 2, "The vampire makes one bite attack."));
 
 		drow = new Creature();
-		drow.name = "Drow Elite Warrior";
+		drow.name = "Drow Priestess of Lolth";
 		drow.shortName = "the drow";
 		drow.size = Size.MEDIUM;
 		drow.type = CreatureType.HUMANOID;
 		drow.subtype = "elf";
 		drow.alignment = Alignment.NEUTRAL_EVIL;
 		drow.ac = 18;
-		drow.armorNote = "studded leather, shield";
-		drow.hitDice = new DiceRoll(11, 8, 22);
+		drow.armorNote = "scale mail";
+		drow.hitDice = new DiceRoll(13, 8, 13);
 		drow.speed = 30;
 		drow.abilityScores.put(Ability.STRENGTH, 13);
 		drow.abilityScores.put(Ability.DEXTERITY, 18);
@@ -92,30 +93,58 @@ public class TestCreatures {
 		drow.senses.put(VisionType.DARKVISION, 120);
 		drow.languages.add("Elvish");
 		drow.languages.add("Undercommon");
-		drow.challengeRating = 5;
+		drow.challengeRating = 8;
 
 		final List<Feature> features = new ArrayList<>();
 		features.add(new Feature("Fey Ancestry", "The drow has advantage on saving throws against being charmed, and magic can't put the drow to sleep."));
 
-		final Map<String, Map<String, String>> spells = new LinkedHashMap<>();
+		final Map<String, Map<String, String>> innateSpells = new LinkedHashMap<>();
 		final Map<String, String> atWill = new HashMap<>();
 		atWill.put("dancing lights", "");
-		spells.put("At will", atWill);
+		innateSpells.put("At will", atWill);
 
 		final Map<String, String> onePerDay = new HashMap<>();
 		onePerDay.put("darkness", "");
 		onePerDay.put("faerie fire", "");
 		onePerDay.put("levitate", "self only");
-		spells.put("1/day each", onePerDay);
+		innateSpells.put("1/day each", onePerDay);
 
-		features.add(new InnateSpellcasting("", "the drow", Ability.CHARISMA, 12, "", spells));
+		features.add(new InnateSpellcasting("", "the drow", Ability.CHARISMA, 12, Integer.MIN_VALUE, "she", "", innateSpells));
+
+		final Map<String, Map<String, String>> spells = new LinkedHashMap<>();
+
+		final Map<String, String> cantrips = new HashMap<>();
+		Stream.of("guidance", "poison spray", "resistance", "spare the dying", "thaumaturgy").forEach(s -> cantrips.put(s, ""));
+		spells.put("Cantrips (at will)", cantrips);
+
+		final Map<String, String> level1 = new HashMap<>();
+		Stream.of("animal friendship", "cure wounds", "detect poison and disease", "ray of sickness").forEach(s -> level1.put(s, ""));
+		spells.put("Level 1 (4 slots)", level1);
+
+		final Map<String, String> level2 = new HashMap<>();
+		Stream.of("lesser restoration", "protection from poison", "web").forEach(s -> level2.put(s, ""));
+		spells.put("Level 2 (3 slots)", level2);
+
+		final Map<String, String> level3 = new HashMap<>();
+		level3.put("dispel magic", "");
+		level3.put("conjure animals", "2 giant spiders");
+		spells.put("Level 3 (3 slots)", level3);
+
+		final Map<String, String> level4 = new HashMap<>();
+		Stream.of("divination", "freedom of movement").forEach(s -> level4.put(s, ""));
+		spells.put("Level 4 (3 slots)", level4);
+
+		final Map<String, String> level5 = new HashMap<>();
+		Stream.of("insect plague", "mass cure wounds").forEach(s -> level5.put(s, ""));
+		spells.put("Level 5 (2 slots)", level5);
+
+		features.add(new Spellcasting("", drow.shortName, 10, Ability.CHARISMA, 14, "her", 6, "", "cleric", "", spells));
+
 		features.add(new Feature("Sunlight Sensitivity", "While in sunlight, the drow has disadvantage on attack rolls, as well as on Wisdom (Perception) checks that rely on sight."));
 		drow.features = features;
 
-		drow.actions = Arrays.asList(new Action("Multiattack", "The drow makes two shortsword attacks."), new Attack("Shortsword", Attack.Type.MELEE_WEAPON, 7, "range 5 ft., one target", "", new Attack.Damage(new DiceRoll(1, 6, 4), DamageType.PIERCING), new Attack.Damage(new DiceRoll(3, 6), DamageType.POISON)),
-				new Attack("Hand Crossbow", Attack.Type.RANGED_WEAPON, 7, "range 30/120 ft., one target", ", and the target must succeed on a DC 13 Constitution saving throw or be poisoned for 1 hour. If the saving throw fails by 5 or more, the target is also unconscious while poisoned in this way. The target wakes up if it takes damage or if another creature takes an action to shake it awake.", new Attack.Damage(new DiceRoll(1, 6, 4), DamageType.PIERCING)));
-		drow.reactions = Arrays.asList(new Action("Parry", "The drow adds 3 to its AC against one melee attack that would hit it. To do so, the drow must see the attacker and be wielding a melee weapon."));
-
+		drow.actions = Arrays.asList(new Action("Multiattack", "The drow makes two scourge attacks."), new Attack("Scourge", Attack.Type.MELEE_WEAPON, 5, "range 5 ft., one target", "", new Attack.Damage(new DiceRoll(1, 6, 2), DamageType.PIERCING), new Attack.Damage(new DiceRoll(5, 6), DamageType.POISON)),
+				new Action("Summon Demon", "1/Day", "The drow attempts to magically summon a yochlol with a 30 percent chance of success. If the attempt fails, the drow takes 5 (ldl0) psychic damage. Otherwise, the summoned demon appears in an unoccupied space within 60 feet of its summoner, acts as an ally of its summoner, and can't summon other demons. It remains for 10 minutes, until it or its summoner dies, or until its summoner dismisses it as an action."));
 	}
 
 }

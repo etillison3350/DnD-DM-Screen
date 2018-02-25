@@ -17,22 +17,32 @@ public class InnateSpellcasting extends Feature {
 
 	private final String shortName;
 	private final Ability ability;
+	private final int attackModifier;
 	private final int saveDC;
 	private final String pronoun;
 	private final Map<String, Map<String, String>> spells;
 
-	public InnateSpellcasting(final String note, final String shortName, final Ability ability, final int saveDC, final String pronoun, final String extra, final Map<String, Map<String, String>> spells) {
-		super("Innate Spellcasting", note, extra);
+	protected InnateSpellcasting(final String name, final String note, final String shortName, final Ability ability, final int saveDC, final int attackModifier, final String pronoun, final String extra, final Map<String, Map<String, String>> spells) {
+		super(name, note, extra);
 
 		this.shortName = shortName;
 		this.ability = ability;
 		this.saveDC = saveDC;
+		this.attackModifier = attackModifier;
 		this.pronoun = pronoun;
 		this.spells = spells;
 	}
 
-	public InnateSpellcasting(final String note, final String shortName, final Ability ability, final int saveDC, final String extra, final Map<String, Map<String, String>> spells) {
-		this(note, shortName, ability, saveDC, "it", extra, spells);
+	protected InnateSpellcasting(final String name, final String note, final String shortName, final Ability ability, final int saveDC, final int attackModifier, final String extra, final Map<String, Map<String, String>> spells) {
+		this(name, note, shortName, ability, saveDC, attackModifier, "it", extra, spells);
+	}
+
+	public InnateSpellcasting(final String note, final String shortName, final Ability ability, final int saveDC, final int attackModifier, final String pronoun, final String extra, final Map<String, Map<String, String>> spells) {
+		this("Innate Spellcasting", note, shortName, ability, saveDC, attackModifier, pronoun, extra, spells);
+	}
+
+	public InnateSpellcasting(final String note, final String shortName, final Ability ability, final int saveDC, final int attackModifier, final String extra, final Map<String, Map<String, String>> spells) {
+		this(note, shortName, ability, saveDC, attackModifier, "it", extra, spells);
 	}
 
 	public String getShortName() {
@@ -47,6 +57,10 @@ public class InnateSpellcasting extends Feature {
 		return saveDC;
 	}
 
+	public int getAttackModifier() {
+		return attackModifier;
+	}
+
 	public String getPronoun() {
 		return pronoun;
 	}
@@ -58,7 +72,8 @@ public class InnateSpellcasting extends Feature {
 	@Override
 	public Node getNode() {
 		final boolean noDescription = getDescription() == null || getDescription().isEmpty();
-		final TextFlow line = StatBlockUtils.dataLine(getTitle(), String.format("%s's innate spellcasting ability is %s (spell save DC %d). %s can innately cast %s spells, requiring no material components%s\n", Util.sentenceCase(shortName), Util.sentenceCase(ability.name()), saveDC, Util.sentenceCase(pronoun), noDescription ? "the following" : "a number of", noDescription ? ":" : ". " + getDescription()), true);
+		final TextFlow line = StatBlockUtils.dataLine(getTitle() + ".",
+				String.format("%s's innate spellcasting ability is %s (spell save DC %d%s). %s can innately cast %s spells, requiring no material components%s\n", Util.sentenceCase(shortName), Util.sentenceCase(ability.name()), saveDC, attackModifier > Integer.MIN_VALUE ? String.format("%+d to hit with spell attacks", attackModifier) : "", Util.sentenceCase(pronoun), noDescription ? "the following" : "a number of", noDescription ? ":" : ". " + getDescription()), true);
 
 		spells.forEach((s, map) -> {
 			line.getChildren().add(new Text("\n" + s + ": "));
