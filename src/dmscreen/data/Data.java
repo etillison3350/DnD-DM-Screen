@@ -3,10 +3,10 @@ package dmscreen.data;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -23,7 +23,6 @@ import dmscreen.data.creature.feature.Feature;
 import dmscreen.data.creature.feature.InnateSpellcasting;
 import dmscreen.data.creature.feature.Spellcasting;
 import dmscreen.data.spell.Bullet;
-import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellFeature;
 import dmscreen.data.spell.SpellParagraph;
 
@@ -78,7 +77,7 @@ public class Data {
 					}
 				} else {
 					final Field field = DataSet.class.getField(name);
-					final Object newSet = GSON.fromJson(new String(Files.readAllBytes(path)), TypeToken.getParameterized(LinkedHashSet.class, Spell.class).getType());
+					final Object newSet = GSON.fromJson(new String(Files.readAllBytes(path)), TypeToken.getParameterized(field.getType(), ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]).getType());
 					field.getType().getMethod("addAll", Collection.class).invoke(field.get(set), newSet);
 				}
 			} catch (JsonSyntaxException | IOException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | NoSuchFieldException e) {
