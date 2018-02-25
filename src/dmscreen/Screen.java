@@ -2,20 +2,12 @@ package dmscreen;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
-
-import dmscreen.data.creature.feature.Action;
-import dmscreen.data.creature.feature.Attack;
-import dmscreen.data.creature.feature.Feature;
-import dmscreen.data.creature.feature.InnateSpellcasting;
-import dmscreen.data.creature.feature.Spellcasting;
-import dmscreen.data.spell.Bullet;
-import dmscreen.data.spell.SpellFeature;
-import dmscreen.data.spell.SpellParagraph;
+import dmscreen.data.Data;
 import dmscreen.misc.TestCreatures;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -24,44 +16,51 @@ import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class Screen extends Application {
 
-	public static final Gson GSON;
-
-	static {
-		final RuntimeTypeAdapterFactory<Feature> featureAdapter = RuntimeTypeAdapterFactory.of(Feature.class);
-		featureAdapter.registerSubtype(Feature.class);
-		featureAdapter.registerSubtype(InnateSpellcasting.class);
-		featureAdapter.registerSubtype(Spellcasting.class);
-
-		final RuntimeTypeAdapterFactory<Action> actionAdapter = RuntimeTypeAdapterFactory.of(Action.class, "class");
-		actionAdapter.registerSubtype(Action.class);
-		actionAdapter.registerSubtype(Attack.class);
-
-		final RuntimeTypeAdapterFactory<SpellParagraph> spellAdapter = RuntimeTypeAdapterFactory.of(SpellParagraph.class);
-		spellAdapter.registerSubtype(SpellParagraph.class, "Paragraph");
-		spellAdapter.registerSubtype(Bullet.class);
-		spellAdapter.registerSubtype(SpellFeature.class, "Feature");
-
-		GSON = new GsonBuilder().registerTypeAdapterFactory(featureAdapter).registerTypeAdapterFactory(actionAdapter).registerTypeAdapterFactory(spellAdapter).create();
-
-	}
-
 	public static void main(final String[] args) {
 		try {
 			Font.loadFont(new FileInputStream(Paths.get("Cormorant_Garamond/CormorantGaramond-Medium.ttf").toFile()), 12);
 			Font.loadFont(new FileInputStream(Paths.get("Cormorant_Garamond/CormorantGaramond-Bold.ttf").toFile()), 12);
 		} catch (final FileNotFoundException e) {}
+
 		Application.launch(args);
 	}
 
+	private Data data;
+
 	@Override
 	public void start(final Stage stage) throws Exception {
-		// final TreeView<Object> segments = new TreeView<>();
+		data = new Data(Paths.get("resources"));
+
+		final TreeItem<Object> treeRoot = new TreeItem<>();
+		data.getData().forEach((name, dataSet) -> {
+			final TreeItem<Object> setRoot = new TreeItem<>(Util.sentenceCase(name));
+			treeRoot.getChildren().add(setRoot);
+
+			for (final Field field : dataSet.getClass().getFields()) {
+				try {
+					if ((Boolean) field.getType().getMethod("isEmpty").invoke(field.get(dataSet))) continue;
+
+					final TreeItem<Object> sectionRoot = new TreeItem<>(Util.sentenceCase(field.getName()));
+					setRoot.getChildren().add(sectionRoot);
+
+					field.getType().getMethod("forEach", Consumer.class).invoke(field.get(dataSet), (Consumer<Object>) o -> {
+						sectionRoot.getChildren().add(new TreeItem<>(o));
+					});
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		final TreeView<Object> dataTree = new TreeView<>(treeRoot);
+		dataTree.setShowRoot(false);
 
 		final Node statBlock = StatBlockUtils.getStatBlock(TestCreatures.drow);
 		final StackPane blockPane = new StackPane(statBlock);
@@ -69,7 +68,7 @@ public class Screen extends Application {
 		final ScrollPane scroll = new ScrollPane(blockPane);
 		scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
 		scroll.setFitToWidth(true);
-		final SplitPane root = new SplitPane(new StackPane(), scroll);
+		final SplitPane root = new SplitPane(dataTree, new StackPane(), scroll);
 
 		final Scene scene = new Scene(root, 1280, 720);
 		scene.getStylesheets().add("dmscreen/statBlock.css");

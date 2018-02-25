@@ -16,4 +16,9 @@ public class Spell {
 	public boolean concentration;
 	public List<? extends SpellParagraph> description;
 
+	@Override
+	public String toString() {
+		return name;
+	}
+
 }

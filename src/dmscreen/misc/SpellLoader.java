@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import dmscreen.Screen;
+import dmscreen.data.Data;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellFeature;
@@ -54,7 +54,7 @@ public class SpellLoader {
 			final Pattern paragraphPattern = Pattern.compile("<(p|h\\d|div).*?>([\\s\\S]*?)<\\/\\1>");
 			final Pattern htmlTags = Pattern.compile("<(.+?)>([\\s\\S]*?)<\\/\\1>");
 			final Pattern htmlTagOpen = Pattern.compile(".*?<([^\\/]+?)>");
-			Files.write(Paths.get("spells.json"), Screen.GSON.toJson(spells.stream().map(s -> {
+			Files.write(Paths.get("spells.json"), Data.GSON.toJson(spells.stream().map(s -> {
 				try {
 					final URL spell = new URL(s);
 					final BufferedReader r = new BufferedReader(new InputStreamReader(spell.openStream(), Charset.forName("UTF-8")));
