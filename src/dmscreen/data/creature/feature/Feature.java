@@ -1,18 +1,18 @@
-package dmscreen.data.creature;
+package dmscreen.data.creature.feature;
 
 import dmscreen.StatBlockUtils;
-import dmscreen.data.BlockEntry;
+import dmscreen.data.base.BlockEntry;
 import javafx.scene.Node;
 
-public class Action implements BlockEntry {
+public class Feature implements BlockEntry {
 
 	private final String name, note, description;
 
-	public Action(final String name, final String description) {
+	public Feature(final String name, final String description) {
 		this(name, "", description);
 	}
 
-	public Action(final String name, final String note, final String description) {
+	public Feature(final String name, final String note, final String description) {
 		this.name = name;
 		this.note = note;
 		this.description = description;

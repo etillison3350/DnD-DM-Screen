@@ -1,4 +1,4 @@
-package dmscreen.data;
+package dmscreen.data.base;
 
 public enum Ability {
 

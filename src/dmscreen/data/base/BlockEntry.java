@@ -1,4 +1,4 @@
-package dmscreen.data;
+package dmscreen.data.base;
 
 import javafx.scene.Node;
 

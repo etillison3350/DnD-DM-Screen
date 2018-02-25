@@ -1,8 +1,8 @@
-package dmscreen.data.creature;
+package dmscreen.data.creature.feature;
 
 import dmscreen.Util;
-import dmscreen.data.DamageType;
-import dmscreen.data.DiceRoll;
+import dmscreen.data.base.DamageType;
+import dmscreen.data.base.DiceRoll;
 import javafx.scene.Node;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;

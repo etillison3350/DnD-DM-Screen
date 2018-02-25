@@ -1,6 +1,6 @@
 package dmscreen;
 
-import dmscreen.data.creature.Action;
+import dmscreen.data.creature.feature.Action;
 import javafx.scene.Node;
 
 public class LegendaryAction extends Action {

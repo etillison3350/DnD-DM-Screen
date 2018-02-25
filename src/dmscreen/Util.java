@@ -10,7 +10,11 @@ public class Util {
 	private Util() {}
 
 	public static String titleCase(final String string) {
-		return Arrays.stream(string.split("[_ ]")).map(str -> Character.toUpperCase(str.charAt(0)) + str.substring(1).toLowerCase()).collect(Collectors.joining(" "));
+		return Arrays.stream(string.split("[_ ]")).map(Util::sentenceCase).collect(Collectors.joining(" "));
+	}
+
+	public static String sentenceCase(final String string) {
+		return Character.toUpperCase(string.charAt(0)) + string.substring(1).toLowerCase();
 	}
 
 	public static String andJoin(final Collection<String> strings) {

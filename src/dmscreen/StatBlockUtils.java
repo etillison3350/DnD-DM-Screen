@@ -10,9 +10,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import dmscreen.data.Ability;
-import dmscreen.data.DamageType;
-import dmscreen.data.Skill;
+import dmscreen.data.base.Ability;
+import dmscreen.data.base.DamageType;
+import dmscreen.data.base.Skill;
 import dmscreen.data.creature.Creature;
 import dmscreen.data.creature.SpeedType;
 import javafx.collections.ObservableList;
@@ -110,7 +110,7 @@ public class StatBlockUtils {
 		}
 
 		if (!creature.reactions.isEmpty()) {
-			children.add(smallCaps("Rections", "header"));
+			children.add(smallCaps("Reactions", "header"));
 			children.add(separator());
 			creature.reactions.forEach(a -> children.add(a.getNode()));
 		}

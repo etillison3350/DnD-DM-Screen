@@ -8,11 +8,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import dmscreen.LegendaryAction;
-import dmscreen.data.Ability;
-import dmscreen.data.DamageType;
-import dmscreen.data.DiceRoll;
-import dmscreen.data.Size;
-import dmscreen.data.Skill;
+import dmscreen.data.base.Ability;
+import dmscreen.data.base.DamageType;
+import dmscreen.data.base.DiceRoll;
+import dmscreen.data.base.Size;
+import dmscreen.data.base.Skill;
+import dmscreen.data.creature.feature.Action;
+import dmscreen.data.creature.feature.Feature;
 
 public class Creature {
 
