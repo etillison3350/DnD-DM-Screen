@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import dmscreen.Util;
 import dmscreen.data.Data;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.Spell;
@@ -26,8 +27,6 @@ public class SpellLoader {
 
 	public static void main(final String[] args) {
 		try {
-			// System.setOut(new PrintStream(Paths.get("out.txt").toFile()));
-
 			final URL spellList = new URL("https://www.dnd-spells.com/spells");
 			final BufferedReader in = new BufferedReader(new InputStreamReader(spellList.openStream(), Charset.forName("UTF-8")));
 
@@ -54,7 +53,7 @@ public class SpellLoader {
 			final Pattern paragraphPattern = Pattern.compile("<(p|h\\d|div).*?>([\\s\\S]*?)<\\/\\1>");
 			final Pattern htmlTags = Pattern.compile("<(.+?)>([\\s\\S]*?)<\\/\\1>");
 			final Pattern htmlTagOpen = Pattern.compile(".*?<([^\\/]+?)>");
-			Files.write(Paths.get("resources/source/spells.json"), Data.GSON.toJson(spells.stream().map(s -> {
+			Files.write(Paths.get("resources/source/spells.json"), Util.escapeUnicode(Data.GSON.toJson(spells.stream().map(s -> {
 				try {
 					final URL spell = new URL(s);
 					final BufferedReader r = new BufferedReader(new InputStreamReader(spell.openStream(), Charset.forName("UTF-8")));
@@ -63,17 +62,13 @@ public class SpellLoader {
 					final StringBuffer out = new StringBuffer();
 					while ((l = r.readLine()) != null) {
 						if (!i && l.contains("<h1 class=\"classic-title\">")) {
-							out.append(l.replace("&nbsp;", " ").replace("&rsquo;", "\u2019").replace("&#8217;", "\u2019").replace("&#039;", "'"));
+							out.append(l.replace("&nbsp;", " ").replace("&rsquo;", "'").replace("&#8217;", "'").replace("&#039;", "'"));
 							i = true;
 						} else if (i) {
-							out.append(l.replace("&nbsp;", " ").replace("&rsquo;", "\u2019").replace("&#8217;", "\u2019").replace("&#039;", "'"));
+							out.append(l.replace("&nbsp;", " ").replace("&rsquo;", "'").replace("&#8217;", "'").replace("&#039;", "'"));
 							if (l.contains("Create and save")) break;
 						}
 					}
-
-					// System.out.println(out);
-
-					// if (Math.sqrt(2) > 1) return;
 
 					final Matcher matcher = spellPattern.matcher(out);
 					if (matcher.find()) {
@@ -158,7 +153,7 @@ public class SpellLoader {
 					e.printStackTrace();
 				}
 				return null;
-			}).filter(s -> s != null).collect(Collectors.toCollection(HashSet::new))).getBytes());
+			}).filter(s -> s != null).collect(Collectors.toCollection(HashSet::new)))).getBytes());
 		} catch (
 
 		final IOException e) {
