@@ -9,16 +9,11 @@ public class Spell {
 	public SpellType type;
 	public boolean ritual;
 	public String castingTime;
-	public int range;
+	public String range;
 	public boolean verbal, somatic;
 	public String materialComponents;
 	public String duration;
 	public boolean concentration;
 	public List<? extends SpellParagraph> description;
-
-	@Override
-	public String toString() {
-		return name;
-	}
 
 }

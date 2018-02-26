@@ -5,22 +5,29 @@ import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import dmscreen.data.Data;
-import dmscreen.misc.TestCreatures;
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.TextFieldTreeCell;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 public class Screen extends Application {
 
@@ -34,6 +41,9 @@ public class Screen extends Application {
 	}
 
 	private Data data;
+	private StackPane blockPane;
+	private TreeView<Object> dataTree;
+	private final Map<TreeItem<Object>, TreeItem<Object>> parents = new LinkedHashMap<>();
 
 	@Override
 	public void start(final Stage stage) throws Exception {
@@ -42,35 +52,79 @@ public class Screen extends Application {
 		final TreeItem<Object> treeRoot = new TreeItem<>();
 		data.getData().forEach((name, dataSet) -> {
 			final TreeItem<Object> setRoot = new TreeItem<>(Util.sentenceCase(name));
-			treeRoot.getChildren().add(setRoot);
+			parents.put(setRoot, treeRoot);
 
 			for (final Field field : dataSet.getClass().getFields()) {
 				try {
 					if ((Boolean) field.getType().getMethod("isEmpty").invoke(field.get(dataSet))) continue;
 
 					final TreeItem<Object> sectionRoot = new TreeItem<>(Util.sentenceCase(field.getName()));
-					setRoot.getChildren().add(sectionRoot);
+					parents.put(sectionRoot, setRoot);
 
 					field.getType().getMethod("forEach", Consumer.class).invoke(field.get(dataSet), (Consumer<Object>) o -> {
-						sectionRoot.getChildren().add(new TreeItem<>(o));
+						parents.put(new TreeItem<>(o), sectionRoot);
 					});
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 					e.printStackTrace();
 				}
 			}
 		});
-		final TreeView<Object> dataTree = new TreeView<>(treeRoot);
+		dataTree = new TreeView<>(treeRoot);
 		dataTree.setShowRoot(false);
+		dataTree.setCellFactory(param -> new TextFieldTreeCell<>(new StringConverter<Object>() {
 
-		final Node statBlock = StatBlockUtils.getStatBlock(TestCreatures.drow);
-		final StackPane blockPane = new StackPane(statBlock);
+			@Override
+			public String toString(final Object object) {
+				final String name = Util.getName(object);
+				return object instanceof Enum<?> ? Util.titleCase(name) : name;
+			}
+
+			@Override
+			public Object fromString(final String string) {
+				return new Object();
+			}
+
+		}));
+		dataTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue != null && newValue.isLeaf()) {
+				blockPane.getChildren().clear();
+				blockPane.getChildren().add(StatBlock.getStatBlock(newValue.getValue()));
+			}
+		});
+		dataTree.setStyle("-fx-focus-color: transparent;");
+
+		final TextField searchBar = new TextField("-");
+		searchBar.setPromptText("Search");
+		searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+			final Set<TreeItem<Object>> pars = new HashSet<>(parents.values()), hasChildren = new LinkedHashSet<>();
+			pars.forEach(item -> item.getChildren().clear());
+
+			parents.forEach((child, parent) -> {
+				if (!pars.contains(child) && (searchBar.getText().isEmpty() || Util.getName(child.getValue()).toLowerCase().contains(searchBar.getText().toLowerCase()))) {
+					parent.getChildren().add(child);
+
+					TreeItem<Object> item = parent, par;
+					while ((par = parents.get(item)) != null) {
+						hasChildren.add(item);
+						item = par;
+					}
+				}
+			});
+
+			hasChildren.forEach(parent -> parents.get(parent).getChildren().add(parent));
+		});
+		searchBar.setText("");
+
+		blockPane = new StackPane();
 		blockPane.setPadding(new Insets(8));
 		final ScrollPane scroll = new ScrollPane(blockPane);
 		scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
 		scroll.setFitToWidth(true);
-		final SplitPane root = new SplitPane(dataTree, new StackPane(), scroll);
 
-		final Scene scene = new Scene(root, 1280, 720);
+		final SplitPane root = new SplitPane(new BorderPane(dataTree, searchBar, null, null, null), new StackPane(), scroll);
+		root.setDividerPositions(0.25, 0.625);
+
+		final Scene scene = new Scene(root, 768, 960);
 		scene.getStylesheets().add("dmscreen/statBlock.css");
 
 		stage.setScene(scene);
@@ -81,7 +135,9 @@ public class Screen extends Application {
 	}
 
 	private void createPlayerStage() {
+		final Stage playerStage = new Stage();
 
+		// playerStage.show();
 	}
 
 }

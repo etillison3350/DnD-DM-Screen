@@ -1,7 +1,11 @@
 package dmscreen;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -13,8 +17,12 @@ import java.util.stream.Stream;
 import dmscreen.data.base.Ability;
 import dmscreen.data.base.DamageType;
 import dmscreen.data.base.Skill;
+import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.Creature;
 import dmscreen.data.creature.SpeedType;
+import dmscreen.data.spell.Bullet;
+import dmscreen.data.spell.Spell;
+import dmscreen.data.spell.SpellParagraph;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
@@ -28,12 +36,66 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-public class StatBlockUtils {
+public class StatBlock {
 
 	public static final NumberFormat COMMA_SEPARATED = new DecimalFormat("#,###");
 	public static final Pattern SMALL_CAPS = Pattern.compile("([^a-z]+)|(?:[^A-Z]+)");
 
-	private StatBlockUtils() {}
+	private StatBlock() {}
+
+	public static Node getStatBlock(final Object obj) {
+		try {
+			if (obj == null) return new VBox(2);
+
+			return (Node) StatBlock.class.getMethod("getStatBlock", obj.getClass()).invoke(null, obj);
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			try {
+				final VBox statBlock = new VBox(2);
+				final ObservableList<Node> children = statBlock.getChildren();
+
+				final String name = Util.getName(obj);
+
+				children.add(smallCaps(Util.titleCase(name), "title"));
+
+				for (final Field field : obj.getClass().getFields()) {
+					try {
+						if (Modifier.isStatic(field.getModifiers())) continue;
+
+						Object value = field.get(obj);
+						if (value.getClass().isArray()) {
+							if (value.getClass().getComponentType().isPrimitive()) {
+								value = Arrays.class.getMethod("toString", value.getClass()).invoke(null, value);
+							} else if (value.getClass().getComponentType().isArray()) {
+								value = Arrays.class.getMethod("deepToString", Object[].class).invoke(null, value);
+							} else {
+								value = Arrays.class.getMethod("toString", Object[].class).invoke(null, value);
+							}
+
+						}
+
+						children.add(dataLine(Util.titleCase(field.getName()), value.toString()));
+					} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException e1) {}
+				}
+
+				return statBlock;
+			} catch (final ArrayIndexOutOfBoundsException e1) {
+				return new VBox(2);
+			}
+		}
+	}
+
+	public static Node getStatBlock(final Condition condition) {
+		final VBox statBlock = new VBox(2);
+		final ObservableList<Node> children = statBlock.getChildren();
+
+		children.add(smallCaps(Util.titleCase(condition.name()), "title"));
+
+		for (final String d : condition.descriptions) {
+			children.add(dataLine("", d));
+		}
+
+		return statBlock;
+	}
 
 	public static Node getStatBlock(final Creature creature) {
 		final VBox statBlock = new VBox(2);
@@ -123,6 +185,50 @@ public class StatBlockUtils {
 		}
 
 		return statBlock;
+	}
+
+	public static Node getStatBlock(final Spell spell) {
+		final VBox statBlock = new VBox(2);
+		final ObservableList<Node> children = statBlock.getChildren();
+
+		children.add(smallCaps(spell.name, "title"));
+
+		final Text subtitle = new Text(spell.level <= 0 ? String.format("%s cantrip\n", Util.titleCase(spell.type.name())) : String.format("%d%s-level %s%s\n", spell.level, Util.ordinal(spell.level), spell.type.name().toLowerCase(), spell.ritual ? " (ritual)" : ""));
+		subtitle.getStyleClass().add("subtitle");
+		children.add(subtitle);
+
+		children.add(dataLine("Casting Time:", spell.castingTime));
+		children.add(dataLine("Range:", spell.range));
+		children.add(dataLine("Components:", componentsString(spell.verbal, spell.somatic, spell.materialComponents)));
+		children.add(dataLine("Duration:", (spell.concentration ? "Concentration, up to " : "") + spell.duration + "\n"));
+
+		Class<? extends SpellParagraph> last = null;
+		for (final SpellParagraph p : spell.description) {
+			if (p.getClass() != Bullet.class && last == Bullet.class) children.add(new Text(""));
+			last = p.getClass();
+
+			children.add(p.getNode());
+		}
+
+		return statBlock;
+	}
+
+	public static String componentsString(final boolean verbal, final boolean somatic, final String materialComponents) {
+		final StringBuffer ret = new StringBuffer();
+		if (verbal) ret.append("V");
+		if (somatic) {
+			if (ret.length() > 0) ret.append(", ");
+			ret.append("S");
+		}
+
+		if (materialComponents != null && !materialComponents.isEmpty()) {
+			if (ret.length() > 0) ret.append(", ");
+			ret.append("M (");
+			ret.append(materialComponents);
+			ret.append(")");
+		}
+
+		return ret.toString();
 	}
 
 	public static String challenge(final int saved) {

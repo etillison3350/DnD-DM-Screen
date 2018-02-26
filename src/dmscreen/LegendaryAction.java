@@ -23,7 +23,7 @@ public class LegendaryAction extends Action {
 
 	@Override
 	public Node getNode() {
-		return StatBlockUtils.dataLine(getTitle() + ".", getDescription());
+		return StatBlock.dataLine(getTitle() + ".", getDescription());
 	}
 
 }

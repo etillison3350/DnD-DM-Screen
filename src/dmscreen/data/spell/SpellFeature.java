@@ -1,5 +1,8 @@
 package dmscreen.data.spell;
 
+import dmscreen.StatBlock;
+import javafx.scene.Node;
+
 public class SpellFeature extends SpellParagraph {
 
 	private final String title;
@@ -12,6 +15,11 @@ public class SpellFeature extends SpellParagraph {
 
 	public String getTitle() {
 		return title;
+	}
+
+	@Override
+	public Node getNode() {
+		return StatBlock.dataLine(title + ".", getText() + "\n", true);
 	}
 
 }

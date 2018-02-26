@@ -1,6 +1,6 @@
 package dmscreen.data.creature.feature;
 
-import dmscreen.StatBlockUtils;
+import dmscreen.StatBlock;
 import dmscreen.data.base.BlockEntry;
 import javafx.scene.Node;
 
@@ -36,7 +36,7 @@ public class Feature implements BlockEntry {
 
 	@Override
 	public Node getNode() {
-		return StatBlockUtils.dataLine(getTitle() + ".", description + "\n", true);
+		return StatBlock.dataLine(getTitle() + ".", description + "\n", true);
 	}
 
 }

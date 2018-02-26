@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 
-import dmscreen.StatBlockUtils;
+import dmscreen.StatBlock;
 import dmscreen.Util;
 import dmscreen.data.base.Ability;
 import javafx.scene.Node;
@@ -72,7 +72,7 @@ public class InnateSpellcasting extends Feature {
 	@Override
 	public Node getNode() {
 		final boolean noDescription = getDescription() == null || getDescription().isEmpty();
-		final TextFlow line = StatBlockUtils.dataLine(getTitle() + ".",
+		final TextFlow line = StatBlock.dataLine(getTitle() + ".",
 				String.format("%s's innate spellcasting ability is %s (spell save DC %d%s). %s can innately cast %s spells, requiring no material components%s\n", Util.sentenceCase(shortName), Util.sentenceCase(ability.name()), saveDC, attackModifier > Integer.MIN_VALUE ? String.format("%+d to hit with spell attacks", attackModifier) : "", Util.sentenceCase(pronoun), noDescription ? "the following" : "a number of", noDescription ? ":" : ". " + getDescription()), true);
 
 		spells.forEach((s, map) -> {

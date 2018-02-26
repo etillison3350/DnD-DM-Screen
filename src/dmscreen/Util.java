@@ -1,5 +1,6 @@
 package dmscreen;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -31,6 +32,41 @@ public class Util {
 			ret.append(str);
 		}
 		return ret.toString();
+	}
+
+	public static String ordinal(final int number) {
+		int last = Math.abs(number % 100);
+		if (last > 10 && last < 20) return "th";
+
+		last %= 10;
+		switch (last) {
+			case 1:
+				return "st";
+			case 2:
+				return "nd";
+			case 3:
+				return "rd";
+			default:
+				return "th";
+		}
+	}
+
+	public static String getName(final Object obj) {
+		String name;
+		try { // Find a field named "name"
+			name = obj.getClass().getField("name").get(obj).toString();
+		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e1) {
+			try { // Find a method named "name" (mostly for enums)
+				name = obj.getClass().getMethod("name").invoke(obj).toString();
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e2) {
+				try { // Find a method named "getName"
+					name = obj.getClass().getMethod("getName").invoke(obj).toString();
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e3) {
+					name = obj.toString(); // Give up and use toString()
+				}
+			}
+		}
+		return name;
 	}
 
 }

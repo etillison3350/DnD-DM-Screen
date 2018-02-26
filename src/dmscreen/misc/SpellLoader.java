@@ -54,7 +54,7 @@ public class SpellLoader {
 			final Pattern paragraphPattern = Pattern.compile("<(p|h\\d|div).*?>([\\s\\S]*?)<\\/\\1>");
 			final Pattern htmlTags = Pattern.compile("<(.+?)>([\\s\\S]*?)<\\/\\1>");
 			final Pattern htmlTagOpen = Pattern.compile(".*?<([^\\/]+?)>");
-			Files.write(Paths.get("spells.json"), Data.GSON.toJson(spells.stream().map(s -> {
+			Files.write(Paths.get("resources/source/spells.json"), Data.GSON.toJson(spells.stream().map(s -> {
 				try {
 					final URL spell = new URL(s);
 					final BufferedReader r = new BufferedReader(new InputStreamReader(spell.openStream(), Charset.forName("UTF-8")));
@@ -87,11 +87,7 @@ public class SpellLoader {
 							sp.level = 0;
 						}
 						sp.castingTime = matcher.group(5);
-						try {
-							sp.range = Integer.parseInt(matcher.group(6).replaceAll("\\D+", ""));
-						} catch (final NumberFormatException e) {
-							sp.range = 0;
-						}
+						sp.range = matcher.group(6);
 						sp.verbal = matcher.group(7).contains("V");
 						sp.somatic = matcher.group(7).contains("S");
 						sp.materialComponents = matcher.group(8);
@@ -137,10 +133,7 @@ public class SpellLoader {
 										String move = "";
 										int sub = 0;
 										while (true) {
-											System.out.println("\t" + paragraphs);
-											System.out.println("\t\t" + paragraphs.get(0));
 											final String regex = String.format("^(.*?<\\/%s>)[\\s\\S]*?$", openTag.group(1));
-											System.out.println("\t\t" + regex);
 											if (paragraphs.get(0).matches(regex)) {
 												sub = move.length();
 												move += paragraphs.get(0).replaceFirst(regex, "$1");
@@ -149,7 +142,6 @@ public class SpellLoader {
 											}
 											move += paragraphs.remove(0);
 										}
-										System.out.println("Move: " + move + "\n");
 
 										paragraphs.add(0, str + move);
 										paragraphs.set(1, paragraphs.get(1).substring(sub));
@@ -166,7 +158,7 @@ public class SpellLoader {
 					e.printStackTrace();
 				}
 				return null;
-			}).collect(Collectors.toCollection(HashSet::new))).getBytes());
+			}).filter(s -> s != null).collect(Collectors.toCollection(HashSet::new))).getBytes());
 		} catch (
 
 		final IOException e) {

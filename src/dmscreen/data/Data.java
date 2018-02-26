@@ -3,9 +3,11 @@ package dmscreen.data;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,11 +19,13 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 
 import dmscreen.data.base.DataSet;
+import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.feature.Action;
 import dmscreen.data.creature.feature.Attack;
 import dmscreen.data.creature.feature.Feature;
 import dmscreen.data.creature.feature.InnateSpellcasting;
 import dmscreen.data.creature.feature.Spellcasting;
+import dmscreen.data.creature.feature.Subfeatures;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.SpellFeature;
 import dmscreen.data.spell.SpellParagraph;
@@ -35,6 +39,7 @@ public class Data {
 		featureAdapter.registerSubtype(Feature.class);
 		featureAdapter.registerSubtype(InnateSpellcasting.class);
 		featureAdapter.registerSubtype(Spellcasting.class);
+		featureAdapter.registerSubtype(Subfeatures.class);
 
 		final RuntimeTypeAdapterFactory<Action> actionAdapter = RuntimeTypeAdapterFactory.of(Action.class, "class");
 		actionAdapter.registerSubtype(Action.class);
@@ -66,6 +71,10 @@ public class Data {
 			if (set == null) {
 				set = new DataSet();
 				data.put(setName, set);
+
+				if (setName.equalsIgnoreCase("source")) {
+					Arrays.stream(Condition.values()).forEach(set.conditions::add);
+				}
 			}
 
 			try {
@@ -77,6 +86,8 @@ public class Data {
 					}
 				} else {
 					final Field field = DataSet.class.getField(name);
+					if (Modifier.isTransient(field.getModifiers())) return;
+
 					final Object newSet = GSON.fromJson(new String(Files.readAllBytes(path)), TypeToken.getParameterized(field.getType(), ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]).getType());
 					field.getType().getMethod("addAll", Collection.class).invoke(field.get(set), newSet);
 				}
