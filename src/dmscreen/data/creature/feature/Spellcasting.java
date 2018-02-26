@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 
-import dmscreen.StatBlock;
 import dmscreen.Util;
 import dmscreen.data.base.Ability;
+import dmscreen.statblock.StatBlock;
 import javafx.scene.Node;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;

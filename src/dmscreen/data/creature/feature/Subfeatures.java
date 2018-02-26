@@ -2,7 +2,7 @@ package dmscreen.data.creature.feature;
 
 import java.util.Map;
 
-import dmscreen.StatBlock;
+import dmscreen.statblock.StatBlock;
 import javafx.scene.Node;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;

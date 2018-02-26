@@ -1,6 +1,6 @@
 package dmscreen.data.spell;
 
-import dmscreen.StatBlock;
+import dmscreen.statblock.StatBlock;
 import javafx.scene.Node;
 
 public class Bullet extends SpellParagraph {

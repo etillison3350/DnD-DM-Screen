@@ -1,6 +1,7 @@
 package dmscreen;
 
 import dmscreen.data.creature.feature.Action;
+import dmscreen.statblock.StatBlock;
 import javafx.scene.Node;
 
 public class LegendaryAction extends Action {

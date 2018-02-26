@@ -96,8 +96,6 @@ public class Data {
 				e.printStackTrace();
 			}
 		});
-
-		System.out.println(GSON.toJson(data));
 	}
 
 	public Map<String, DataSet> getData() {

@@ -1,7 +1,7 @@
 package dmscreen.data.creature.feature;
 
-import dmscreen.StatBlock;
 import dmscreen.data.base.BlockEntry;
+import dmscreen.statblock.StatBlock;
 import javafx.scene.Node;
 
 public class Feature implements BlockEntry {
