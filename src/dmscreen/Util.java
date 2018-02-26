@@ -69,4 +69,15 @@ public class Util {
 		return name;
 	}
 
+	public static String escapeUnicode(final String unicode) {
+		final StringBuffer ret = new StringBuffer(unicode.length());
+		unicode.chars().forEach(c -> {
+			if (c > 0xff)
+				ret.append(String.format("\\u%04x", c));
+			else
+				ret.append((char) c);
+		});
+		return ret.toString();
+	}
+
 }
