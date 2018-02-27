@@ -13,9 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import dmscreen.data.Data;
-import dmscreen.statblock.StatBlock;
-import dmscreen.statblock.StatBlockEditor;
+import javafx.animation.PauseTransition;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -39,6 +37,9 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import dmscreen.data.Data;
+import dmscreen.statblock.StatBlock;
+import dmscreen.statblock.StatBlockEditor;
 
 public class Screen extends Application {
 
@@ -58,7 +59,10 @@ public class Screen extends Application {
 	private TextField searchBar;
 	private SplitPane rootPane;
 	private Button editButton;
+	private BorderPane editPane;
 	private boolean isEditing = false;
+	private ScrollPane scroll;
+	private StatBlockEditor<? extends Object> currentEditor;
 
 	@Override
 	public void start(final Stage stage) throws Exception {
@@ -69,7 +73,7 @@ public class Screen extends Application {
 
 		blockPane = new StackPane();
 		blockPane.setPadding(new Insets(8));
-		final ScrollPane scroll = new ScrollPane(blockPane);
+		scroll = new ScrollPane(blockPane);
 		scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
 		scroll.setFitToWidth(true);
 
@@ -78,7 +82,10 @@ public class Screen extends Application {
 
 		editButton = new Button("Edit");
 		editButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-		editButton.setOnAction(event -> setEditing(!isEditing));
+		editButton.setOnAction(event -> setEditing(true));
+
+		editPane = new BorderPane();
+		editPane.setBottom(createEditButtonsPane());
 
 		final Scene scene = new Scene(rootPane, 768, 960);
 		scene.getStylesheets().add("dmscreen/statblock/statBlock.css");
@@ -93,6 +100,28 @@ public class Screen extends Application {
 				playerStage.hide();
 		});
 		// playerStage.show();
+	}
+
+	private HBox createEditButtonsPane() {
+		final HBox buttonPane = new HBox(8);
+		buttonPane.setPadding(new Insets(8));
+
+		final Button save = new Button("Save");
+		save.setOnAction(saveEvent -> {
+			if (currentEditor != null) {
+				// TODO update
+			}
+			setEditing(false);
+		});
+		buttonPane.getChildren().add(save);
+
+		final Button cancel = new Button("Cancel");
+		cancel.setOnAction(cancelEvent -> {
+			setEditing(false);
+		});
+		buttonPane.getChildren().add(cancel);
+
+		return buttonPane;
 	}
 
 	private TextField createSearchBar() {
@@ -200,30 +229,37 @@ public class Screen extends Application {
 		if (this.isEditing != isEditing) {
 			this.isEditing = isEditing;
 			if (this.isEditing) {
-				editButton.setText("Done");
 				final Object item = dataTree.getSelectionModel().getSelectedItem().getValue();
 				if (!StatBlockEditor.isEditable(item)) {
 					this.isEditing = false;
 					return false;
 				}
 
-				rootPane.getItems().add(StatBlockEditor.getEditor(item));
+				currentEditor = StatBlockEditor.getEditor(item);
+				rootPane.getItems().add(currentEditor);
 				rootPane.setDividerPosition(2, 1.0);
 				final double[] divs = rootPane.getDividerPositions();
 				final Transition openPane = new Transition() {
 					{
 						setCycleDuration(Duration.millis(300));
+						setOnFinished(event -> rootPane.getItems().remove(2));
 					}
 
 					@Override
 					protected void interpolate(final double pct) {
-						rootPane.setDividerPositions((1 - 3 * pct / 11) * divs[0], (1 - 3 * pct / 11) * divs[1], 1 - 3 * pct / 11);
+						rootPane.setDividerPosition(2, 1 - pct + pct * divs[1]);
 					}
 				};
 				openPane.play();
 			} else {
-				editButton.setText("Edit");
 				final double[] divs = rootPane.getDividerPositions();
+				rootPane.getItems().add(2, scroll);
+
+				final PauseTransition pt = new PauseTransition(Duration.seconds(1));
+				pt.setOnFinished(event -> {
+					rootPane.setDividerPositions(divs[0], divs[1], divs[1]);
+				});
+				pt.play();
 				final Transition closePane = new Transition() {
 					{
 						setCycleDuration(Duration.millis(300));
@@ -234,7 +270,8 @@ public class Screen extends Application {
 
 					@Override
 					protected void interpolate(final double pct) {
-						rootPane.setDividerPositions(divs[0] * (1 - pct) + pct * divs[0] / divs[2], divs[1] * (1 - pct) + pct * divs[1] / divs[2], divs[2] * (1 - pct) + pct);
+						rootPane.setDividerPosition(1, divs[1]);
+						rootPane.setDividerPosition(2, pct + (1 - pct) * divs[1]);
 					}
 				};
 				closePane.play();
