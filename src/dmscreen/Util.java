@@ -18,6 +18,10 @@ public class Util {
 		return Character.toUpperCase(string.charAt(0)) + string.substring(1).toLowerCase();
 	}
 
+	public static String titleCaseFromCamelCase(final String camelCase) {
+		return Character.toUpperCase(camelCase.charAt(0)) + camelCase.substring(1).replaceAll("[A-Z]", " $0");
+	}
+
 	public static String andJoin(final Collection<String> strings) {
 		if (strings.isEmpty()) return "";
 		if (strings.size() == 1) return strings.iterator().next();

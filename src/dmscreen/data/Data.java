@@ -18,6 +18,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 
+import dmscreen.Util;
 import dmscreen.data.base.DataSet;
 import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.feature.Action;
@@ -70,6 +71,7 @@ public class Data {
 			DataSet set = data.get(setName);
 			if (set == null) {
 				set = new DataSet();
+				set.name = Util.titleCase(setName);
 				data.put(setName, set);
 
 				if (setName.equalsIgnoreCase("source")) {

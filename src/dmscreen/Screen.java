@@ -2,6 +2,7 @@ package dmscreen;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
@@ -121,7 +122,7 @@ public class Screen extends Application {
 	}
 
 	private TreeView<Object> createTree() {
-		final TreeItem<Object> treeRoot = constructTree();
+		final TreeItem<Object> treeRoot = constructTreeValues();
 		final TreeView<Object> dataTree = new TreeView<>(treeRoot);
 		dataTree.setShowRoot(false);
 		dataTree.setCellFactory(param -> new TextFieldTreeCell<>(new StringConverter<Object>() {
@@ -129,7 +130,12 @@ public class Screen extends Application {
 			@Override
 			public String toString(final Object object) {
 				final String name = Util.getName(object);
-				return object instanceof Enum<?> ? Util.titleCase(name) : name;
+
+				if (object instanceof Enum<?>) return Util.titleCase(name);
+
+				if (object instanceof AccessibleObject) return Util.titleCaseFromCamelCase(name);
+
+				return name;
 			}
 
 			@Override
@@ -140,6 +146,8 @@ public class Screen extends Application {
 		}));
 		dataTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue != null && newValue.isLeaf()) {
+				setEditing(false);
+
 				blockPane.getChildren().clear();
 				final Pane statBlock = StatBlock.getStatBlock(newValue.getValue());
 				if (StatBlockEditor.isEditable(newValue.getValue())) {
@@ -156,27 +164,25 @@ public class Screen extends Application {
 		return dataTree;
 	}
 
-	private TreeItem<Object> constructTree() {
+	private TreeItem<Object> constructTreeValues() {
 		parents.clear();
 
 		final TreeItem<Object> treeRoot = new TreeItem<>();
 		data.getData().forEach((name, dataSet) -> {
-			final TreeItem<Object> setRoot = new TreeItem<>(Util.sentenceCase(name));
+			final TreeItem<Object> setRoot = new TreeItem<>(dataSet);
 			parents.put(setRoot, treeRoot);
 
 			for (final Field field : dataSet.getClass().getFields()) {
 				try {
-					if ((Boolean) field.getType().getMethod("isEmpty").invoke(field.get(dataSet))) continue;
+					if (field.getName().equals("name") || (Boolean) field.getType().getMethod("isEmpty").invoke(field.get(dataSet))) continue;
 
-					final TreeItem<Object> sectionRoot = new TreeItem<>(Util.sentenceCase(field.getName()));
+					final TreeItem<Object> sectionRoot = new TreeItem<>(field);
 					parents.put(sectionRoot, setRoot);
 
 					field.getType().getMethod("forEach", Consumer.class).invoke(field.get(dataSet), (Consumer<Object>) o -> {
 						parents.put(new TreeItem<>(o), sectionRoot);
 					});
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-					e.printStackTrace();
-				}
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {}
 			}
 		});
 		return treeRoot;

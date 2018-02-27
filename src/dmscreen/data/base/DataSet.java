@@ -11,6 +11,8 @@ import dmscreen.data.spell.Spell;
 
 public class DataSet {
 
+	public String name;
+
 	public transient final Set<Condition> conditions = new TreeSet<>();
 	public final Set<Spell> spells = new TreeSet<>(Comparator.comparing(spell -> spell.name));
 	public final Set<Creature> creatures = new TreeSet<>(Comparator.comparing(creature -> creature.name));
