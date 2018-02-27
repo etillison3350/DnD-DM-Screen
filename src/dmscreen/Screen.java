@@ -12,11 +12,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import javafx.animation.PauseTransition;
+import dmscreen.data.Data;
+import dmscreen.statblock.StatBlock;
+import dmscreen.statblock.StatBlockEditor;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -27,15 +29,15 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-import dmscreen.data.Data;
-import dmscreen.statblock.StatBlock;
-import dmscreen.statblock.StatBlockEditor;
 
 public class Screen extends Application {
 
@@ -49,10 +51,13 @@ public class Screen extends Application {
 	}
 
 	private Data data;
-	private VBox blockPane;
+	private StackPane blockPane;
 	private TreeView<Object> dataTree;
 	private final Map<TreeItem<Object>, TreeItem<Object>> parents = new LinkedHashMap<>();
 	private TextField searchBar;
+	private SplitPane rootPane;
+	private Button editButton;
+	private boolean isEditing = false;
 
 	@Override
 	public void start(final Stage stage) throws Exception {
@@ -61,48 +66,32 @@ public class Screen extends Application {
 		dataTree = createTree();
 		searchBar = createSearchBar();
 
-		blockPane = new VBox();
-		blockPane.setAlignment(Pos.TOP_RIGHT);
+		blockPane = new StackPane();
 		blockPane.setPadding(new Insets(8));
 		final ScrollPane scroll = new ScrollPane(blockPane);
 		scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
 		scroll.setFitToWidth(true);
 
-		final SplitPane root = new SplitPane(new BorderPane(dataTree, searchBar, null, null, null), new StackPane(), scroll);
-		root.setDividerPositions(0.25, 0.625);
+		rootPane = new SplitPane(new BorderPane(dataTree, searchBar, null, null, null), new StackPane(), scroll);
+		rootPane.setDividerPositions(0.25, 0.625);
 
-		final Scene scene = new Scene(root, 768, 960);
+		editButton = new Button("Edit");
+		editButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+		editButton.setOnAction(event -> setEditing(!isEditing));
+
+		final Scene scene = new Scene(rootPane, 768, 960);
 		scene.getStylesheets().add("dmscreen/statblock/statBlock.css");
 
 		stage.setScene(scene);
 		stage.setTitle("Dungeon Master's Screen");
 		stage.show();
 
-		final Transition t = new Transition() {
-			{
-				setCycleDuration(Duration.seconds(1));
-			}
-
-			@Override
-			protected void interpolate(final double pct) {
-				root.setDividerPositions(.25 - pct * 3 / 44, .625 - pct * 15 / 88, 1 - pct * 3 / 11);
-			}
-		};
-
-		final PauseTransition wait = new PauseTransition(Duration.seconds(5));
-		wait.setOnFinished(event -> {
-			root.getItems().add(new StackPane());
-			root.setDividerPositions(0.25, 0.625, 1.0);
-			t.play();
-		});
-		wait.play();
-
 		final Stage playerStage = createPlayerStage();
 		stage.showingProperty().addListener((observable, oldValue, newValue) -> {
 			if (!newValue) // If the main window is closed, close the player window
 				playerStage.hide();
 		});
-		playerStage.show();
+		// playerStage.show();
 	}
 
 	private TextField createSearchBar() {
@@ -152,8 +141,14 @@ public class Screen extends Application {
 		dataTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue != null && newValue.isLeaf()) {
 				blockPane.getChildren().clear();
-				if (StatBlockEditor.isEditable(newValue.getValue())) blockPane.getChildren().add(new Button("Edit"));
-				blockPane.getChildren().add(StatBlock.getStatBlock(newValue.getValue()));
+				final Pane statBlock = StatBlock.getStatBlock(newValue.getValue());
+				if (StatBlockEditor.isEditable(newValue.getValue())) {
+					final Node topNode = statBlock.getChildrenUnmodifiable().get(0);
+					final HBox top = new HBox(8, topNode, editButton);
+					HBox.setHgrow(topNode, Priority.ALWAYS);
+					statBlock.getChildren().set(0, top);
+				}
+				blockPane.getChildren().add(statBlock);
 			}
 		});
 		dataTree.setStyle("-fx-focus-color: transparent;");
@@ -193,6 +188,54 @@ public class Screen extends Application {
 		// playerStage.show();
 
 		return playerStage;
+	}
+
+	public boolean setEditing(final boolean isEditing) {
+		if (this.isEditing != isEditing) {
+			this.isEditing = isEditing;
+			if (this.isEditing) {
+				editButton.setText("Done");
+				final Object item = dataTree.getSelectionModel().getSelectedItem().getValue();
+				if (!StatBlockEditor.isEditable(item)) {
+					this.isEditing = false;
+					return false;
+				}
+
+				rootPane.getItems().add(StatBlockEditor.getEditor(item));
+				rootPane.setDividerPosition(2, 1.0);
+				final double[] divs = rootPane.getDividerPositions();
+				final Transition openPane = new Transition() {
+					{
+						setCycleDuration(Duration.millis(300));
+					}
+
+					@Override
+					protected void interpolate(final double pct) {
+						rootPane.setDividerPositions((1 - 3 * pct / 11) * divs[0], (1 - 3 * pct / 11) * divs[1], 1 - 3 * pct / 11);
+					}
+				};
+				openPane.play();
+			} else {
+				editButton.setText("Edit");
+				final double[] divs = rootPane.getDividerPositions();
+				final Transition closePane = new Transition() {
+					{
+						setCycleDuration(Duration.millis(300));
+						setOnFinished(event -> {
+							rootPane.getItems().remove(3);
+						});
+					}
+
+					@Override
+					protected void interpolate(final double pct) {
+						rootPane.setDividerPositions(divs[0] * (1 - pct) + pct * divs[0] / divs[2], divs[1] * (1 - pct) + pct * divs[1] / divs[2], divs[2] * (1 - pct) + pct);
+					}
+				};
+				closePane.play();
+			}
+		}
+
+		return this.isEditing;
 	}
 
 }

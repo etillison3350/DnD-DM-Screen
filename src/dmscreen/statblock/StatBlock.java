@@ -14,19 +14,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javafx.collections.ObservableList;
-import javafx.geometry.HPos;
-import javafx.scene.Node;
-import javafx.scene.control.Separator;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import dmscreen.Util;
 import dmscreen.data.base.Ability;
 import dmscreen.data.base.DamageType;
@@ -37,6 +24,19 @@ import dmscreen.data.creature.SpeedType;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellParagraph;
+import javafx.collections.ObservableList;
+import javafx.geometry.HPos;
+import javafx.scene.Node;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 public class StatBlock {
 
@@ -45,11 +45,11 @@ public class StatBlock {
 
 	private StatBlock() {}
 
-	public static Region getStatBlock(final Object obj) {
+	public static Pane getStatBlock(final Object obj) {
 		try {
 			if (obj == null || obj.getClass() == Object.class) return new VBox(2);
 
-			return (Region) StatBlock.class.getMethod("getStatBlock", obj.getClass()).invoke(null, obj);
+			return (Pane) StatBlock.class.getMethod("getStatBlock", obj.getClass()).invoke(null, obj);
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			try {
 				final VBox statBlock = new VBox(2);
@@ -86,7 +86,7 @@ public class StatBlock {
 		}
 	}
 
-	public static Region getStatBlock(final Condition condition) {
+	public static Pane getStatBlock(final Condition condition) {
 		final VBox statBlock = new VBox(2);
 		final ObservableList<Node> children = statBlock.getChildren();
 
@@ -99,7 +99,7 @@ public class StatBlock {
 		return statBlock;
 	}
 
-	public static Region getStatBlock(final Creature creature) {
+	public static Pane getStatBlock(final Creature creature) {
 		final VBox statBlock = new VBox(2);
 		final ObservableList<Node> children = statBlock.getChildren();
 
@@ -189,7 +189,7 @@ public class StatBlock {
 		return statBlock;
 	}
 
-	public static Region getStatBlock(final Spell spell) {
+	public static Pane getStatBlock(final Spell spell) {
 		final VBox statBlock = new VBox(2);
 		final ObservableList<Node> children = statBlock.getChildren();
 

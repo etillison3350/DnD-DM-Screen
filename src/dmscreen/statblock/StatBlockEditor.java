@@ -2,9 +2,9 @@ package dmscreen.statblock;
 
 import java.lang.reflect.InvocationTargetException;
 
+import dmscreen.data.creature.Creature;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
-import dmscreen.data.creature.Creature;
 
 public class StatBlockEditor {
 
