@@ -6,6 +6,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -13,6 +14,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import dmscreen.data.Data;
+import dmscreen.data.base.DataSet;
+import dmscreen.statblock.StatBlock;
+import dmscreen.statblock.StatBlockEditor;
 import javafx.animation.PauseTransition;
 import javafx.animation.Transition;
 import javafx.application.Application;
@@ -37,9 +42,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-import dmscreen.data.Data;
-import dmscreen.statblock.StatBlock;
-import dmscreen.statblock.StatBlockEditor;
 
 public class Screen extends Application {
 
@@ -60,6 +62,7 @@ public class Screen extends Application {
 	private SplitPane rootPane;
 	private Button editButton;
 	private BorderPane editPane;
+	private ScrollPane editScroll;
 	private boolean isEditing = false;
 	private ScrollPane scroll;
 	private StatBlockEditor<? extends Object> currentEditor;
@@ -84,7 +87,10 @@ public class Screen extends Application {
 		editButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 		editButton.setOnAction(event -> setEditing(true));
 
-		editPane = new BorderPane();
+		editScroll = new ScrollPane();
+		editScroll.setHbarPolicy(ScrollBarPolicy.NEVER);
+		editScroll.setFitToWidth(true);
+		editPane = new BorderPane(editScroll);
 		editPane.setBottom(createEditButtonsPane());
 
 		final Scene scene = new Scene(rootPane, 768, 960);
@@ -108,8 +114,21 @@ public class Screen extends Application {
 
 		final Button save = new Button("Save");
 		save.setOnAction(saveEvent -> {
-			if (currentEditor != null) {
-				// TODO update
+			try {
+				final TreeItem<Object> selection = dataTree.getSelectionModel().getSelectedItem();
+				final Field type = (Field) selection.getParent().getValue();
+				final DataSet dataSet = (DataSet) selection.getParent().getParent().getValue();
+
+				type.getType().getMethod("remove", Object.class).invoke(type.get(dataSet), currentEditor.getOriginalValue());
+				final Object newValue = currentEditor.getNewValue();
+				type.getType().getMethod("add", Object.class).invoke(type.get(dataSet), newValue);
+				selection.setValue(newValue);
+				Collections.sort(selection.getParent().getChildren(), (o1, o2) -> Util.getName(o1.getValue()).compareToIgnoreCase(Util.getName(o2.getValue())));
+				setStatBlock(newValue);
+				dataTree.getSelectionModel().select(selection);
+				dataTree.scrollTo(dataTree.getSelectionModel().getSelectedIndex());
+			} catch (final NullPointerException | ClassCastException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				e.printStackTrace();
 			}
 			setEditing(false);
 		});
@@ -177,20 +196,24 @@ public class Screen extends Application {
 			if (newValue != null && newValue.isLeaf()) {
 				setEditing(false);
 
-				blockPane.getChildren().clear();
-				final Pane statBlock = StatBlock.getStatBlock(newValue.getValue());
-				if (StatBlockEditor.isEditable(newValue.getValue())) {
-					final Node topNode = statBlock.getChildrenUnmodifiable().get(0);
-					final HBox top = new HBox(8, topNode, editButton);
-					HBox.setHgrow(topNode, Priority.ALWAYS);
-					statBlock.getChildren().set(0, top);
-				}
-				blockPane.getChildren().add(statBlock);
+				setStatBlock(newValue.getValue());
 			}
 		});
 		dataTree.setStyle("-fx-focus-color: transparent;");
 
 		return dataTree;
+	}
+
+	public void setStatBlock(final Object obj) {
+		blockPane.getChildren().clear();
+		final Pane statBlock = StatBlock.getStatBlock(obj);
+		if (StatBlockEditor.isEditable(obj)) {
+			final Node topNode = statBlock.getChildrenUnmodifiable().get(0);
+			final HBox top = new HBox(8, topNode, editButton);
+			HBox.setHgrow(topNode, Priority.ALWAYS);
+			statBlock.getChildren().set(0, top);
+		}
+		blockPane.getChildren().add(statBlock);
 	}
 
 	private TreeItem<Object> constructTreeValues() {
@@ -236,7 +259,8 @@ public class Screen extends Application {
 				}
 
 				currentEditor = StatBlockEditor.getEditor(item);
-				rootPane.getItems().add(currentEditor);
+				editScroll.setContent(currentEditor);
+				rootPane.getItems().add(editPane);
 				rootPane.setDividerPosition(2, 1.0);
 				final double[] divs = rootPane.getDividerPositions();
 				final Transition openPane = new Transition() {
