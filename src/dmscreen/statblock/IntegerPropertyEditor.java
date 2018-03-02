@@ -11,15 +11,7 @@ public class IntegerPropertyEditor extends PropertyEditor<Integer> {
 	public IntegerPropertyEditor(final String name, final int min, final int max, final int value) {
 		super(name);
 
-		this.value = new Spinner<>(min, max, value);
-		this.value.setEditable(true);
-		this.value.focusedProperty().addListener((observable, oldValue, newValue) -> {
-			try {
-				if (!newValue) this.value.increment(0);
-			} catch (final NumberFormatException e) {
-				this.value.getEditor().setText(Integer.toString(this.value.getValue()));
-			}
-		});
+		this.value = createEditorSpinner(min, max, value);
 
 		addRow(0, new TextFlow(new Text(name + ":")), this.value);
 	}
@@ -27,6 +19,20 @@ public class IntegerPropertyEditor extends PropertyEditor<Integer> {
 	@Override
 	public Integer getValue() {
 		return value.getValue();
+	}
+
+	public static Spinner<Integer> createEditorSpinner(final int min, final int max, final int value) {
+		final Spinner<Integer> ret = new Spinner<>(min, max, value);
+		ret.setEditable(true);
+		ret.focusedProperty().addListener((observable, oldValue, newValue) -> {
+			try {
+				if (!newValue) ret.increment(0);
+			} catch (final NumberFormatException e) {
+				ret.getEditor().setText(Integer.toString(ret.getValue()));
+			}
+		});
+
+		return ret;
 	}
 
 }

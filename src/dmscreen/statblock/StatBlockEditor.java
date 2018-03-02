@@ -4,13 +4,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
 
-import javafx.geometry.Insets;
-import javafx.scene.layout.VBox;
 import dmscreen.data.base.Size;
 import dmscreen.data.creature.Alignment;
 import dmscreen.data.creature.Creature;
 import dmscreen.data.creature.CreatureType;
+import dmscreen.data.creature.SpeedType;
 import dmscreen.data.spell.Spell;
+import javafx.geometry.Insets;
+import javafx.scene.layout.VBox;
 
 public class StatBlockEditor<T> extends VBox {
 
@@ -82,8 +83,9 @@ public class StatBlockEditor<T> extends VBox {
 		final StringPropertyEditor armorNote = new StringPropertyEditor("Armor Description", creature.armorNote);
 		final DiceRollPropertyEditor hitDice = new DiceRollPropertyEditor("Hit Dice", creature.hitDice);
 		final IntegerPropertyEditor speed = new IntegerPropertyEditor("Speed (ft.)", 0, 500, creature.speed);
+		final MapEnumIntegerPropertyEditor<SpeedType> speeds = new MapEnumIntegerPropertyEditor<>(SpeedType.class, "Other Speeds", "Type", "Speed", 0, 500, creature.speeds, true);
 
-		editor.getChildren().addAll(name, shortName, size, type, subtype, alignment, ac, armorNote, hitDice, speed);
+		editor.getChildren().addAll(name, shortName, size, type, subtype, alignment, ac, armorNote, hitDice, speed, speeds);
 
 		editor.newValueGetter = () -> {
 			final Creature newCreature = new Creature();
