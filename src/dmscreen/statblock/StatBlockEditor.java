@@ -4,9 +4,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
 
-import dmscreen.data.creature.Creature;
-import dmscreen.data.spell.Spell;
+import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
+import dmscreen.data.base.Size;
+import dmscreen.data.creature.Alignment;
+import dmscreen.data.creature.Creature;
+import dmscreen.data.creature.CreatureType;
+import dmscreen.data.spell.Spell;
 
 public class StatBlockEditor<T> extends VBox {
 
@@ -14,8 +18,12 @@ public class StatBlockEditor<T> extends VBox {
 	private Supplier<T> newValueGetter;
 
 	private StatBlockEditor(final T originalValue, final Supplier<T> newValueGetter) {
+		super(2);
+
 		this.originalValue = originalValue;
 		this.newValueGetter = newValueGetter;
+
+		setPadding(new Insets(8));
 	}
 
 	private StatBlockEditor(final T originalValue) {
@@ -64,24 +72,21 @@ public class StatBlockEditor<T> extends VBox {
 	public static StatBlockEditor<Creature> getEditor(final Creature creature) {
 		final StatBlockEditor<Creature> editor = new StatBlockEditor<>(creature);
 
+		final StringPropertyEditor name = new StringPropertyEditor("Name", creature.name);
+		final StringPropertyEditor shortName = new StringPropertyEditor("General Name", creature.shortName);
+		final EnumPropertyEditor<Size> size = new EnumPropertyEditor<>("Size", creature.size);
+		final EnumPropertyEditor<CreatureType> type = new EnumPropertyEditor<>("Type", creature.type);
+		final StringPropertyEditor subtype = new StringPropertyEditor("Subtype", creature.subtype);
+		final EnumPropertyEditor<Alignment> alignment = new EnumPropertyEditor<>("Alignment", creature.alignment);
+		final IntegerPropertyEditor ac = new IntegerPropertyEditor("Armor Class", 0, 30, creature.ac);
+		final StringPropertyEditor armorNote = new StringPropertyEditor("Armor Description", creature.armorNote);
+		final DiceRollPropertyEditor hitDice = new DiceRollPropertyEditor("Hit Dice", creature.hitDice);
+		final IntegerPropertyEditor speed = new IntegerPropertyEditor("Speed (ft.)", 0, 500, creature.speed);
+
+		editor.getChildren().addAll(name, shortName, size, type, subtype, alignment, ac, armorNote, hitDice, speed);
+
 		editor.newValueGetter = () -> {
 			final Creature newCreature = new Creature();
-
-			final Creature oldCreature = editor.getOriginalValue();
-
-			for (final Field field : Creature.class.getFields()) {
-				try {
-					if (field.getType() == String.class) {
-						final StringBuilder str = new StringBuilder();
-						final String old = (String) field.get(oldCreature);
-						for (final char c : old.toCharArray())
-							str.insert(0, c);
-						field.set(newCreature, str.toString());
-					} else {
-						field.set(newCreature, field.get(oldCreature));
-					}
-				} catch (IllegalArgumentException | IllegalAccessException e) {}
-			}
 
 			return newCreature;
 		};

@@ -14,10 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import dmscreen.data.Data;
-import dmscreen.data.base.DataSet;
-import dmscreen.statblock.StatBlock;
-import dmscreen.statblock.StatBlockEditor;
 import javafx.animation.PauseTransition;
 import javafx.animation.Transition;
 import javafx.application.Application;
@@ -42,6 +38,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import dmscreen.data.Data;
+import dmscreen.data.base.DataSet;
+import dmscreen.statblock.StatBlock;
+import dmscreen.statblock.StatBlockEditor;
 
 public class Screen extends Application {
 
@@ -208,10 +208,10 @@ public class Screen extends Application {
 		blockPane.getChildren().clear();
 		final Pane statBlock = StatBlock.getStatBlock(obj);
 		if (StatBlockEditor.isEditable(obj)) {
-			final Node topNode = statBlock.getChildrenUnmodifiable().get(0);
+			final Node topNode = statBlock.getChildren().remove(0);
 			final HBox top = new HBox(8, topNode, editButton);
 			HBox.setHgrow(topNode, Priority.ALWAYS);
-			statBlock.getChildren().set(0, top);
+			statBlock.getChildren().add(0, top);
 		}
 		blockPane.getChildren().add(statBlock);
 	}

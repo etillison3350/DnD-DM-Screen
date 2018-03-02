@@ -1,65 +1,30 @@
 package dmscreen.statblock;
 
-import java.util.Map;
+import javafx.geometry.Pos;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 
-import javafx.scene.Node;
-
-public abstract class PropertyEditor<T> {
+public abstract class PropertyEditor<T> extends GridPane {
 
 	private final String name;
 
 	public PropertyEditor(final String name) {
 		this.name = name;
+
+		setAlignment(Pos.CENTER_LEFT);
+
+		final ColumnConstraints cc40 = new ColumnConstraints();
+		cc40.setPercentWidth(40);
+		final ColumnConstraints cc60 = new ColumnConstraints();
+		cc60.setPercentWidth(60);
+
+		getColumnConstraints().addAll(cc40, cc60);
 	}
 
 	public abstract T getValue();
 
-	public abstract Map<Node, Constraints> getNodes();
-
 	public final String getName() {
 		return name;
-	}
-
-	public final int getWidth() {
-		return getNodes().isEmpty() ? 0 : getNodes().values().stream().mapToInt(c -> c.x + c.width).max().getAsInt();
-	}
-
-	public final int getHeight() {
-		return getNodes().isEmpty() ? 0 : getNodes().values().stream().mapToInt(c -> c.y + c.height).max().getAsInt();
-	}
-
-	public static class Constraints {
-		public final int x, y, width, height;
-
-		public Constraints(final int x, final int y, final int width, final int height) {
-			if (x < 0 || y < 0 || width < 1 || height < 1) throw new IllegalArgumentException();
-
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.height = height;
-		}
-
-		public Constraints(final int x, final int y) {
-			this(x, y, 1, 1);
-		}
-
-		public int getX() {
-			return x;
-		}
-
-		public int getY() {
-			return y;
-		}
-
-		public int getWidth() {
-			return width;
-		}
-
-		public int getHeight() {
-			return height;
-		}
-
 	}
 
 }
