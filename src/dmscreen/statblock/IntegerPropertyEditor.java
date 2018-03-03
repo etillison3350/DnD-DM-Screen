@@ -2,18 +2,21 @@ package dmscreen.statblock;
 
 import javafx.scene.control.Spinner;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 public class IntegerPropertyEditor extends PropertyEditor<Integer> {
 
 	private final Spinner<Integer> value;
 
-	public IntegerPropertyEditor(final String name, final int min, final int max, final int value) {
+	public IntegerPropertyEditor(final String name, final int min, final int max, final int value, final int step) {
 		super(name);
 
-		this.value = createEditorSpinner(min, max, value);
+		this.value = createEditorSpinner(min, max, value, step);
 
-		addRow(0, new TextFlow(new Text(name + ":")), this.value);
+		addRow(0, new Text(name + ":"), this.value);
+	}
+
+	public IntegerPropertyEditor(final String name, final int min, final int max, final int value) {
+		this(name, min, max, value, 1);
 	}
 
 	@Override
@@ -21,8 +24,8 @@ public class IntegerPropertyEditor extends PropertyEditor<Integer> {
 		return value.getValue();
 	}
 
-	public static Spinner<Integer> createEditorSpinner(final int min, final int max, final int value) {
-		final Spinner<Integer> ret = new Spinner<>(min, max, value);
+	public static Spinner<Integer> createEditorSpinner(final int min, final int max, final int value, final int step) {
+		final Spinner<Integer> ret = new Spinner<>(min, max, value, step);
 		ret.setEditable(true);
 		ret.focusedProperty().addListener((observable, oldValue, newValue) -> {
 			try {
@@ -33,6 +36,10 @@ public class IntegerPropertyEditor extends PropertyEditor<Integer> {
 		});
 
 		return ret;
+	}
+
+	public static Spinner<Integer> createEditorSpinner(final int min, final int max, final int value) {
+		return createEditorSpinner(min, max, value, 1);
 	}
 
 }

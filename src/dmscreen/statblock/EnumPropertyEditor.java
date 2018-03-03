@@ -5,12 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import dmscreen.Util;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.util.StringConverter;
+import dmscreen.Util;
 
 public class EnumPropertyEditor<T extends Enum<?>> extends PropertyEditor<T> {
 
@@ -20,7 +19,7 @@ public class EnumPropertyEditor<T extends Enum<?>> extends PropertyEditor<T> {
 		super(name);
 
 		value = createEditorComboBox(initialValue);
-		addRow(0, new TextFlow(new Text(name + ":")), value);
+		addRow(0, new Text(name + ":"), value);
 	}
 
 	@Override

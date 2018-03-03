@@ -1,5 +1,6 @@
 package dmscreen.data.spell;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Spell {
@@ -14,6 +15,6 @@ public class Spell {
 	public String materialComponents;
 	public String duration;
 	public boolean concentration;
-	public List<? extends SpellParagraph> description;
+	public List<? extends SpellParagraph> description = new ArrayList<>();
 
 }

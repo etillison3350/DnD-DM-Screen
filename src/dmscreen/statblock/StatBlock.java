@@ -14,16 +14,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import dmscreen.Util;
-import dmscreen.data.base.Ability;
-import dmscreen.data.base.DamageType;
-import dmscreen.data.base.Skill;
-import dmscreen.data.creature.Condition;
-import dmscreen.data.creature.Creature;
-import dmscreen.data.creature.SpeedType;
-import dmscreen.data.spell.Bullet;
-import dmscreen.data.spell.Spell;
-import dmscreen.data.spell.SpellParagraph;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
@@ -37,6 +27,16 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import dmscreen.Util;
+import dmscreen.data.base.Ability;
+import dmscreen.data.base.DamageType;
+import dmscreen.data.base.Skill;
+import dmscreen.data.creature.Condition;
+import dmscreen.data.creature.Creature;
+import dmscreen.data.creature.SpeedType;
+import dmscreen.data.spell.Bullet;
+import dmscreen.data.spell.Spell;
+import dmscreen.data.spell.SpellParagraph;
 
 public class StatBlock {
 
@@ -51,6 +51,8 @@ public class StatBlock {
 
 			return (Pane) StatBlock.class.getMethod("getStatBlock", obj.getClass()).invoke(null, obj);
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+
 			try {
 				final VBox statBlock = new VBox(2);
 				final ObservableList<Node> children = statBlock.getChildren();
@@ -118,7 +120,8 @@ public class StatBlock {
 		final StringBuffer speed = new StringBuffer(Integer.toString(creature.speed));
 		speed.append(" ft.");
 		for (final SpeedType s : creature.speeds.keySet()) {
-			speed.append(String.format(", %s %d ft.", s.name().toLowerCase(), creature.speeds.get(s)));
+			final Integer sp = creature.speeds.get(s);
+			if (sp > 0) speed.append(String.format(", %s %d ft.", s.name().toLowerCase(), sp));
 		}
 		children.add(dataLine("Speed", speed.toString()));
 

@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import dmscreen.data.base.DiceRoll;
 
 public class DiceRollPropertyEditor extends PropertyEditor<DiceRoll> {
@@ -17,7 +16,7 @@ public class DiceRollPropertyEditor extends PropertyEditor<DiceRoll> {
 	public DiceRollPropertyEditor(final String name, final DiceRoll initialValue) {
 		super(name);
 
-		final TextFlow label = new TextFlow(new Text(name + ":"));
+		final Text label = new Text(name + ":");
 		value = new TextField(initialValue.toString());
 		value.textProperty().addListener((observable, oldValue, newValue) -> {
 			final String text = newValue.toLowerCase().replaceAll("[^\\dd +\\-]+", "");
@@ -36,7 +35,7 @@ public class DiceRollPropertyEditor extends PropertyEditor<DiceRoll> {
 	public DiceRoll getValue() {
 		final Matcher matcher = DIE_ROLL.matcher(value.getText().toLowerCase().replaceAll("[^\\dd+\\-]+", ""));
 		if (matcher.find()) {
-			return new DiceRoll(Integer.parseInt(matcher.group(0)), Integer.parseInt(matcher.group(1)), matcher.group(2) == null ? 0 : Integer.parseInt(matcher.group(2)));
+			return new DiceRoll(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), matcher.group(3) == null ? 0 : Integer.parseInt(matcher.group(2)));
 		}
 
 		return null;

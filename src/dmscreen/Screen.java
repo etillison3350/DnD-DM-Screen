@@ -208,7 +208,7 @@ public class Screen extends Application {
 		blockPane.getChildren().clear();
 		final Pane statBlock = StatBlock.getStatBlock(obj);
 		if (StatBlockEditor.isEditable(obj)) {
-			final Node topNode = statBlock.getChildren().remove(0);
+			final Node topNode = statBlock.getChildren().isEmpty() ? new Pane() : statBlock.getChildren().remove(0);
 			final HBox top = new HBox(8, topNode, editButton);
 			HBox.setHgrow(topNode, Priority.ALWAYS);
 			statBlock.getChildren().add(0, top);

@@ -9,6 +9,9 @@ public abstract class PropertyEditor<T> extends GridPane {
 	private final String name;
 
 	public PropertyEditor(final String name) {
+		setHgap(2);
+		setVgap(2);
+
 		this.name = name;
 
 		setAlignment(Pos.CENTER_LEFT);

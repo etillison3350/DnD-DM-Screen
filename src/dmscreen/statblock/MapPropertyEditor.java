@@ -6,20 +6,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 public class MapPropertyEditor<K, V> extends PropertyEditor<Map<K, V>> {
 
 	private final List<MapRow<K, V>> rows = new ArrayList<>();
-	private int minRow = 2;
+	private int minRow = 3;
 
 	public MapPropertyEditor(final String name, final String keyTitle, final String valueTitle) {
 		super(name);
 
-		this.add(new TextFlow(new Text(name)), 0, 0, 2, 1);
-		addRow(1, new TextFlow(new Text(keyTitle)), new TextFlow(new Text(valueTitle)));
+		setPadding(new Insets(8, 0, 8, 0));
+
+		this.add(StatBlock.smallCaps(name, "header-small"), 0, 0, 2, 1);
+		this.add(new Separator(), 0, 1, 2, 1);
+
+		final RowConstraints header = new RowConstraints();
+		header.setMinHeight(20);
+		getRowConstraints().addAll(new RowConstraints(), new RowConstraints(), header);
+
+		addRow(2, new Text(keyTitle), new Text(valueTitle));
 	}
 
 	protected void addMapRow(final MapRow<K, V> row) {
