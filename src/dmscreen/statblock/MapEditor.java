@@ -1,6 +1,7 @@
 package dmscreen.statblock;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ import javafx.scene.text.Text;
 public abstract class MapEditor<K, V> extends Editor<Map<K, V>> {
 
 	private final List<MapRow<K, V>> rows = new ArrayList<>();
-	private int minRow = 3;
+	private int minRow = 2;
 
 	public MapEditor(final String name, final String keyTitle, final String valueTitle) {
 		super(name);
@@ -29,12 +30,21 @@ public abstract class MapEditor<K, V> extends Editor<Map<K, V>> {
 		header.setMinHeight(20);
 		getRowConstraints().addAll(new RowConstraints(), new RowConstraints(), header);
 
-		addRow(2, new Text(keyTitle), new Text(valueTitle));
+		if (keyTitle != null && valueTitle != null) addRow(minRow++, new Text(keyTitle), new Text(valueTitle));
 	}
 
 	protected void addMapRow(final MapRow<K, V> row) {
 		this.rows.add(row);
-		addRow(minRow++, row.key, row.value);
+		if (row.separateRows) {
+			add(row.key, 0, minRow++, 2, 1);
+			add(row.value, 0, minRow++, 2, 1);
+		} else {
+			addRow(minRow++, row.key, row.value);
+		}
+	}
+
+	protected Collection<MapRow<K, V>> getRows() {
+		return new ArrayList<>(rows);
 	}
 
 	@Override
@@ -54,14 +64,19 @@ public abstract class MapEditor<K, V> extends Editor<Map<K, V>> {
 		public final Node key, value;
 		public final Supplier<K> keyGetter;
 		public final Supplier<V> valueGetter;
+		public final boolean separateRows;
 
-		public MapRow(final Node key, final Node value, final Supplier<K> keyGetter, final Supplier<V> valueGetter) {
+		public MapRow(final Node key, final Node value, final Supplier<K> keyGetter, final Supplier<V> valueGetter, final boolean separateRows) {
 			this.key = key;
 			this.value = value;
 			this.keyGetter = keyGetter;
 			this.valueGetter = valueGetter;
+			this.separateRows = separateRows;
 		}
 
+		public MapRow(final Node key, final Node value, final Supplier<K> keyGetter, final Supplier<V> valueGetter) {
+			this(key, value, keyGetter, valueGetter, false);
+		}
 	}
 
 }

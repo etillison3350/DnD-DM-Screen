@@ -1,12 +1,15 @@
 package dmscreen.statblock;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.TreeSet;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
 import dmscreen.data.base.Ability;
+import dmscreen.data.base.DamageType;
 import dmscreen.data.base.Size;
 import dmscreen.data.base.Skill;
 import dmscreen.data.creature.Alignment;
@@ -71,6 +74,7 @@ public class StatBlockEditor<T> extends VBox {
 
 			return (StatBlockEditor<?>) StatBlockEditor.class.getMethod("getEditor", obj.getClass()).invoke(null, obj);
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
 			return new StatBlockEditor<>(null);
 		}
 	}
@@ -92,10 +96,17 @@ public class StatBlockEditor<T> extends VBox {
 		final MapEnumIntegerEditor<Ability> abilityScores = new MapEnumIntegerEditor<Ability>(Ability.class, "Ability Scores", "Ability", "Score", 0, 40, creature.abilityScores);
 		final EditableMapEnumIntegerEditor<Ability> savingThrows = new EditableMapEnumIntegerEditor<Ability>(Ability.class, "Saving Throws", "Ability", "Modifier", -10, 20, creature.savingThrows);
 		final EditableMapEnumIntegerEditor<Skill> skills = new EditableMapEnumIntegerEditor<>(Skill.class, "Skills", "Skill", "Modifier", -10, 20, creature.skills);
+
+		final BiFunction<String, String, Editor<String>> damageKeyEditor = (n, v) -> new StringEditor(n, v.equals("null") ? null : v, "any source");
+		final BiFunction<String, Collection<DamageType>, Editor<Collection<DamageType>>> damageValueEditor = (s, c) -> new CollectionEnumEditor<>(DamageType.class, s, c);
+		final EditableMapCollectionEditor<String, DamageType> vulnerabilities = new EditableMapCollectionEditor<String, DamageType>("Damage Vulnerabilities", "Sources", null, "Add Source", creature.vulnerabilities, damageKeyEditor, damageValueEditor);
+		final EditableMapCollectionEditor<String, DamageType> resistances = new EditableMapCollectionEditor<String, DamageType>("Damage Resistances", "Sources", null, "Add Source", creature.resistances, damageKeyEditor, damageValueEditor);
+		final EditableMapCollectionEditor<String, DamageType> immunities = new EditableMapCollectionEditor<String, DamageType>("Damage Immunities", "Sources", null, "Add Source", creature.immunities, damageKeyEditor, damageValueEditor);
+
 		final CollectionEnumEditor<Condition> conditionImmunities = new CollectionEnumEditor<Condition>(Condition.class, "Condition Immunities", creature.conditionImmunities);
 		final MapEnumIntegerEditor<VisionType> senses = new MapEnumIntegerEditor<VisionType>(VisionType.class, "Senses", "Type", "Range (ft.)", 0, 5000, 5, creature.senses);
 
-		editor.getChildren().addAll(name, shortName, size, type, subtype, alignment, ac, armorNote, hitDice, speed, speeds, abilityScores, savingThrows, skills, conditionImmunities, senses);
+		editor.getChildren().addAll(name, shortName, size, type, subtype, alignment, ac, armorNote, hitDice, speed, speeds, abilityScores, savingThrows, skills, vulnerabilities, resistances, immunities, conditionImmunities, senses);
 
 		editor.newValueGetter = () -> {
 			final Creature newCreature = new Creature();
@@ -114,6 +125,22 @@ public class StatBlockEditor<T> extends VBox {
 			newCreature.abilityScores = abilityScores.getValue();
 			newCreature.savingThrows = savingThrows.getValue();
 			newCreature.skills = skills.getValue();
+
+			newCreature.vulnerabilities.clear();
+			vulnerabilities.getValue().forEach((s, c) -> {
+				newCreature.vulnerabilities.put(s, new TreeSet<>(c));
+			});
+
+			newCreature.resistances.clear();
+			resistances.getValue().forEach((s, c) -> {
+				newCreature.resistances.put(s, new TreeSet<>(c));
+			});
+
+			newCreature.immunities.clear();
+			immunities.getValue().forEach((s, c) -> {
+				newCreature.immunities.put(s, new TreeSet<>(c));
+			});
+
 			newCreature.conditionImmunities = new TreeSet<>(conditionImmunities.getValue());
 			newCreature.senses = senses.getValue();
 
