@@ -3,11 +3,11 @@ package dmscreen.statblock;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
-public class StringPropertyEditor extends PropertyEditor<String> {
+public class StringEditor extends Editor<String> {
 
 	private final TextField value;
 
-	public StringPropertyEditor(final String name, final String initialValue) {
+	public StringEditor(final String name, final String initialValue) {
 		super(name);
 
 		value = new TextField(initialValue);

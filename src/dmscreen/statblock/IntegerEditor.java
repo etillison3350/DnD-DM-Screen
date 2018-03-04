@@ -3,11 +3,11 @@ package dmscreen.statblock;
 import javafx.scene.control.Spinner;
 import javafx.scene.text.Text;
 
-public class IntegerPropertyEditor extends PropertyEditor<Integer> {
+public class IntegerEditor extends Editor<Integer> {
 
 	private final Spinner<Integer> value;
 
-	public IntegerPropertyEditor(final String name, final int min, final int max, final int value, final int step) {
+	public IntegerEditor(final String name, final int min, final int max, final int value, final int step) {
 		super(name);
 
 		this.value = createEditorSpinner(min, max, value, step);
@@ -15,7 +15,7 @@ public class IntegerPropertyEditor extends PropertyEditor<Integer> {
 		addRow(0, new Text(name + ":"), this.value);
 	}
 
-	public IntegerPropertyEditor(final String name, final int min, final int max, final int value) {
+	public IntegerEditor(final String name, final int min, final int max, final int value) {
 		this(name, min, max, value, 1);
 	}
 

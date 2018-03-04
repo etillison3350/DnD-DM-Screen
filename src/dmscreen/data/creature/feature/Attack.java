@@ -1,14 +1,15 @@
 package dmscreen.data.creature.feature;
 
-import dmscreen.Util;
-import dmscreen.data.base.DamageType;
-import dmscreen.data.base.DiceRoll;
 import javafx.scene.Node;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import dmscreen.Screen;
+import dmscreen.Util;
+import dmscreen.data.base.DamageType;
+import dmscreen.data.base.DiceRoll;
 
 public class Attack extends Action {
 
@@ -73,18 +74,18 @@ public class Attack extends Action {
 		final TextFlow line = new TextFlow();
 
 		final Text titleText = new Text(getTitle() + ". ");
-		titleText.setFont(Font.font("System", FontWeight.BOLD, FontPosture.ITALIC, Font.getDefault().getSize()));
+		titleText.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.BOLD, FontPosture.ITALIC, Font.getDefault().getSize()));
 		line.getChildren().add(titleText);
 
 		final Text attackType = new Text(Util.titleCase(type.name()) + " Attack: ");
-		attackType.setFont(Font.font("System", FontWeight.NORMAL, FontPosture.ITALIC, Font.getDefault().getSize()));
+		attackType.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.NORMAL, FontPosture.ITALIC, Font.getDefault().getSize()));
 		line.getChildren().add(attackType);
 
 		final Text attackParams = new Text(String.format("+%d to hit, %s. ", mod, params));
 		line.getChildren().add(attackParams);
 
 		final Text hit = new Text("Hit: ");
-		hit.setFont(Font.font("System", FontWeight.NORMAL, FontPosture.ITALIC, Font.getDefault().getSize()));
+		hit.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.NORMAL, FontPosture.ITALIC, Font.getDefault().getSize()));
 		line.getChildren().add(hit);
 
 		final Text onHit = new Text(getOnHit() + "\n");

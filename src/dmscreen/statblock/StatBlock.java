@@ -27,6 +27,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import dmscreen.Screen;
 import dmscreen.Util;
 import dmscreen.data.base.Ability;
 import dmscreen.data.base.DamageType;
@@ -144,7 +145,7 @@ public class StatBlock {
 		children.add(separator());
 
 		if (!creature.savingThrows.isEmpty()) children.add(dataLine("Saving Throws", creature.savingThrows.keySet().stream().sorted().map(a -> String.format("%s %+d", Util.titleCase(a.abbr()), creature.savingThrows.get(a))).collect(Collectors.joining(", "))));
-		if (!creature.skills.isEmpty()) children.add(dataLine("Skills", creature.skills.keySet().stream().sorted().map(s -> String.format("%s %+d", Util.titleCase(s.name()), creature.skills.get(s))).collect(Collectors.joining(", "))));
+		if (!creature.skills.isEmpty()) children.add(dataLine("Skills", creature.skills.keySet().stream().sorted().map(s -> String.format("%s %+d", s == Skill.SLEIGHT_OF_HAND ? "Sleight of Hand" : Util.titleCase(s.name()), creature.skills.get(s))).collect(Collectors.joining(", "))));
 
 		if (!creature.vulnerabilities.isEmpty() && !creature.vulnerabilities.values().stream().allMatch(Set::isEmpty)) children.add(dataLine("Damage Vulnerabilities", creatureDamageTypes(creature.vulnerabilities)));
 		if (!creature.resistances.isEmpty() && !creature.resistances.values().stream().allMatch(Set::isEmpty)) children.add(dataLine("Damage Resistances", creatureDamageTypes(creature.resistances)));
@@ -158,7 +159,7 @@ public class StatBlock {
 		else
 			passivePerception += 10;
 
-		children.add(dataLine("Senses", creature.senses.keySet().stream().map(v -> String.format("%s %d ft., ", v.name().toLowerCase(), creature.senses.get(v))).collect(Collectors.joining()) + String.format("passive Perception %d", passivePerception)));
+		children.add(dataLine("Senses", creature.senses.keySet().stream().filter(v -> creature.senses.get(v) > 0).map(v -> String.format("%s %d ft., ", v.name().toLowerCase(), creature.senses.get(v))).collect(Collectors.joining()) + String.format("passive Perception %d", passivePerception)));
 
 		children.add(dataLine("Languages", creature.languages.isEmpty() ? "\u2014" : creature.languages.stream().collect(Collectors.joining(", "))));
 
@@ -273,7 +274,7 @@ public class StatBlock {
 
 		if (title != null && !title.isEmpty()) {
 			final Text titleText = new Text(title + " ");
-			titleText.setFont(Font.font("System", FontWeight.BOLD, feature ? FontPosture.ITALIC : FontPosture.REGULAR, Font.getDefault().getSize()));
+			titleText.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.BOLD, feature ? FontPosture.ITALIC : FontPosture.REGULAR, Font.getDefault().getSize()));
 			line.getChildren().add(titleText);
 		}
 

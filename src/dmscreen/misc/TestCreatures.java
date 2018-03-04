@@ -15,7 +15,6 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import dmscreen.LegendaryAction;
 import dmscreen.data.Data;
 import dmscreen.data.base.Ability;
 import dmscreen.data.base.DamageType;
@@ -30,6 +29,7 @@ import dmscreen.data.creature.feature.Action;
 import dmscreen.data.creature.feature.Attack;
 import dmscreen.data.creature.feature.Feature;
 import dmscreen.data.creature.feature.InnateSpellcasting;
+import dmscreen.data.creature.feature.LegendaryAction;
 import dmscreen.data.creature.feature.Spellcasting;
 import dmscreen.data.creature.feature.Subfeatures;
 

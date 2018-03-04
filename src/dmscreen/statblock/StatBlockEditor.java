@@ -1,6 +1,7 @@
 package dmscreen.statblock;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.TreeSet;
 import java.util.function.Supplier;
 
 import javafx.geometry.Insets;
@@ -9,9 +10,11 @@ import dmscreen.data.base.Ability;
 import dmscreen.data.base.Size;
 import dmscreen.data.base.Skill;
 import dmscreen.data.creature.Alignment;
+import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.Creature;
 import dmscreen.data.creature.CreatureType;
 import dmscreen.data.creature.SpeedType;
+import dmscreen.data.creature.VisionType;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellType;
 
@@ -75,22 +78,24 @@ public class StatBlockEditor<T> extends VBox {
 	public static StatBlockEditor<Creature> getEditor(final Creature creature) {
 		final StatBlockEditor<Creature> editor = new StatBlockEditor<>(creature);
 
-		final StringPropertyEditor name = new StringPropertyEditor("Name", creature.name);
-		final StringPropertyEditor shortName = new StringPropertyEditor("General Name", creature.shortName);
-		final EnumPropertyEditor<Size> size = new EnumPropertyEditor<>("Size", creature.size);
-		final EnumPropertyEditor<CreatureType> type = new EnumPropertyEditor<>("Type", creature.type);
-		final StringPropertyEditor subtype = new StringPropertyEditor("Subtype", creature.subtype);
-		final EnumPropertyEditor<Alignment> alignment = new EnumPropertyEditor<>("Alignment", creature.alignment);
-		final IntegerPropertyEditor ac = new IntegerPropertyEditor("Armor Class", 0, 30, creature.ac);
-		final StringPropertyEditor armorNote = new StringPropertyEditor("Armor Description", creature.armorNote);
-		final DiceRollPropertyEditor hitDice = new DiceRollPropertyEditor("Hit Dice", creature.hitDice);
-		final IntegerPropertyEditor speed = new IntegerPropertyEditor("Speed (ft.)", 0, 500, creature.speed, 5);
-		final MapEnumIntegerPropertyEditor<SpeedType> speeds = new MapEnumIntegerPropertyEditor<>(SpeedType.class, "Other Speeds", "Type", "Speed (ft.)", 0, 500, 5, creature.speeds, true);
-		final MapEnumIntegerPropertyEditor<Ability> abilityScores = new MapEnumIntegerPropertyEditor<Ability>(Ability.class, "Ability Scores", "Ability", "Score", 0, 40, creature.abilityScores, true);
-		final MapEnumIntegerPropertyEditor<Ability> savingThrows = new MapEnumIntegerPropertyEditor<Ability>(Ability.class, "Saving Throws", "Ability", "Modifier", -10, 20, creature.savingThrows, false);
-		final MapEnumIntegerPropertyEditor<Skill> skills = new MapEnumIntegerPropertyEditor<>(Skill.class, "Skills", "Skill", "Modifier", -10, 20, creature.skills, false);
+		final StringEditor name = new StringEditor("Name", creature.name);
+		final StringEditor shortName = new StringEditor("General Name", creature.shortName);
+		final EnumEditor<Size> size = new EnumEditor<>(Size.class, "Size", creature.size);
+		final EnumEditor<CreatureType> type = new EnumEditor<>(CreatureType.class, "Type", creature.type);
+		final StringEditor subtype = new StringEditor("Subtype", creature.subtype);
+		final EnumEditor<Alignment> alignment = new EnumEditor<>(Alignment.class, "Alignment", creature.alignment);
+		final IntegerEditor ac = new IntegerEditor("Armor Class", 0, 30, creature.ac);
+		final StringEditor armorNote = new StringEditor("Armor Description", creature.armorNote);
+		final DiceRollEditor hitDice = new DiceRollEditor("Hit Dice", creature.hitDice);
+		final IntegerEditor speed = new IntegerEditor("Speed (ft.)", 0, 500, creature.speed, 5);
+		final MapEnumIntegerEditor<SpeedType> speeds = new MapEnumIntegerEditor<>(SpeedType.class, "Other Speeds", "Type", "Speed (ft.)", 0, 500, 5, creature.speeds);
+		final MapEnumIntegerEditor<Ability> abilityScores = new MapEnumIntegerEditor<Ability>(Ability.class, "Ability Scores", "Ability", "Score", 0, 40, creature.abilityScores);
+		final EditableMapEnumIntegerEditor<Ability> savingThrows = new EditableMapEnumIntegerEditor<Ability>(Ability.class, "Saving Throws", "Ability", "Modifier", -10, 20, creature.savingThrows);
+		final EditableMapEnumIntegerEditor<Skill> skills = new EditableMapEnumIntegerEditor<>(Skill.class, "Skills", "Skill", "Modifier", -10, 20, creature.skills);
+		final CollectionEnumEditor<Condition> conditionImmunities = new CollectionEnumEditor<Condition>(Condition.class, "Condition Immunities", creature.conditionImmunities);
+		final MapEnumIntegerEditor<VisionType> senses = new MapEnumIntegerEditor<VisionType>(VisionType.class, "Senses", "Type", "Range (ft.)", 0, 5000, 5, creature.senses);
 
-		editor.getChildren().addAll(name, shortName, size, type, subtype, alignment, ac, armorNote, hitDice, speed, speeds, abilityScores, savingThrows, skills);
+		editor.getChildren().addAll(name, shortName, size, type, subtype, alignment, ac, armorNote, hitDice, speed, speeds, abilityScores, savingThrows, skills, conditionImmunities, senses);
 
 		editor.newValueGetter = () -> {
 			final Creature newCreature = new Creature();
@@ -109,6 +114,8 @@ public class StatBlockEditor<T> extends VBox {
 			newCreature.abilityScores = abilityScores.getValue();
 			newCreature.savingThrows = savingThrows.getValue();
 			newCreature.skills = skills.getValue();
+			newCreature.conditionImmunities = new TreeSet<>(conditionImmunities.getValue());
+			newCreature.senses = senses.getValue();
 
 			return newCreature;
 		};
@@ -118,17 +125,17 @@ public class StatBlockEditor<T> extends VBox {
 	public static StatBlockEditor<Spell> getEditor(final Spell spell) {
 		final StatBlockEditor<Spell> editor = new StatBlockEditor<>(spell);
 
-		final StringPropertyEditor name = new StringPropertyEditor("Name", spell.name);
-		final IntegerPropertyEditor level = new IntegerPropertyEditor("Level", 0, 9, spell.level);
-		final EnumPropertyEditor<SpellType> type = new EnumPropertyEditor<SpellType>("Type", spell.type);
-		final BooleanPropertyEditor ritual = new BooleanPropertyEditor("Ritual", spell.ritual);
-		final StringPropertyEditor castingTime = new StringPropertyEditor("Casting Time", spell.castingTime);
-		final StringPropertyEditor range = new StringPropertyEditor("Range", spell.range);
-		final BooleanPropertyEditor verbal = new BooleanPropertyEditor("Verbal Components", spell.verbal);
-		final BooleanPropertyEditor somatic = new BooleanPropertyEditor("Somatic Components", spell.somatic);
-		final StringPropertyEditor materialComponents = new StringPropertyEditor("Material Components", spell.materialComponents);
-		final StringPropertyEditor duration = new StringPropertyEditor("Duration", spell.duration);
-		final BooleanPropertyEditor concentration = new BooleanPropertyEditor("Concentration", spell.concentration);
+		final StringEditor name = new StringEditor("Name", spell.name);
+		final IntegerEditor level = new IntegerEditor("Level", 0, 9, spell.level);
+		final EnumEditor<SpellType> type = new EnumEditor<SpellType>(SpellType.class, "Type", spell.type);
+		final BooleanEditor ritual = new BooleanEditor("Ritual", spell.ritual);
+		final StringEditor castingTime = new StringEditor("Casting Time", spell.castingTime);
+		final StringEditor range = new StringEditor("Range", spell.range);
+		final BooleanEditor verbal = new BooleanEditor("Verbal Components", spell.verbal);
+		final BooleanEditor somatic = new BooleanEditor("Somatic Components", spell.somatic);
+		final StringEditor materialComponents = new StringEditor("Material Components", spell.materialComponents);
+		final StringEditor duration = new StringEditor("Duration", spell.duration);
+		final BooleanEditor concentration = new BooleanEditor("Concentration", spell.concentration);
 		final SpellDescriptionEditor description = new SpellDescriptionEditor("Features", spell.description);
 
 		editor.getChildren().addAll(name, level, type, ritual, castingTime, range, verbal, somatic, materialComponents, duration, concentration, description);

@@ -4,11 +4,11 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 
-public abstract class PropertyEditor<T> extends GridPane {
+public abstract class Editor<T> extends GridPane {
 
 	private final String name;
 
-	public PropertyEditor(final String name) {
+	public Editor(final String name) {
 		setHgap(2);
 		setVgap(2);
 

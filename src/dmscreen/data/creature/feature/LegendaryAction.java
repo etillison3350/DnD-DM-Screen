@@ -1,6 +1,5 @@
-package dmscreen;
+package dmscreen.data.creature.feature;
 
-import dmscreen.data.creature.feature.Action;
 import dmscreen.statblock.StatBlock;
 import javafx.scene.Node;
 

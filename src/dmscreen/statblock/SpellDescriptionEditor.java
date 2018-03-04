@@ -14,7 +14,7 @@ import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.SpellFeature;
 import dmscreen.data.spell.SpellParagraph;
 
-public class SpellDescriptionEditor extends PropertyEditor<List<? extends SpellParagraph>> {
+public class SpellDescriptionEditor extends Editor<List<? extends SpellParagraph>> {
 
 	private static final Pattern PARAGRAPH_BREAK = Pattern.compile("\n\\s*(?=[\n\\-\\#\\\\])");
 	private final TextArea value;

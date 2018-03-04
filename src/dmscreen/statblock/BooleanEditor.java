@@ -4,11 +4,11 @@ import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
 import javafx.scene.text.Text;
 
-public class BooleanPropertyEditor extends PropertyEditor<Boolean> {
+public class BooleanEditor extends Editor<Boolean> {
 
 	private final CheckBox value;
 
-	public BooleanPropertyEditor(final String name, final boolean initialValue) {
+	public BooleanEditor(final String name, final boolean initialValue) {
 		super(name);
 
 		value = new CheckBox();

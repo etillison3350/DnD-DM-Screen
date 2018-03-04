@@ -12,12 +12,12 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Text;
 
-public class MapPropertyEditor<K, V> extends PropertyEditor<Map<K, V>> {
+public abstract class MapEditor<K, V> extends Editor<Map<K, V>> {
 
 	private final List<MapRow<K, V>> rows = new ArrayList<>();
 	private int minRow = 3;
 
-	public MapPropertyEditor(final String name, final String keyTitle, final String valueTitle) {
+	public MapEditor(final String name, final String keyTitle, final String valueTitle) {
 		super(name);
 
 		setPadding(new Insets(8, 0, 8, 0));
@@ -44,6 +44,10 @@ public class MapPropertyEditor<K, V> extends PropertyEditor<Map<K, V>> {
 			ret.put(row.keyGetter.get(), row.valueGetter.get());
 		});
 		return ret;
+	}
+
+	protected int getMinRow() {
+		return minRow;
 	}
 
 	public static class MapRow<K, V> {

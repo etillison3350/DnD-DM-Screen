@@ -18,6 +18,7 @@ import javafx.animation.PauseTransition;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.scene.CacheHint;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -44,6 +45,8 @@ import dmscreen.statblock.StatBlock;
 import dmscreen.statblock.StatBlockEditor;
 
 public class Screen extends Application {
+
+	public static final String DEFAULT_FONT_NAME = "Avenir";
 
 	public static void main(final String[] args) {
 		try {
@@ -262,11 +265,17 @@ public class Screen extends Application {
 				editScroll.setContent(currentEditor);
 				rootPane.getItems().add(editPane);
 				rootPane.setDividerPosition(2, 1.0);
+
+				scroll.setCacheHint(CacheHint.SPEED);
+
 				final double[] divs = rootPane.getDividerPositions();
 				final Transition openPane = new Transition() {
 					{
 						setCycleDuration(Duration.millis(300));
-						setOnFinished(event -> rootPane.getItems().remove(2));
+						setOnFinished(event -> {
+							rootPane.getItems().remove(2);
+							scroll.setCacheHint(CacheHint.QUALITY);
+						});
 					}
 
 					@Override
@@ -279,6 +288,8 @@ public class Screen extends Application {
 				final double[] divs = rootPane.getDividerPositions();
 				rootPane.getItems().add(2, scroll);
 
+				editScroll.setCacheHint(CacheHint.SPEED);
+
 				final PauseTransition pt = new PauseTransition(Duration.seconds(1));
 				pt.setOnFinished(event -> {
 					rootPane.setDividerPositions(divs[0], divs[1], divs[1]);
@@ -289,6 +300,7 @@ public class Screen extends Application {
 						setCycleDuration(Duration.millis(300));
 						setOnFinished(event -> {
 							rootPane.getItems().remove(3);
+							editScroll.setCacheHint(CacheHint.QUALITY);
 						});
 					}
 

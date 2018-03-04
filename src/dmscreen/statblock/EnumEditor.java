@@ -11,14 +11,14 @@ import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 import dmscreen.Util;
 
-public class EnumPropertyEditor<T extends Enum<?>> extends PropertyEditor<T> {
+public class EnumEditor<T extends Enum<?>> extends Editor<T> {
 
 	private final ComboBox<T> value;
 
-	public EnumPropertyEditor(final String name, final T initialValue) {
+	public EnumEditor(final Class<T> clazz, final String name, final T initialValue) {
 		super(name);
 
-		value = createEditorComboBox(initialValue);
+		value = createEditorComboBox(clazz, initialValue);
 		addRow(0, new Text(name + ":"), value);
 	}
 
@@ -27,10 +27,10 @@ public class EnumPropertyEditor<T extends Enum<?>> extends PropertyEditor<T> {
 		return value.getValue();
 	}
 
-	public static <E extends Enum<?>> ComboBox<E> createEditorComboBox(final E initialValue) {
+	public static <E extends Enum<?>> ComboBox<E> createEditorComboBox(final Class<E> clazz, final E initialValue) {
 		final ComboBox<E> ret = new ComboBox<>();
 		try {
-			List.class.getMethod("forEach", Consumer.class).invoke(Arrays.class.getMethod("asList", Object[].class).invoke(null, initialValue.getClass().getMethod("values").invoke(null)), (Consumer<E>) ret.getItems()::add);
+			List.class.getMethod("forEach", Consumer.class).invoke(Arrays.class.getMethod("asList", Object[].class).invoke(null, clazz.getMethod("values").invoke(null)), (Consumer<E>) ret.getItems()::add);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -48,7 +48,7 @@ public class EnumPropertyEditor<T extends Enum<?>> extends PropertyEditor<T> {
 
 		}));
 		ret.setButtonCell(ret.getCellFactory().call(null));
-		ret.setValue(initialValue);
+		if (initialValue != null) ret.setValue(initialValue);
 
 		return ret;
 	}

@@ -2,12 +2,13 @@ package dmscreen.data.creature.feature;
 
 import java.util.Map;
 
-import dmscreen.statblock.StatBlock;
 import javafx.scene.Node;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import dmscreen.Screen;
+import dmscreen.statblock.StatBlock;
 
 public class Subfeatures extends Feature {
 
@@ -33,7 +34,7 @@ public class Subfeatures extends Feature {
 
 		subfeatures.forEach((name, desc) -> {
 			final Text title = new Text("\n   " + name + ". ");
-			title.setFont(Font.font("System", FontPosture.ITALIC, Font.getDefault().getSize()));
+			title.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontPosture.ITALIC, Font.getDefault().getSize()));
 			node.getChildren().add(title);
 
 			node.getChildren().add(new Text(desc));

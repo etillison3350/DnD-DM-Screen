@@ -7,13 +7,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import dmscreen.data.base.DiceRoll;
 
-public class DiceRollPropertyEditor extends PropertyEditor<DiceRoll> {
+public class DiceRollEditor extends Editor<DiceRoll> {
 
 	public static final Pattern DIE_ROLL = Pattern.compile("^(\\d+)d(\\d+)([+\\-]\\d+)?$");
 
 	private final TextField value;
 
-	public DiceRollPropertyEditor(final String name, final DiceRoll initialValue) {
+	public DiceRollEditor(final String name, final DiceRoll initialValue) {
 		super(name);
 
 		final Text label = new Text(name + ":");
