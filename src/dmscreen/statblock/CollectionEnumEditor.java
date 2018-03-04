@@ -22,6 +22,11 @@ public class CollectionEnumEditor<T extends Enum<?>> extends CollectionEditor<T>
 	}
 
 	@Override
+	protected void clearEditor() {
+		editor.setValue(null);
+	}
+
+	@Override
 	protected String convertToString(final T value) {
 		return Util.titleCase(Util.getName(value));
 	}

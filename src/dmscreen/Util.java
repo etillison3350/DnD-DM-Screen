@@ -1,12 +1,16 @@
 package dmscreen;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 
 public class Util {
+
+	public static final NumberFormat COMMA_SEPARATED = new DecimalFormat("#,###");
 
 	private Util() {}
 

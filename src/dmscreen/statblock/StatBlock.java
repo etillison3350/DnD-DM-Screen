@@ -3,8 +3,6 @@ package dmscreen.statblock;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +39,6 @@ import dmscreen.data.spell.SpellParagraph;
 
 public class StatBlock {
 
-	public static final NumberFormat COMMA_SEPARATED = new DecimalFormat("#,###");
 	public static final Pattern SMALL_CAPS = Pattern.compile("([^a-z]+)|(?:[^A-Z]+)");
 
 	private StatBlock() {}
@@ -75,7 +72,6 @@ public class StatBlock {
 							} else {
 								value = Arrays.class.getMethod("toString", Object[].class).invoke(null, value);
 							}
-
 						}
 
 						children.add(dataLine(Util.titleCase(field.getName()), value.toString()));
@@ -163,7 +159,7 @@ public class StatBlock {
 
 		children.add(dataLine("Languages", creature.languages.isEmpty() ? "\u2014" : creature.languages.stream().collect(Collectors.joining(", "))));
 
-		children.add(dataLine("Challenge", String.format("%s (%s XP)", challenge(creature.challengeRating), COMMA_SEPARATED.format(Creature.XP[creature.challengeRating + 5]))));
+		children.add(dataLine("Challenge", String.format("%s (%s XP)", challenge(creature.challengeRating), Util.COMMA_SEPARATED.format(Creature.XP[creature.challengeRating + 5]))));
 
 		children.add(separator());
 

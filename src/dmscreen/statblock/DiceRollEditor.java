@@ -35,7 +35,7 @@ public class DiceRollEditor extends Editor<DiceRoll> {
 	public DiceRoll getValue() {
 		final Matcher matcher = DIE_ROLL.matcher(value.getText().toLowerCase().replaceAll("[^\\dd+\\-]+", ""));
 		if (matcher.find()) {
-			return new DiceRoll(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), matcher.group(3) == null ? 0 : Integer.parseInt(matcher.group(2)));
+			return new DiceRoll(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), matcher.group(3) == null ? 0 : Integer.parseInt(matcher.group(3)));
 		}
 
 		return null;

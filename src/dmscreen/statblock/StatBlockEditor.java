@@ -97,7 +97,7 @@ public class StatBlockEditor<T> extends VBox {
 		final EditableMapEnumIntegerEditor<Ability> savingThrows = new EditableMapEnumIntegerEditor<Ability>(Ability.class, "Saving Throws", "Ability", "Modifier", -10, 20, creature.savingThrows);
 		final EditableMapEnumIntegerEditor<Skill> skills = new EditableMapEnumIntegerEditor<>(Skill.class, "Skills", "Skill", "Modifier", -10, 20, creature.skills);
 
-		final BiFunction<String, String, Editor<String>> damageKeyEditor = (n, v) -> new StringEditor(n, v.equals("null") ? null : v, "any source");
+		final BiFunction<String, String, Editor<String>> damageKeyEditor = (n, v) -> new StringEditor(n, v == null || v.equals("null") ? null : v, "any source");
 		final BiFunction<String, Collection<DamageType>, Editor<Collection<DamageType>>> damageValueEditor = (s, c) -> new CollectionEnumEditor<>(DamageType.class, s, c);
 		final EditableMapCollectionEditor<String, DamageType> vulnerabilities = new EditableMapCollectionEditor<String, DamageType>("Damage Vulnerabilities", "Sources", null, "Add Source", creature.vulnerabilities, damageKeyEditor, damageValueEditor);
 		final EditableMapCollectionEditor<String, DamageType> resistances = new EditableMapCollectionEditor<String, DamageType>("Damage Resistances", "Sources", null, "Add Source", creature.resistances, damageKeyEditor, damageValueEditor);
@@ -105,8 +105,10 @@ public class StatBlockEditor<T> extends VBox {
 
 		final CollectionEnumEditor<Condition> conditionImmunities = new CollectionEnumEditor<Condition>(Condition.class, "Condition Immunities", creature.conditionImmunities);
 		final MapEnumIntegerEditor<VisionType> senses = new MapEnumIntegerEditor<VisionType>(VisionType.class, "Senses", "Type", "Range (ft.)", 0, 5000, 5, creature.senses);
+		final CollectionStringEditor languages = new CollectionStringEditor("Languages", creature.languages);
+		final ChallengeRatingEditor challengeRating = new ChallengeRatingEditor("Challenge Rating", creature.challengeRating);
 
-		editor.getChildren().addAll(name, shortName, size, type, subtype, alignment, ac, armorNote, hitDice, speed, speeds, abilityScores, savingThrows, skills, vulnerabilities, resistances, immunities, conditionImmunities, senses);
+		editor.getChildren().addAll(name, shortName, size, type, subtype, alignment, ac, armorNote, hitDice, speed, speeds, abilityScores, savingThrows, skills, vulnerabilities, resistances, immunities, conditionImmunities, senses, languages, challengeRating);
 
 		editor.newValueGetter = () -> {
 			final Creature newCreature = new Creature();
@@ -143,6 +145,8 @@ public class StatBlockEditor<T> extends VBox {
 
 			newCreature.conditionImmunities = new TreeSet<>(conditionImmunities.getValue());
 			newCreature.senses = senses.getValue();
+			newCreature.languages = new TreeSet<>(languages.getValue());
+			newCreature.challengeRating = challengeRating.getValue();
 
 			return newCreature;
 		};

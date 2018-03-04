@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -24,13 +27,13 @@ public abstract class CollectionEditor<T> extends Editor<Collection<T>> {
 	public CollectionEditor(final String name, final Collection<T> initialValues) {
 		super(name);
 
+		setPadding(new Insets(8, 0, 8, 0));
+
 		collection = new HashMap<>();
 
 		values = new FlowPane(4, 4);
 		add = new Button("+");
-		add.setOnAction(event -> {
-			this.add(getEditorValue());
-		});
+		add.setOnAction(getOnAddAction());
 
 		bottomPane = new HBox(4, new Pane(), add);
 
@@ -61,6 +64,15 @@ public abstract class CollectionEditor<T> extends Editor<Collection<T>> {
 
 	protected abstract T getEditorValue();
 
+	protected void clearEditor() {}
+
+	protected final EventHandler<ActionEvent> getOnAddAction() {
+		return event -> {
+			this.add(getEditorValue());
+			this.clearEditor();
+		};
+	}
+
 	protected String convertToString(final T value) {
 		return value.toString();
 	}
@@ -69,52 +81,5 @@ public abstract class CollectionEditor<T> extends Editor<Collection<T>> {
 	public Collection<T> getValue() {
 		return new HashSet<>(collection.keySet());
 	}
-
-// private final List<ListItem<T>> items = new ArrayList<>();
-// private final Hyperlink add;
-// private final FlowPane pane;
-//
-// public CollectionEditor(final String name) {
-// super(name);
-//
-// setPadding(new Insets(8, 0, 8, 0));
-//
-// this.add(StatBlock.smallCaps(name, "header-small"), 0, 0, 2, 1);
-// this.add(new Separator(), 0, 1, 2, 1);
-//
-// pane = new FlowPane(4, 4);
-// add(pane, 0, 2, 2, 1);
-//
-// add = new Hyperlink("Add");
-// add(add, 0, 3, 2, 1);
-// add.setOnAction(event -> {
-// add.setVisited(false);
-// addListItem(makeItem());
-// });
-// }
-//
-// protected abstract ListItem<T> makeItem();
-//
-// @Override
-// public Collection<T> getValue() {
-// return items.stream().map(r -> r.valueGetter.get()).collect(Collectors.toList());
-// }
-//
-// protected void addListItem(final ListItem<T> item) {
-// items.add(item);
-// pane.getChildren().add(item.value);
-// // addRow(minRow++, row.value);
-// }
-//
-// public static class ListItem<T> {
-// public final Node value;
-// public final Supplier<T> valueGetter;
-//
-// public ListItem(final Node value, final Supplier<T> valueGetter) {
-// this.value = value;
-// this.valueGetter = valueGetter;
-// }
-//
-// }
 
 }
