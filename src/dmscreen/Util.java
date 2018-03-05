@@ -26,6 +26,33 @@ public class Util {
 		return Character.toUpperCase(camelCase.charAt(0)) + camelCase.substring(1).replaceAll("[A-Z]", " $0");
 	}
 
+	/**
+	 * Applies a case rule (uppercase, lowercase, sentence case, or title case) on {@code string} based on {@code source}.<br>
+	 * <ul>
+	 * <li>If {@code source} is entirely uppercase, returns an uppercase string.</li>
+	 * <li>If {@code source} is entirely lowercase, returns an lowercase string.</li>
+	 * <li>If the first and second word of {@code source} begin with an uppercase letter (i.e. the first character and the
+	 * character after the first underscore are both uppercase), returns a title case string (as by {@link #titleCase(String)})</li>
+	 * <li>If the first character of {@code source} is uppercase, and {@code source} either has one word, or has a second word
+	 * that begins with a lowercase letter, returns a sentence case string, as by {@link #sentenceCase(String)}</li>
+	 * <li>If none of the above conditions are met, the original string is returned.
+	 * </ul>
+	 */
+	public static String matchCase(final String source, final String string) {
+		if (source.equals(source.toUpperCase())) {
+			return string.toUpperCase();
+		} else if (source.equals(source.toLowerCase())) {
+			return string.toLowerCase();
+		} else if (Character.isUpperCase(source.charAt(0))) {
+			final int index = source.indexOf('_');
+			if (index < 0 || index >= source.length() - 1 || !Character.isUpperCase(source.charAt(index + 1))) return sentenceCase(string);
+
+			return titleCase(string);
+		} else {
+			return string;
+		}
+	}
+
 	public static String andJoin(final Collection<String> strings) {
 		if (strings.isEmpty()) return "";
 		if (strings.size() == 1) return strings.iterator().next();
