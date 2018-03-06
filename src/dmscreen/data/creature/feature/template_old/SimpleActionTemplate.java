@@ -1,4 +1,4 @@
-package dmscreen.data.creature.feature.template;
+package dmscreen.data.creature.feature.template_old;
 
 import java.util.Map;
 import java.util.regex.Matcher;

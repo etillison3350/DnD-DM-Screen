@@ -1,4 +1,4 @@
-package dmscreen.data.creature.feature.template;
+package dmscreen.data.creature.feature.template_old;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -48,26 +48,7 @@ public abstract class Template<T> {
 		while (m.find()) {
 			ret.append(format.substring(lastEnd, m.start()));
 
-			String var = m.group(1);
-
-			final String filter = m.group(2);
-			if (filter != null) {
-				switch (filter.toLowerCase()) {
-					case "upper":
-						var = var.toUpperCase();
-						break;
-					case "lower":
-						var = var.toLowerCase();
-						break;
-					case "title":
-						var = Util.titleCase(var);
-						break;
-					case "sentence":
-						var = Util.sentenceCase(var);
-						break;
-				}
-			}
-
+			final String var = m.group(1);
 			ret.append(Util.matchCase(var, values.get(var).toString()));
 
 			lastEnd = m.end();

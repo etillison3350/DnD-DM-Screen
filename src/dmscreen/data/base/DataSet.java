@@ -6,7 +6,7 @@ import java.util.TreeSet;
 
 import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.Creature;
-import dmscreen.data.creature.feature.template.Template;
+import dmscreen.data.creature.feature.template_old.Template;
 import dmscreen.data.spell.Spell;
 
 public class DataSet {

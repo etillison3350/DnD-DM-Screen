@@ -1,4 +1,4 @@
-package dmscreen.data.creature.feature.template;
+package dmscreen.data.creature.feature.template_old;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -18,17 +18,17 @@ public class SimpleFeatureTemplate extends Template<Feature> {
 
 		Matcher m = Template.VARIABLE.matcher(nameFormat);
 		while (m.find()) {
-			fields.put(m.group(1), getClass(m.group(2)));
+			if (!fields.containsKey(m.group(1))) fields.put(m.group(1), getClass(m.group(2)));
 		}
 
 		m = Template.VARIABLE.matcher(noteFormat);
 		while (m.find()) {
-			fields.put(m.group(1), getClass(m.group(2)));
+			if (!fields.containsKey(m.group(1))) fields.put(m.group(1), getClass(m.group(2)));
 		}
 
 		m = Template.VARIABLE.matcher(descFormat);
 		while (m.find()) {
-			fields.put(m.group(1), getClass(m.group(2)));
+			if (!fields.containsKey(m.group(1))) fields.put(m.group(1), getClass(m.group(2)));
 		}
 	}
 
