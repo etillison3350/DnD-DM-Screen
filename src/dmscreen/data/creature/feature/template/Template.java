@@ -1,28 +1,16 @@
 package dmscreen.data.creature.feature.template;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 
 import dmscreen.Util;
-import dmscreen.data.base.Ability;
-import dmscreen.data.base.DamageType;
-import dmscreen.data.base.DiceRoll;
-import dmscreen.data.base.Size;
-import dmscreen.data.base.Skill;
-import dmscreen.data.creature.Condition;
-import dmscreen.data.creature.CreatureType;
-import dmscreen.data.creature.SpeedType;
-import dmscreen.data.creature.VisionType;
 
 public abstract class Template<T> {
-
-	public static final List<Class<?>> SIMPLE_CLASSES = Arrays.asList(int.class, boolean.class, String.class, DiceRoll.class, Ability.class, Skill.class, DamageType.class, Size.class, Condition.class, CreatureType.class, SpeedType.class, VisionType.class);
-
-	public static final Pattern VARIABLE = Pattern.compile("\\$\\{(\\w+?)(?:\\.(\\w+?))?\\}");
 
 	public final String name;
 	protected final Map<String, Class<?>> fields = new LinkedHashMap<>();
@@ -33,48 +21,61 @@ public abstract class Template<T> {
 
 	public abstract T make(final Map<String, Object> values);
 
-	public static Class<?> getClass(final String className) {
-		for (final Class<?> clazz : SIMPLE_CLASSES) {
-			if (clazz.getSimpleName().equalsIgnoreCase(className)) return clazz;
-		}
-		return String.class;
-	}
-
 	public static String format(final String format, final Map<String, Object> values) {
+		ScriptEngine engine = null;
+
 		final StringBuffer ret = new StringBuffer(format.length() + 16);
-		final Matcher m = Template.VARIABLE.matcher(format);
+		StringBuffer script = null;
+		int bracket = 0;
 
-		int lastEnd = 0;
-		while (m.find()) {
-			ret.append(format.substring(lastEnd, m.start()));
-
-			String var = m.group(1);
-
-			final String filter = m.group(2);
-			if (filter != null) {
-				switch (filter.toLowerCase()) {
-					case "upper":
-						var = var.toUpperCase();
-						break;
-					case "lower":
-						var = var.toLowerCase();
-						break;
-					case "title":
-						var = Util.titleCase(var);
-						break;
-					case "sentence":
-						var = Util.sentenceCase(var);
-						break;
+		for (final char c : format.toCharArray()) {
+			if (script == null) {
+				if (c == '$')
+					script = new StringBuffer();
+				else
+					ret.append(c);
+			} else {
+				if (bracket == 0 && c != '{') {
+					ret.append('$');
+					ret.append(c);
+				} else if (c == '{') {
+					if (bracket++ > 0) script.append(c);
+				} else if (c == '}') {
+					if (--bracket <= 0) {
+						if (values.containsKey(script.toString())) {
+							ret.append(getString(values.get(script.toString()).toString()));
+						} else {
+							if (engine == null) engine = JavaScript.getEngine(values);
+							try {
+								ret.append(engine.eval(script.toString()));
+							} catch (final ScriptException e) {
+								ret.append("[ERROR]");
+							}
+						}
+						script = null;
+					} else {
+						script.append(c);
+					}
+				} else {
+					script.append(c);
 				}
 			}
-
-			ret.append(Util.matchCase(var, values.get(var).toString()));
-
-			lastEnd = m.end();
 		}
-		ret.append(format.substring(lastEnd));
 
 		return ret.toString();
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public static String getString(final Object o) {
+		if (o instanceof Collection) {
+			return ((Collection) o).stream().collect(Collectors.joining(", ")).toString();
+		} else if (o instanceof Map) {
+			return ((Map) o).keySet().stream().map(k -> String.format("%s: %s", k, ((Map) o).get(k))).collect(Collectors.joining(", ")).toString();
+		} else if (o instanceof Enum) {
+			return Util.titleCase(((Enum) o).name());
+		}
+
+		return o.toString();
 	}
 
 }
