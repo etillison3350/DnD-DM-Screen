@@ -9,6 +9,7 @@ public class DiceRoll {
 	public final int number;
 	public final int die;
 	public final int modifier;
+	public final Integer expected;
 
 	public DiceRoll(final int number, final int die) {
 		this(number, die, 0);
@@ -18,10 +19,18 @@ public class DiceRoll {
 		this.number = number;
 		this.die = die;
 		this.modifier = modifier;
+		expected = null;
+	}
+
+	public DiceRoll(final int number, final int die, final int modifier, final int overrideExpectedValue) {
+		this.number = number;
+		this.die = die;
+		this.modifier = modifier;
+		expected = overrideExpectedValue;
 	}
 
 	public double expectedValue() {
-		return (die + 1) * number * 0.5 + modifier;
+		return expected == null ? (die + 1) * number * 0.5 + modifier : expected;
 	}
 
 	public int roll() {

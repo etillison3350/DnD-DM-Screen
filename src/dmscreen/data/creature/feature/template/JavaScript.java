@@ -16,13 +16,13 @@ import dmscreen.data.base.Skill;
 import dmscreen.data.creature.Alignment;
 import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.CreatureType;
-import dmscreen.data.creature.SpeedType;
+import dmscreen.data.creature.MovementType;
 import dmscreen.data.creature.VisionType;
 import dmscreen.data.spell.SpellType;
 
 public class JavaScript {
 
-	private static final List<Class<?>> LOADED_CLASSES = Arrays.asList(Util.class, Ability.class, DamageType.class, Size.class, Skill.class, Alignment.class, Condition.class, CreatureType.class, SpeedType.class, VisionType.class, SpellType.class);
+	private static final List<Class<?>> LOADED_CLASSES = Arrays.asList(Util.class, Ability.class, DamageType.class, Size.class, Skill.class, Alignment.class, Condition.class, CreatureType.class, MovementType.class, VisionType.class, SpellType.class);
 
 	private JavaScript() {}
 

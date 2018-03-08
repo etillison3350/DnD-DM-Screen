@@ -16,7 +16,7 @@ import dmscreen.data.creature.Alignment;
 import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.Creature;
 import dmscreen.data.creature.CreatureType;
-import dmscreen.data.creature.SpeedType;
+import dmscreen.data.creature.MovementType;
 import dmscreen.data.creature.VisionType;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellType;
@@ -92,7 +92,7 @@ public class StatBlockEditor<T> extends VBox {
 		final StringEditor armorNote = new StringEditor("Armor Description", creature.armorNote);
 		final DiceRollEditor hitDice = new DiceRollEditor("Hit Dice", creature.hitDice);
 		final IntegerEditor speed = new IntegerEditor("Speed (ft.)", 0, 500, creature.speed, 5);
-		final MapEnumIntegerEditor<SpeedType> speeds = new MapEnumIntegerEditor<>(SpeedType.class, "Other Speeds", "Type", "Speed (ft.)", 0, 500, 5, creature.speeds);
+		final MapEnumIntegerEditor<MovementType> speeds = new MapEnumIntegerEditor<>(MovementType.class, "Other Speeds", "Type", "Speed (ft.)", 0, 500, 5, creature.speeds);
 		final MapEnumIntegerEditor<Ability> abilityScores = new MapEnumIntegerEditor<Ability>(Ability.class, "Ability Scores", "Ability", "Score", 0, 40, creature.abilityScores);
 		final EditableMapEnumIntegerEditor<Ability> savingThrows = new EditableMapEnumIntegerEditor<Ability>(Ability.class, "Saving Throws", "Ability", "Modifier", -10, 20, creature.savingThrows);
 		final EditableMapEnumIntegerEditor<Skill> skills = new EditableMapEnumIntegerEditor<>(Skill.class, "Skills", "Skill", "Modifier", -10, 20, creature.skills);

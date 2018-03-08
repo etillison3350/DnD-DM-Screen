@@ -2,7 +2,6 @@ package dmscreen.misc;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,8 +22,10 @@ import dmscreen.data.base.DiceRoll;
 import dmscreen.data.base.Size;
 import dmscreen.data.base.Skill;
 import dmscreen.data.creature.Alignment;
+import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.Creature;
 import dmscreen.data.creature.CreatureType;
+import dmscreen.data.creature.MovementType;
 import dmscreen.data.creature.VisionType;
 import dmscreen.data.creature.feature.Action;
 import dmscreen.data.creature.feature.Attack;
@@ -39,16 +41,13 @@ public class TestCreatures {
 
 	public static void main(final String[] args) {
 		try {
-			final Path path = Paths.get("resources/source/creatures.json");
-			if (Files.exists(path)) return;
-
-			Files.write(path, Data.GSON.toJson(Arrays.asList(drow, vampire)).getBytes());
+			Files.write(Paths.get("resources/source/creatures.json"), Data.GSON.toJson(Arrays.asList(drow, vampire, demilich)).getBytes());
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static final Creature vampire, drow;
+	public static final Creature vampire, drow, demilich;
 
 	static {
 		vampire = new Creature();
@@ -180,6 +179,45 @@ public class TestCreatures {
 
 		drow.actions = Arrays.asList(new Action("Multiattack", "The drow makes two scourge attacks."), new Attack("Scourge", Attack.Type.MELEE_WEAPON, 5, "range 5 ft., one target", "", new Attack.Damage(new DiceRoll(1, 6, 2), DamageType.PIERCING), new Attack.Damage(new DiceRoll(5, 6), DamageType.POISON)),
 				new Action("Summon Demon", "1/Day", "The drow attempts to magically summon a yochlol with a 30 percent chance of success. If the attempt fails, the drow takes 5 (1d10) psychic damage. Otherwise, the summoned demon appears in an unoccupied space within 60 feet of its summoner, acts as an ally of its summoner, and can't summon other demons. It remains for 10 minutes, until it or its summoner dies, or until its summoner dismisses it as an action."));
+
+		demilich = new Creature();
+		demilich.name = "Acererak";
+		demilich.shortName = "the demilich";
+		demilich.size = Size.TINY;
+		demilich.type = CreatureType.UNDEAD;
+		demilich.alignment = Alignment.NEUTRAL_EVIL;
+		demilich.ac = 20;
+		demilich.armorNote = "natural armor";
+		demilich.hitDice = new DiceRoll(20, 4, 0, 80);
+		demilich.speed = 0;
+		demilich.speeds.put(MovementType.FLY, 30);
+		demilich.abilityScores.put(Ability.STRENGTH, 1);
+		demilich.abilityScores.put(Ability.DEXTERITY, 20);
+		demilich.abilityScores.put(Ability.CONSTITUTION, 10);
+		demilich.abilityScores.put(Ability.INTELLIGENCE, 20);
+		demilich.abilityScores.put(Ability.WISDOM, 17);
+		demilich.abilityScores.put(Ability.CHARISMA, 20);
+		demilich.savingThrows.put(Ability.CONSTITUTION, 6);
+		demilich.savingThrows.put(Ability.INTELLIGENCE, 11);
+		demilich.savingThrows.put(Ability.WISDOM, 9);
+		demilich.savingThrows.put(Ability.CHARISMA, 11);
+		demilich.resistances.put("magic weapons", Stream.of(DamageType.BLUDGEONING, DamageType.SLASHING, DamageType.PIERCING).collect(Collectors.toCollection(TreeSet::new)));
+		demilich.immunities.put(null, Stream.of(DamageType.NECROTIC, DamageType.POISON, DamageType.PSYCHIC).collect(Collectors.toCollection(TreeSet::new)));
+		demilich.immunities.put("nonmagical weapons", Stream.of(DamageType.BLUDGEONING, DamageType.SLASHING, DamageType.PIERCING).collect(Collectors.toCollection(TreeSet::new)));
+		Stream.of(Condition.CHARMED, Condition.DEAFENED, Condition.EXHAUSTION, Condition.FRIGHTENED, Condition.PARALYZED, Condition.POISONED, Condition.PRONE, Condition.STUNNED).forEach(demilich.conditionImmunities::add);
+		demilich.senses.put(VisionType.TRUESIGHT, 120);
+		demilich.challengeRating = 21;
+		demilich.features = Arrays.asList(new Feature("Avoidance", "If the demilich is subjected to an effect that allows it to make a saving throw to take only half damage, it instead takes no damage if it succeeds on the saving throw, and only half damage if it fails."), //
+				new Feature("Legendary Resistance", "3/Day", "If the vampire fails a saving throw, it can choose to succeed instead."), //
+				new Feature("Turn Immunity", "The demilich is immune to effects that turn undead."));
+		demilich.actions = Arrays.asList(new Action("Howl", "Recharge 5-6", "The demilich emits a bloodcurdling howl. Each creature within 30 feet of the demilich that can hear the howl must succeed on a DC 15 Constitution saving throw or drop to 0 hit points. On a successful save, the creature is frightened until the end of its next turn."), //
+				new Action("Life Drain", "The demilich targets up to three creatures that it can see within 10 feet of it. Each target must succeed on a DC 19 Constitution saving throw or take 21 (6d6) necrotic damage, and the demilich regains hit points equal to the total damage dealt to all targets."), //
+				new Action("Trap Soul",
+						"The demilich targets one creature that it can see within 30 feet of it. The target must make a DC 19 Charisma saving throw. On a failed save, the target's soul is magically trapped inside one of the demilich's gems. While the soul is trapped, the target's body and all the equipment it is carrying cease to exist. On a successful save, the target takes 24 (7d6) necrotic damage, and if this damage reduces the target to 0 hit points, its soul is trapped as if it failed the saving throw. A soul trapped in a gem for 24 hours is devoured and ceases to exist.\nlfthe demilich drops to 0 hit points, it is destroyed and turns to powder, leaving behind its gems. Crushing a gem releases any soul trapped within, at which point the target's body re-forms in an unoccupied space nearest to the gem and in the same state as when it was trapped."));
+		demilich.legendaryActions = Arrays.asList(new LegendaryAction("Flight", "The demilich flies up to half its movement speed."), //
+				new LegendaryAction("Cloud of Dust", "The demilich magically swirls its dusty remains. Each creature within 10 feet of the demilich, including around a corner, must succeed on a DC 15 Constitution saving throw or be blinded until the end of the demilich's next turn. A creature that succeeds on the saving throw is immune to this effect until the end of the demilich's next turn."), //
+				new LegendaryAction("Energy Drain", 2, "Each creature with in 30 feet of the demilich must make a DC 15 Constitution saving throw. On a failed save, the creature's hit point maximum is magically reduced by 10 (3d6). If a creature's hit point maximum is reduced to 0 by this effect, the creature dies. A creature's hit point maximum can be restored with the greater restoration spell or similar magic."), //
+				new LegendaryAction("Vile Curse", 3, "The demilich targets one creature it can see within 30 feet of it. The target must succeed on a DC 15 Wisdom saving throw or be magically cursed. Until the curse ends, the target has disadvantage on attack rolls and saving throws. The target can repeat the saving throw at the end of each of its turns, ending the curse on a success."));
 	}
 
 }

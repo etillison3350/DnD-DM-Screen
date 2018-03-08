@@ -32,7 +32,7 @@ import dmscreen.data.base.DamageType;
 import dmscreen.data.base.Skill;
 import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.Creature;
-import dmscreen.data.creature.SpeedType;
+import dmscreen.data.creature.MovementType;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellParagraph;
@@ -116,7 +116,7 @@ public class StatBlock {
 
 		final StringBuffer speed = new StringBuffer(Integer.toString(creature.speed));
 		speed.append(" ft.");
-		for (final SpeedType s : creature.speeds.keySet()) {
+		for (final MovementType s : creature.speeds.keySet()) {
 			final Integer sp = creature.speeds.get(s);
 			if (sp > 0) speed.append(String.format(", %s %d ft.", s.name().toLowerCase(), sp));
 		}

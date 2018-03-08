@@ -46,9 +46,10 @@ import javafx.util.StringConverter;
 
 public class Screen extends Application {
 
-	public static final String DEFAULT_FONT_NAME = "Avenir";
+	public static final String DEFAULT_FONT_NAME = "System";
 
 	public static void main(final String[] args) {
+		System.out.println(Data.GSON.fromJson(Data.GSON.toJson(new Object[] {false}), Object[].class)[0].getClass());
 		try {
 			Font.loadFont(new FileInputStream(Paths.get("Cormorant_Garamond/CormorantGaramond-Medium.ttf").toFile()), 12);
 			Font.loadFont(new FileInputStream(Paths.get("Cormorant_Garamond/CormorantGaramond-Bold.ttf").toFile()), 12);
@@ -183,7 +184,6 @@ public class Screen extends Application {
 				final String name = Util.getName(object);
 
 				if (object instanceof Enum<?>) return Util.titleCase(name);
-
 				if (object instanceof AccessibleObject) return Util.titleCaseFromCamelCase(name);
 
 				return name;
@@ -196,7 +196,7 @@ public class Screen extends Application {
 
 		}));
 		dataTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue != null && newValue.isLeaf()) {
+			if (newValue != null && newValue.isLeaf() && !(newValue.getValue() instanceof Field)) {
 				setEditing(false);
 
 				setStatBlock(newValue.getValue());

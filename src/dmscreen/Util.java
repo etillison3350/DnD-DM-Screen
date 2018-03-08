@@ -15,26 +15,32 @@ public class Util {
 	private Util() {}
 
 	public static String titleCase(final String string) {
+		if (string.isEmpty()) return string;
 		return Arrays.stream(string.split("[_ ]")).map(Util::sentenceCase).collect(Collectors.joining(" "));
 	}
 
 	public static String sentenceCase(final String string) {
+		if (string.isEmpty()) return string;
 		return Character.toUpperCase(string.charAt(0)) + string.substring(1).toLowerCase();
 	}
 
 	public static String titleCaseFromCamelCase(final String camelCase) {
+		if (camelCase.isEmpty()) return camelCase;
 		return Character.toUpperCase(camelCase.charAt(0)) + camelCase.substring(1).replaceAll("[A-Z]", " $0");
 	}
 
 	/**
-	 * Applies a case rule (uppercase, lowercase, sentence case, or title case) on {@code string} based on {@code source}.<br>
+	 * Applies a case rule (uppercase, lowercase, sentence case, or title case) on {@code string}
+	 * based on {@code source}.<br>
 	 * <ul>
 	 * <li>If {@code source} is entirely uppercase, returns an uppercase string.</li>
 	 * <li>If {@code source} is entirely lowercase, returns an lowercase string.</li>
-	 * <li>If the first and second word of {@code source} begin with an uppercase letter (i.e. the first character and the
-	 * character after the first underscore are both uppercase), returns a title case string (as by {@link #titleCase(String)})</li>
-	 * <li>If the first character of {@code source} is uppercase, and {@code source} either has one word, or has a second word
-	 * that begins with a lowercase letter, returns a sentence case string, as by {@link #sentenceCase(String)}</li>
+	 * <li>If the first and second word of {@code source} begin with an uppercase letter (i.e. the
+	 * first character and the character after the first underscore are both uppercase), returns a
+	 * title case string (as by {@link #titleCase(String)})</li>
+	 * <li>If the first character of {@code source} is uppercase, and {@code source} either has one
+	 * word, or has a second word that begins with a lowercase letter, returns a sentence case
+	 * string, as by {@link #sentenceCase(String)}</li>
 	 * <li>If none of the above conditions are met, the original string is returned.
 	 * </ul>
 	 */

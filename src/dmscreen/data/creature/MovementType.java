@@ -1,6 +1,6 @@
 package dmscreen.data.creature;
 
-public enum SpeedType {
+public enum MovementType {
 
 	SWIM,
 	FLY,

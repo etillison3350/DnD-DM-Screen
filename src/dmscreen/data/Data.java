@@ -9,8 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,6 +32,8 @@ import dmscreen.data.creature.feature.Subfeatures;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.SpellFeature;
 import dmscreen.data.spell.SpellParagraph;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 public class Data {
 
@@ -65,6 +69,7 @@ public class Data {
 	});
 
 	public Data(final Path root) throws IOException {
+		final Map<String, Exception> errors = new HashMap<>();
 		Files.walk(root).filter(path -> !Files.isDirectory(path) && path.getFileName().toString().endsWith(".json")).forEach(path -> {
 			final String setName = path.getParent().getFileName().toString();
 
@@ -79,8 +84,8 @@ public class Data {
 				}
 			}
 
+			final String name = path.getFileName().toString().replace(".json", "").toLowerCase();
 			try {
-				final String name = path.getFileName().toString().replace(".json", "").toLowerCase();
 				if (name.equals("data")) {
 					final DataSet newSet = GSON.fromJson(new String(Files.readAllBytes(path)), DataSet.class);
 					for (final Field field : DataSet.class.getFields()) {
@@ -95,9 +100,15 @@ public class Data {
 				}
 			} catch (JsonSyntaxException | IOException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | NoSuchFieldException e) {
 				System.err.println("Error reading " + path.toString() + ": " + e.toString());
-				e.printStackTrace();
+				errors.put(setName + "/" + name, e);
 			}
 		});
+
+		if (!errors.isEmpty()) {
+			final Alert alert = new Alert(AlertType.ERROR);
+			alert.setContentText("Error while loading JSON:\n\n" + errors.keySet().stream().map(s -> String.format(" \u2022  %s.json: %s", s, errors.get(s))).collect(Collectors.joining("\n")) + "\n\nThese files will not be loaded.");
+			alert.showAndWait();
+		}
 	}
 
 	public Map<String, DataSet> getData() {
