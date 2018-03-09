@@ -1,7 +1,8 @@
 package dmscreen.data.creature.feature.template;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -13,10 +14,11 @@ import dmscreen.Util;
 public abstract class Template<T> {
 
 	public final String name;
-	protected final Map<String, Class<?>> fields = new LinkedHashMap<>();
+	protected final List<TemplateField> fields = new ArrayList<>();
 
-	public Template(final String name) {
+	public Template(final String name, final Collection<TemplateField> fields) {
 		this.name = name;
+		this.fields.addAll(fields);
 	}
 
 	public abstract T make(final Map<String, Object> values);

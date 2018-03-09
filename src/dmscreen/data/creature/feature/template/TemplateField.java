@@ -22,21 +22,26 @@ import dmscreen.statblock.StringSelectEditor;
 
 public class TemplateField {
 
-	public final String name;
+	public final String name, displayName;
 	public final FieldType type;
 	public final Object[] args;
 
-	public TemplateField(final String name, final FieldType type, final Object... args) {
+	public TemplateField(final String name, final String displayName, final FieldType type, final Object... args) {
 		this.name = name;
+		this.displayName = displayName;
 		this.type = type;
 		this.args = args;
+	}
+
+	public TemplateField(final String name, final FieldType type, final Object... args) {
+		this(name, Util.titleCaseFromCamelCase(name), type, args);
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static Editor<?> getEditor(final TemplateField field) {
 		if (field == null) throw new NullPointerException("field cannot be null");
 
-		final String name = Util.titleCaseFromCamelCase(field.name);
+		final String name = field.displayName;
 		final Object[] fieldArgs = new Object[field.args.length];
 
 		for (int n = 0; n < fieldArgs.length; n++) {
@@ -52,7 +57,8 @@ public class TemplateField {
 		} else {
 			if (field.type == FieldType.STRING) {
 				if (fieldArgs.length > 1) {
-					return new StringSelectEditor(name, -1, Arrays.stream(fieldArgs).map(Object::toString).toArray(size -> new String[size]));
+					final String[] values = Arrays.stream(fieldArgs).map(Object::toString).toArray(size -> new String[size]);
+					return new StringSelectEditor(name, -1, values);
 				} else if (fieldArgs.length > 0) {
 					return new StringEditor(name, null, fieldArgs[0].toString());
 				} else {

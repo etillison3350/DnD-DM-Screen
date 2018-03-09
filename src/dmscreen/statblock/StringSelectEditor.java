@@ -14,6 +14,7 @@ public class StringSelectEditor extends Editor<String> {
 
 		value = new ComboBox<>();
 		Arrays.stream(values).forEach(value.getItems()::add);
+		if (initialIndex >= 0) value.getSelectionModel().select(initialIndex);
 		addRow(0, new Text(name + ":"), value);
 	}
 

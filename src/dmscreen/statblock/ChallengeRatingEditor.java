@@ -15,16 +15,10 @@ public class ChallengeRatingEditor extends Editor<Integer> {
 
 		value = new Spinner<>(-4, 30, initialValue == 0 ? -4 : initialValue < 0 ? initialValue + 1 : initialValue);
 		value.getValueFactory().setConverter(new StringConverter<Integer>() {
-			{
-				for (int i = -4; i <= 30; i++) {
-					System.out.println(toString(i) + ", " + fromString(toString(i)));
-				}
-			}
 
 			@Override
 			public String toString(final Integer i) {
 				final int cr = i < 1 ? i - 1 : i;
-				System.out.println(i + ", " + cr);
 				return String.format("%s (%s XP)", StatBlock.challenge(cr), Util.COMMA_SEPARATED.format(Creature.XP[cr + 5]));
 			}
 

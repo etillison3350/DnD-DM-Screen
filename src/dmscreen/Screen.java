@@ -14,10 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import dmscreen.data.Data;
-import dmscreen.data.base.DataSet;
-import dmscreen.statblock.StatBlock;
-import dmscreen.statblock.StatBlockEditor;
 import javafx.animation.PauseTransition;
 import javafx.animation.Transition;
 import javafx.application.Application;
@@ -43,13 +39,16 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import dmscreen.data.Data;
+import dmscreen.data.base.DataSet;
+import dmscreen.statblock.StatBlock;
+import dmscreen.statblock.StatBlockEditor;
 
 public class Screen extends Application {
 
-	public static final String DEFAULT_FONT_NAME = "System";
+	public static final String DEFAULT_FONT_NAME = "Avenir";
 
 	public static void main(final String[] args) {
-		System.out.println(Data.GSON.fromJson(Data.GSON.toJson(new Object[] {false}), Object[].class)[0].getClass());
 		try {
 			Font.loadFont(new FileInputStream(Paths.get("Cormorant_Garamond/CormorantGaramond-Medium.ttf").toFile()), 12);
 			Font.loadFont(new FileInputStream(Paths.get("Cormorant_Garamond/CormorantGaramond-Bold.ttf").toFile()), 12);
