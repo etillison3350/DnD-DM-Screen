@@ -13,6 +13,7 @@ import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.CreatureType;
 import dmscreen.data.creature.MovementType;
 import dmscreen.data.creature.VisionType;
+import dmscreen.data.creature.feature.Attack;
 import dmscreen.data.spell.SpellType;
 
 public enum FieldType {
@@ -22,6 +23,7 @@ public enum FieldType {
 	BOOLEAN(Boolean.class),
 	ABILITY(Ability.class),
 	DAMAGE_TYPE(DamageType.class),
+	ATTACK_TYPE(Attack.Type.class),
 	SIZE(Size.class),
 	SKILL(Skill.class),
 	ALIGNMENT(Alignment.class),

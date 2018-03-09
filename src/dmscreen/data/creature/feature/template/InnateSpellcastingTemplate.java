@@ -16,7 +16,7 @@ import dmscreen.data.creature.feature.InnateSpellcasting;
 
 public class InnateSpellcastingTemplate extends Template<InnateSpellcasting> {
 
-	private static final Pattern SPELL_NOTE = Pattern.compile("^(.+?)\\s*\\((.+?\\)$");
+	private static final Pattern SPELL_NOTE = Pattern.compile("^(.+?)\\s*\\((.+?)\\)$");
 
 	public InnateSpellcastingTemplate() {
 		this("Innate Spellcasting");
@@ -32,16 +32,15 @@ public class InnateSpellcastingTemplate extends Template<InnateSpellcasting> {
 				new TemplateField("attackModifier", FieldType.INTEGER, -10, 20), //
 				new TemplateField("includeAttackMod", FieldType.BOOLEAN), //
 				new TemplateField("additionalDetails", FieldType.STRING), //
-				new TemplateField("spells", FieldType.MAP, FieldType.STRING, "Time Limit", FieldType.LIST, FieldType.STRING, "Spells", true) //
-		).collect(Collectors.toList()));
+				new TemplateField("spells", FieldType.MAP, FieldType.STRING, "Limit", FieldType.LIST, FieldType.STRING, "Spells", true) //
+				).collect(Collectors.toList()));
 	}
 
 	@Override
 	public InnateSpellcasting make(final Map<String, Object> values) {
 		final Map<String, Map<String, String>> spells = getSpells(values);
 
-		return new InnateSpellcasting(Util.castOrDefault(CharSequence.class, values.get("note"), "").toString(), Util.castOrDefault(CharSequence.class, values.get("shortName"), "It").toString(), Util.castOrDefault(Ability.class, values.get("ability"), null), Util.castOrDefault(Integer.class, values.get("saveDC"), 10), Util.castOrDefault(Boolean.class, values.get("includeAttackMod"), false) ? Util.castOrDefault(Integer.class, values.get("attackModifier"), 0) : Integer.MIN_VALUE,
-				Util.castOrDefault(CharSequence.class, values.get("pronoun"), "it").toString(), Util.castOrDefault(CharSequence.class, values.get("additionalDetails"), "").toString(), spells);
+		return new InnateSpellcasting(Util.castOrDefault(CharSequence.class, values.get("note"), "").toString(), Util.castOrDefault(CharSequence.class, values.get("shortName"), "It").toString(), Util.castOrDefault(Ability.class, values.get("ability"), null), Util.castOrDefault(Integer.class, values.get("saveDC"), 10), Util.castOrDefault(Boolean.class, values.get("includeAttackMod"), false) ? Util.castOrDefault(Integer.class, values.get("attackModifier"), 0) : Integer.MIN_VALUE, Util.castOrDefault(CharSequence.class, values.get("pronoun"), "it").toString(), Util.castOrDefault(CharSequence.class, values.get("additionalDetails"), "").toString(), spells);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -29,6 +32,7 @@ import dmscreen.data.creature.feature.Feature;
 import dmscreen.data.creature.feature.InnateSpellcasting;
 import dmscreen.data.creature.feature.Spellcasting;
 import dmscreen.data.creature.feature.Subfeatures;
+import dmscreen.data.creature.feature.template.AttackTemplate;
 import dmscreen.data.creature.feature.template.InnateSpellcastingTemplate;
 import dmscreen.data.creature.feature.template.SimpleActionTemplate;
 import dmscreen.data.creature.feature.template.SimpleFeatureTemplate;
@@ -37,8 +41,6 @@ import dmscreen.data.creature.feature.template.Template;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.SpellFeature;
 import dmscreen.data.spell.SpellParagraph;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 
 public class Data {
 
@@ -64,6 +66,7 @@ public class Data {
 		final RuntimeTypeAdapterFactory<Template> templateAdapter = RuntimeTypeAdapterFactory.of(Template.class);
 		templateAdapter.registerSubtype(SimpleFeatureTemplate.class, "Feature");
 		templateAdapter.registerSubtype(SimpleActionTemplate.class, "Action");
+		templateAdapter.registerSubtype(AttackTemplate.class, "Attack");
 		templateAdapter.registerSubtype(InnateSpellcastingTemplate.class, "InnateSpellcasting");
 		templateAdapter.registerSubtype(SpellcastingTemplate.class, "Spellcasting");
 
