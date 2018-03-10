@@ -2,6 +2,7 @@ package dmscreen.statblock;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
@@ -33,6 +34,7 @@ import dmscreen.data.base.Skill;
 import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.Creature;
 import dmscreen.data.creature.MovementType;
+import dmscreen.data.creature.feature.template.Template;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellParagraph;
@@ -44,44 +46,50 @@ public class StatBlock {
 	private StatBlock() {}
 
 	public static Pane getStatBlock(final Object obj) {
-		try {
-			if (obj == null || obj.getClass() == Object.class) return new VBox(2);
+		if (obj == null || obj.getClass() == Object.class) return new VBox(2);
 
-			return (Pane) StatBlock.class.getMethod("getStatBlock", obj.getClass()).invoke(null, obj);
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
+		for (final Method m : StatBlock.class.getMethods()) {
+			if (!m.getName().equals("getStatBlock") || m.getParameterCount() != 1) continue;
 
-			try {
-				final VBox statBlock = new VBox(2);
-				final ObservableList<Node> children = statBlock.getChildren();
-
-				final String name = Util.getName(obj);
-
-				children.add(smallCaps(Util.titleCase(name), "title"));
-
-				for (final Field field : obj.getClass().getFields()) {
-					try {
-						if (Modifier.isStatic(field.getModifiers())) continue;
-
-						Object value = field.get(obj);
-						if (value.getClass().isArray()) {
-							if (value.getClass().getComponentType().isPrimitive()) {
-								value = Arrays.class.getMethod("toString", value.getClass()).invoke(null, value);
-							} else if (value.getClass().getComponentType().isArray()) {
-								value = Arrays.class.getMethod("deepToString", Object[].class).invoke(null, value);
-							} else {
-								value = Arrays.class.getMethod("toString", Object[].class).invoke(null, value);
-							}
-						}
-
-						children.add(dataLine(Util.titleCase(field.getName()), value.toString()));
-					} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException e1) {}
+			if (m.getParameterTypes()[0] != Object.class && m.getParameterTypes()[0].isAssignableFrom(obj.getClass())) {
+				try {
+					return (Pane) m.invoke(null, obj);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					e.printStackTrace();
 				}
-
-				return statBlock;
-			} catch (final Exception e1) {
-				return new VBox(2);
 			}
+		}
+
+		try {
+			final VBox statBlock = new VBox(2);
+			final ObservableList<Node> children = statBlock.getChildren();
+
+			final String name = Util.getName(obj);
+
+			children.add(smallCaps(Util.titleCase(name), "title"));
+
+			for (final Field field : obj.getClass().getFields()) {
+				try {
+					if (Modifier.isStatic(field.getModifiers())) continue;
+
+					Object value = field.get(obj);
+					if (value.getClass().isArray()) {
+						if (value.getClass().getComponentType().isPrimitive()) {
+							value = Arrays.class.getMethod("toString", value.getClass()).invoke(null, value);
+						} else if (value.getClass().getComponentType().isArray()) {
+							value = Arrays.class.getMethod("deepToString", Object[].class).invoke(null, value);
+						} else {
+							value = Arrays.class.getMethod("toString", Object[].class).invoke(null, value);
+						}
+					}
+
+					children.add(dataLine(Util.titleCase(field.getName()), value.toString()));
+				} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException e1) {}
+			}
+
+			return statBlock;
+		} catch (final Exception e1) {
+			return new VBox(2);
 		}
 	}
 
@@ -211,6 +219,24 @@ public class StatBlock {
 
 			children.add(p.getNode());
 		}
+
+		return statBlock;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static Pane getStatBlock(final Template template) {
+		final VBox statBlock = new VBox(2);
+		final ObservableList<Node> children = statBlock.getChildren();
+
+		children.add(smallCaps(template.name, "title"));
+
+		String typeName = "";
+		try {
+			typeName = template.getClass().getMethod("make", Map.class).getReturnType().getSimpleName();
+		} catch (NoSuchMethodException | SecurityException e) {}
+		final Text subtitle = new Text(Util.sentenceCase(Util.titleCaseFromCamelCase(typeName)) + " template");
+		subtitle.getStyleClass().add("subtitle");
+		children.add(subtitle);
 
 		return statBlock;
 	}

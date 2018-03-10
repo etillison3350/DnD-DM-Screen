@@ -21,6 +21,10 @@ public abstract class Template<T> {
 		this.fields.addAll(fields);
 	}
 
+	public List<TemplateField> getFields() {
+		return new ArrayList<>(fields);
+	}
+
 	public abstract T make(final Map<String, Object> values);
 
 	public static String format(final String format, final Map<String, Object> values) {
