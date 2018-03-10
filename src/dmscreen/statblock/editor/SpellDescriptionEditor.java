@@ -1,4 +1,4 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,6 +13,7 @@ import javafx.scene.control.TextArea;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.SpellFeature;
 import dmscreen.data.spell.SpellParagraph;
+import dmscreen.statblock.StatBlock;
 
 public class SpellDescriptionEditor extends Editor<List<? extends SpellParagraph>> {
 

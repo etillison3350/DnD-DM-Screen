@@ -1,4 +1,4 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor.map;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import javafx.scene.control.Spinner;
 import javafx.scene.text.Text;
 import dmscreen.Util;
+import dmscreen.statblock.editor.IntegerEditor;
 
 public class MapEnumIntegerEditor<T extends Enum<?>> extends MapEditor<T, Integer> {
 

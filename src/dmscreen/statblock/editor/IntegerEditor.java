@@ -1,4 +1,4 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor;
 
 import javafx.scene.control.Spinner;
 import javafx.scene.text.Text;

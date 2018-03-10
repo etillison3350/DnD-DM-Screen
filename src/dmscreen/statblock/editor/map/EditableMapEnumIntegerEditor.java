@@ -1,7 +1,9 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor.map;
 
 import java.util.Map;
 
+import dmscreen.statblock.editor.EnumEditor;
+import dmscreen.statblock.editor.IntegerEditor;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
 

@@ -20,6 +20,19 @@ import dmscreen.data.creature.MovementType;
 import dmscreen.data.creature.VisionType;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellType;
+import dmscreen.statblock.editor.BooleanEditor;
+import dmscreen.statblock.editor.ChallengeRatingEditor;
+import dmscreen.statblock.editor.DiceRollEditor;
+import dmscreen.statblock.editor.Editor;
+import dmscreen.statblock.editor.EnumEditor;
+import dmscreen.statblock.editor.IntegerEditor;
+import dmscreen.statblock.editor.SpellDescriptionEditor;
+import dmscreen.statblock.editor.StringEditor;
+import dmscreen.statblock.editor.collection.CollectionEnumEditor;
+import dmscreen.statblock.editor.collection.CollectionStringEditor;
+import dmscreen.statblock.editor.map.EditableMapCollectionEditor;
+import dmscreen.statblock.editor.map.EditableMapEnumIntegerEditor;
+import dmscreen.statblock.editor.map.MapEnumIntegerEditor;
 
 public class StatBlockEditor<T> extends VBox {
 

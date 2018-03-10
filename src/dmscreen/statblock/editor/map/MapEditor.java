@@ -1,4 +1,4 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor.map;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import dmscreen.statblock.StatBlock;
+import dmscreen.statblock.editor.Editor;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;

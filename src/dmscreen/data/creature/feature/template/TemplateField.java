@@ -3,22 +3,25 @@ package dmscreen.data.creature.feature.template;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import dmscreen.Util;
 import dmscreen.data.base.DiceRoll;
-import dmscreen.statblock.BooleanEditor;
-import dmscreen.statblock.CollectionEnumEditor;
-import dmscreen.statblock.CollectionStringEditor;
-import dmscreen.statblock.DiceRollEditor;
-import dmscreen.statblock.EditableMapCollectionEditor;
-import dmscreen.statblock.EditableMapEnumIntegerEditor;
-import dmscreen.statblock.EditableMapStringStringEditor;
-import dmscreen.statblock.Editor;
-import dmscreen.statblock.EnumEditor;
-import dmscreen.statblock.IntegerEditor;
-import dmscreen.statblock.MapEnumIntegerEditor;
-import dmscreen.statblock.StringEditor;
-import dmscreen.statblock.StringSelectEditor;
+import dmscreen.statblock.editor.BooleanEditor;
+import dmscreen.statblock.editor.DiceRollEditor;
+import dmscreen.statblock.editor.Editor;
+import dmscreen.statblock.editor.EnumEditor;
+import dmscreen.statblock.editor.IntegerEditor;
+import dmscreen.statblock.editor.StringEditor;
+import dmscreen.statblock.editor.StringSelectEditor;
+import dmscreen.statblock.editor.collection.CollectionEnumEditor;
+import dmscreen.statblock.editor.collection.CollectionStringEditor;
+import dmscreen.statblock.editor.collection.CollectionStringSelectEditor;
+import dmscreen.statblock.editor.map.DamageEditor;
+import dmscreen.statblock.editor.map.EditableMapCollectionEditor;
+import dmscreen.statblock.editor.map.EditableMapEnumIntegerEditor;
+import dmscreen.statblock.editor.map.EditableMapStringStringEditor;
+import dmscreen.statblock.editor.map.MapEnumIntegerEditor;
 
 public class TemplateField {
 
@@ -81,7 +84,9 @@ public class TemplateField {
 				if (subtype.clazz.isEnum()) {
 					return new CollectionEnumEditor(subtype.clazz, name, null);
 				} else if (subtype == FieldType.STRING) {
-					if (fieldArgs.length > 1) {
+					if (fieldArgs.length > 2) {
+						return new CollectionStringSelectEditor(name, null, Arrays.stream(fieldArgs).skip(1).map(Object::toString).collect(Collectors.toList()));
+					} else if (fieldArgs.length > 1) {
 						return new CollectionStringEditor(name, fieldArgs[1].toString(), null);
 					} else {
 						return new CollectionStringEditor(name, null);
@@ -109,6 +114,8 @@ public class TemplateField {
 						} else {
 							return new MapEnumIntegerEditor(keyType.clazz, name, keyTitle, valueTitle, min, max, step, null);
 						}
+					} else if (keyType == FieldType.DAMAGE_TYPE && valueType == FieldType.DICE_ROLL) {
+						return new DamageEditor(name, keyTitle, valueTitle, null);
 					} else if (valueType == FieldType.LIST) {
 						BiFunction keySupplier, valueSupplier;
 						if (keyType == FieldType.INTEGER) {

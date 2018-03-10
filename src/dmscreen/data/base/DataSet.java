@@ -16,6 +16,6 @@ public class DataSet {
 	public transient final Set<Condition> conditions = new TreeSet<>();
 	public final Set<Spell> spells = new TreeSet<>(Comparator.comparing(spell -> spell.name));
 	public final Set<Creature> creatures = new TreeSet<>(Comparator.comparing(creature -> creature.name));
-	public final Set<Template<?>> features = new TreeSet<>(Comparator.comparing(feature -> feature.name));
+	public final Set<Template<?>> templates = new TreeSet<>(Comparator.comparing(template -> template.name));
 
 }

@@ -1,4 +1,4 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor.collection;
 
 import java.util.Collection;
 

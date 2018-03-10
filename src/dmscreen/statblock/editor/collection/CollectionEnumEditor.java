@@ -1,9 +1,10 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor.collection;
 
 import java.util.Collection;
 
 import javafx.scene.control.ComboBox;
 import dmscreen.Util;
+import dmscreen.statblock.editor.EnumEditor;
 
 public class CollectionEnumEditor<T extends Enum<?>> extends CollectionEditor<T> {
 

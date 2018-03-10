@@ -1,4 +1,4 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor.map;
 
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.GridPane;

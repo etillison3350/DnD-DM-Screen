@@ -1,4 +1,4 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor;
 
 import javafx.geometry.Pos;
 import javafx.scene.layout.ColumnConstraints;

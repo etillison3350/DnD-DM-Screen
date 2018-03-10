@@ -1,9 +1,11 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor.map;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+
+import dmscreen.statblock.editor.Editor;
 
 public class EditableMapCollectionEditor<K, T> extends EditableMapEditor<K, Collection<T>> {
 

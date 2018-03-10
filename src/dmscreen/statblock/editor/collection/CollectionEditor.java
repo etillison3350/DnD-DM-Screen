@@ -1,10 +1,12 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor.collection;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import dmscreen.statblock.StatBlock;
+import dmscreen.statblock.editor.Editor;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;

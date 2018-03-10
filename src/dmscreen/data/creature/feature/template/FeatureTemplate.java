@@ -5,11 +5,11 @@ import java.util.Map;
 
 import dmscreen.data.creature.feature.Feature;
 
-public class SimpleFeatureTemplate extends Template<Feature> {
+public class FeatureTemplate extends Template<Feature> {
 
 	public final String nameFormat, noteFormat, descFormat;
 
-	public SimpleFeatureTemplate(final String name, final Collection<TemplateField> fields, final String nameFormat, final String noteFormat, final String descFormat) {
+	public FeatureTemplate(final String name, final Collection<TemplateField> fields, final String nameFormat, final String noteFormat, final String descFormat) {
 		super(name, fields);
 		this.nameFormat = nameFormat;
 		this.noteFormat = noteFormat;

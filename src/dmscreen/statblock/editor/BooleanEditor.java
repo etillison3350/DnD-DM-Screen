@@ -1,4 +1,4 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;

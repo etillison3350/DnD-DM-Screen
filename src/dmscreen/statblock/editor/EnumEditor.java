@@ -1,4 +1,4 @@
-package dmscreen.statblock;
+package dmscreen.statblock.editor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
