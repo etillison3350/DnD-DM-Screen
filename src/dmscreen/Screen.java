@@ -195,7 +195,7 @@ public class Screen extends Application {
 
 		}));
 		dataTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue != null && newValue.isLeaf() && !(newValue.getValue() instanceof Field)) {
+			if (newValue != null && !parents.containsValue(newValue)) {
 				setEditing(false);
 
 				setStatBlock(newValue.getValue());

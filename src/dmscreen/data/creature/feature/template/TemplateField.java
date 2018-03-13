@@ -44,12 +44,14 @@ public class TemplateField {
 	public static Editor<?> getEditor(final TemplateField field) {
 		if (field == null) throw new NullPointerException("field cannot be null");
 
+		System.out.println(field.type + " | " + Arrays.toString(field.args));
+
 		final String name = field.displayName;
 		final Object[] fieldArgs = new Object[field.args.length];
 
 		for (int n = 0; n < fieldArgs.length; n++) {
 			try {
-				fieldArgs[n] = FieldType.valueOf(field.args[n].toString());
+				fieldArgs[n] = FieldType.valueOf(String.format("%s", field.args[n]));
 			} catch (final IllegalArgumentException e) {
 				fieldArgs[n] = field.args[n];
 			}
@@ -103,6 +105,8 @@ public class TemplateField {
 					final String valueTitle = fieldArgs[4] == null ? null : fieldArgs[4].toString();
 					final boolean editable = fieldArgs[5] == null ? false : (Boolean) fieldArgs[5];
 
+					System.out.println(keyType + ", " + valueType);
+
 					if (keyType.clazz.isEnum() && valueType == FieldType.INTEGER) {
 						final int[] args = Arrays.stream(fieldArgs).skip(6).mapToInt(o -> o instanceof Number ? ((Number) o).intValue() : Integer.parseInt(o.toString())).toArray();
 
@@ -141,6 +145,7 @@ public class TemplateField {
 						return new EditableMapCollectionEditor(name, keyTitle, valueTitle, null, keySupplier, valueSupplier);
 					}
 				} catch (IndexOutOfBoundsException | ClassCastException | NullPointerException e) {
+					e.printStackTrace();
 					return new EditableMapStringStringEditor(name, null, null, null);
 				}
 			}

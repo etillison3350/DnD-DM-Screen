@@ -15,17 +15,17 @@ public class Util {
 	private Util() {}
 
 	public static String titleCase(final String string) {
-		if (string.isEmpty()) return string;
+		if (string == null || string.isEmpty()) return "";
 		return Arrays.stream(string.split("[_ ]")).map(Util::sentenceCase).collect(Collectors.joining(" "));
 	}
 
 	public static String sentenceCase(final String string) {
-		if (string.isEmpty()) return string;
+		if (string == null || string.isEmpty()) return "";
 		return Character.toUpperCase(string.charAt(0)) + string.substring(1).toLowerCase();
 	}
 
 	public static String titleCaseFromCamelCase(final String camelCase) {
-		if (camelCase.isEmpty()) return camelCase;
+		if (camelCase == null || camelCase.isEmpty()) return "";
 		return Character.toUpperCase(camelCase.charAt(0)) + camelCase.substring(1).replaceAll("[A-Z]", " $0");
 	}
 

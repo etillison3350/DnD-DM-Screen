@@ -2,10 +2,10 @@ package dmscreen.statblock.editor.map;
 
 import java.util.Map;
 
-import dmscreen.statblock.editor.EnumEditor;
-import dmscreen.statblock.editor.IntegerEditor;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
+import dmscreen.statblock.editor.EnumEditor;
+import dmscreen.statblock.editor.IntegerEditor;
 
 public class EditableMapEnumIntegerEditor<T extends Enum<?>> extends EditableMapEditor<T, Integer> {
 
@@ -13,16 +13,12 @@ public class EditableMapEnumIntegerEditor<T extends Enum<?>> extends EditableMap
 	private final int min, max, step;
 
 	public EditableMapEnumIntegerEditor(final Class<T> clazz, final String name, final String keyTitle, final String valueTitle, final int min, final int max, final int step, final Map<T, Integer> initialValue) {
-		super(name, keyTitle, valueTitle);
+		super(name, keyTitle, valueTitle, initialValue);
 
 		this.clazz = clazz;
 		this.min = min;
 		this.max = max;
 		this.step = step;
-
-		initialValue.forEach((t, i) -> {
-			addMapRow(makeRow(clazz, t, min, max, step, i));
-		});
 	}
 
 	public EditableMapEnumIntegerEditor(final Class<T> clazz, final String name, final String keyTitle, final String valueTitle, final int min, final int max, final Map<T, Integer> initialValue) {
@@ -36,8 +32,8 @@ public class EditableMapEnumIntegerEditor<T extends Enum<?>> extends EditableMap
 	}
 
 	@Override
-	protected MapRow<T, Integer> makeRow() {
-		return makeRow(clazz, null, min, max, step, Math.max(0, min));
+	protected MapRow<T, Integer> makeRow(final T initialKey, final Integer initialValue) {
+		return makeRow(clazz, initialKey, min, max, step, initialValue == null ? 0 : initialValue);
 	}
 
 }

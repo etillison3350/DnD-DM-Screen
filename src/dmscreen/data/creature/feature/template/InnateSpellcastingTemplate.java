@@ -60,6 +60,8 @@ public class InnateSpellcastingTemplate extends Template<InnateSpellcasting> {
 			}
 
 			for (final String spell : vs.split(",")) {
+				System.out.println(spell);
+
 				final Matcher m = SPELL_NOTE.matcher(spell);
 				if (m.find()) {
 					spellList.put(m.group(1), m.group(2));

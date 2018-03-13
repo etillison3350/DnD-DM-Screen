@@ -22,7 +22,7 @@ public class TestTemplates {
 	public static final InnateSpellcastingTemplate innate = new InnateSpellcastingTemplate();
 	public static final SpellcastingTemplate spellcasting = new SpellcastingTemplate();
 	public static final AttackTemplate basicAttack = new AttackTemplate("Basic Attack", Arrays.asList(new TemplateField("description", "Additional Effects", FieldType.STRING)), "${description}");
-	public static final FeatureTemplate keenSenses = new FeatureTemplate("Keen Sense", Arrays.asList(new TemplateField("shortName", "General Creature Name", FieldType.STRING), new TemplateField("senses", FieldType.LIST, FieldType.STRING, "Hearing", "Sight", "Smell")), "Keen ${senses.length == 1 ? senses[0] : senses.length == 3 || senses.length == 0 ? 'Senses' : senses[0] + ' and ' + senses[1]}", "", "${Util.sentenceCase(shortName) + ' has advantage on Wisdom (Perception) checks that rely on ' + (senses.length == 0 ? 'senses' : Util.andJoin('or', senses).toLowerCase()) + '.'}");
+	public static final FeatureTemplate keenSenses = new FeatureTemplate("Keen Sense", Arrays.asList(new TemplateField("shortName", "General Name", FieldType.STRING), new TemplateField("senses", FieldType.LIST, FieldType.STRING, "Hearing", "Sight", "Smell")), "Keen ${senses.size() == 1 ? senses.get(0) : senses.size() == 3 || senses.size() == 0 ? 'Senses' : senses.get(0) + ' and ' + senses.get(1)}", "", "${Util.sentenceCase(shortName) + ' has advantage on Wisdom (Perception) checks that rely on ' + (senses.length == 0 ? 'senses' : Util.andJoin('or', senses).toLowerCase()) + '.'}");
 
 	public static void main(final String... args) {
 		try {

@@ -49,7 +49,7 @@ public abstract class Template<T> {
 				} else if (c == '}') {
 					if (--bracket <= 0) {
 						if (values.containsKey(script.toString())) {
-							ret.append(getString(values.get(script.toString()).toString()));
+							ret.append(getString(values.get(script.toString())));
 						} else {
 							if (engine == null) engine = JavaScript.getEngine(values);
 							try {
@@ -73,7 +73,9 @@ public abstract class Template<T> {
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public static String getString(final Object o) {
-		if (o instanceof Collection) {
+		if (o == null) {
+			return "";
+		} else if (o instanceof Collection) {
 			return ((Collection) o).stream().collect(Collectors.joining(", ")).toString();
 		} else if (o instanceof Map) {
 			return ((Map) o).keySet().stream().map(k -> String.format("%s: %s", k, ((Map) o).get(k))).collect(Collectors.joining(", ")).toString();

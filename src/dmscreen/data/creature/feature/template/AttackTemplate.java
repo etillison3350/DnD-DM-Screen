@@ -39,6 +39,6 @@ public class AttackTemplate extends Template<Attack> {
 
 		final Attack.Damage[] damages = damageMap.keySet().stream().map(k -> new Attack.Damage(damageMap.get(k), k)).toArray(size -> new Attack.Damage[size]);
 
-		return new Attack(Util.castOrDefault(CharSequence.class, values.get("name"), "").toString(), Util.castOrDefault(CharSequence.class, values.get("note"), "").toString(), Util.castOrDefault(Attack.Type.class, values.get("type"), Attack.Type.MELEE_WEAPON), Util.castOrDefault(Integer.class, values.get("attackModifier"), 0), Util.castOrDefault(CharSequence.class, values.get("params"), "").toString(), format(descFormat, values), damages);
+		return new Attack(Util.castOrDefault(CharSequence.class, values.get("name"), "").toString(), Util.castOrDefault(CharSequence.class, values.get("note"), "").toString(), Util.castOrDefault(Attack.Type.class, values.get("attackType"), Attack.Type.MELEE_WEAPON), Util.castOrDefault(Integer.class, values.get("attackModifier"), 0), Util.castOrDefault(CharSequence.class, values.get("params"), "").toString(), format(descFormat, values), damages);
 	}
 }
