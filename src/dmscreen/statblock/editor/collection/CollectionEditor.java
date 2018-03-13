@@ -7,6 +7,7 @@ import java.util.Map;
 
 import dmscreen.statblock.StatBlock;
 import dmscreen.statblock.editor.Editor;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -18,6 +19,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 public abstract class CollectionEditor<T> extends Editor<Collection<T>> {
 
@@ -29,7 +32,7 @@ public abstract class CollectionEditor<T> extends Editor<Collection<T>> {
 	public CollectionEditor(final String name, final Collection<T> initialValues) {
 		super(name);
 
-		setPadding(new Insets(8, 0, 8, 0));
+		setPadding(new Insets(4, 0, 4, 0));
 
 		collection = new HashMap<>();
 
@@ -47,15 +50,34 @@ public abstract class CollectionEditor<T> extends Editor<Collection<T>> {
 		this.add(values, 0, row++, 2, 1);
 		this.add(bottomPane, 0, row++, 2, 1);
 
+		final Text empty = new Text("(empty)");
+		empty.setFill(Color.GRAY);
+		values.getChildren().add(empty);
+
 		if (initialValues != null) initialValues.forEach(this::add);
+
+		values.getChildrenUnmodifiable().addListener((ListChangeListener<Node>) c -> {
+			if (c.next()) {
+				if (c.wasRemoved() && c.getList().isEmpty()) {
+					final Text placeholder = new Text("(empty)");
+					placeholder.setFill(Color.GRAY);
+					values.getChildren().add(placeholder);
+				}
+			}
+		});
 	}
 
 	private boolean add(final T t) {
 		if (t == null) return false;
 
 		final Node v = new Label(convertToString(t)); // TODO add delete buttons
-		values.getChildren().remove(collection.put(t, v));
-		values.getChildren().add(v);
+		if (collection.isEmpty()) {
+			collection.put(t, v);
+			values.getChildren().set(0, v);
+		} else {
+			values.getChildren().remove(collection.put(t, v));
+			values.getChildren().add(v);
+		}
 		return true;
 	}
 

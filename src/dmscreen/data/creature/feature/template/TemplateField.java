@@ -18,8 +18,8 @@ import dmscreen.statblock.editor.collection.CollectionEnumEditor;
 import dmscreen.statblock.editor.collection.CollectionStringEditor;
 import dmscreen.statblock.editor.collection.CollectionStringSelectEditor;
 import dmscreen.statblock.editor.map.DamageEditor;
-import dmscreen.statblock.editor.map.EditableMapCollectionEditor;
 import dmscreen.statblock.editor.map.EditableMapEnumIntegerEditor;
+import dmscreen.statblock.editor.map.EditableMapCollectionEditor;
 import dmscreen.statblock.editor.map.EditableMapStringStringEditor;
 import dmscreen.statblock.editor.map.MapEnumIntegerEditor;
 
@@ -74,7 +74,7 @@ public class TemplateField {
 				final int[] args = Arrays.stream(fieldArgs).mapToInt(o -> o instanceof Number ? ((Number) o).intValue() : Integer.parseInt(o.toString())).toArray();
 
 				final int min = args.length < 1 ? Short.MIN_VALUE : args[0];
-				return new IntegerEditor(name, min, args.length < 2 ? Short.MAX_VALUE : args[1], args.length < 3 ? Math.min(0, min) : args[2], args.length < 4 ? 1 : args[3]);
+				return new IntegerEditor(name, min, args.length < 2 ? Short.MAX_VALUE : args[1], args.length < 3 ? Math.max(0, min) : args[2], args.length < 4 ? 1 : args[3]);
 			} else if (field.type == FieldType.BOOLEAN) {
 				return new BooleanEditor(name, false);
 			} else if (field.type == FieldType.DICE_ROLL) {
@@ -104,8 +104,6 @@ public class TemplateField {
 					final FieldType listType = valueType == FieldType.LIST ? fieldArgs[3] == null ? FieldType.STRING : (FieldType) fieldArgs[3] : null;
 					final String valueTitle = fieldArgs[4] == null ? null : fieldArgs[4].toString();
 					final boolean editable = fieldArgs[5] == null ? false : (Boolean) fieldArgs[5];
-
-					System.out.println(keyType + ", " + valueType);
 
 					if (keyType.clazz.isEnum() && valueType == FieldType.INTEGER) {
 						final int[] args = Arrays.stream(fieldArgs).skip(6).mapToInt(o -> o instanceof Number ? ((Number) o).intValue() : Integer.parseInt(o.toString())).toArray();

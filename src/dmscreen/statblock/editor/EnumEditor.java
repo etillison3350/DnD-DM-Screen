@@ -1,15 +1,12 @@
 package dmscreen.statblock.editor;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
 
+import dmscreen.Util;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
-import dmscreen.Util;
 
 public class EnumEditor<T extends Enum<?>> extends Editor<T> {
 
@@ -27,10 +24,13 @@ public class EnumEditor<T extends Enum<?>> extends Editor<T> {
 		return value.getValue();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <E extends Enum<?>> ComboBox<E> createEditorComboBox(final Class<E> clazz, final E initialValue) {
 		final ComboBox<E> ret = new ComboBox<>();
 		try {
-			List.class.getMethod("forEach", Consumer.class).invoke(Arrays.class.getMethod("asList", Object[].class).invoke(null, clazz.getMethod("values").invoke(null)), (Consumer<E>) ret.getItems()::add);
+			final E[] values = (E[]) clazz.getMethod("values").invoke(null);
+			for (final E e : values)
+				ret.getItems().add(e);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			throw new IllegalArgumentException(e);
 		}

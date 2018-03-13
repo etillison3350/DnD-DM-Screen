@@ -40,6 +40,7 @@ public abstract class MapEditor<K, V> extends Editor<Map<K, V>> {
 		if (row.separateRows) {
 			add(row.key, 0, minRow++, 2, 1);
 			add(row.value, 0, minRow++, 2, 1);
+			add(new Text(), 0, minRow++, 2, 1);
 		} else {
 			addRow(minRow++, row.key, row.value);
 		}

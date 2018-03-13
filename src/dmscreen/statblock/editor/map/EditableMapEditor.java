@@ -1,7 +1,5 @@
 package dmscreen.statblock.editor.map;
 
-import java.util.Map;
-
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.GridPane;
 
@@ -11,7 +9,7 @@ public abstract class EditableMapEditor<K, V> extends MapEditor<K, V> {
 
 	private final Hyperlink add;
 
-	public EditableMapEditor(final String name, final String keyTitle, final String valueTitle, final Map<? extends K, ? extends V> initialValue) {
+	public EditableMapEditor(final String name, final String keyTitle, final String valueTitle) {
 		super(name, keyTitle, valueTitle);
 
 		add = new Hyperlink(DEFAULT_ADD_BUTTON_NAME);
@@ -20,12 +18,6 @@ public abstract class EditableMapEditor<K, V> extends MapEditor<K, V> {
 			add.setVisited(false);
 			addMapRow(makeRow(null, null));
 		});
-
-		if (initialValue != null) {
-			initialValue.forEach((k, v) -> {
-				addMapRow(makeRow(k, v));
-			});
-		}
 	}
 
 	protected abstract MapRow<K, V> makeRow(K initialKey, V initialValue);
@@ -36,7 +28,7 @@ public abstract class EditableMapEditor<K, V> extends MapEditor<K, V> {
 
 	@Override
 	protected void addMapRow(final MapRow<K, V> row) {
-		GridPane.setRowIndex(add, getMinRow() + (row.separateRows ? 2 : 1));
+		GridPane.setRowIndex(add, getMinRow() + (row.separateRows ? 3 : 1));
 
 		super.addMapRow(row);
 	}

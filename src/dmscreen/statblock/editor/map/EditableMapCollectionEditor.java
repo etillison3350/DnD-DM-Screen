@@ -14,7 +14,7 @@ public class EditableMapCollectionEditor<K, T> extends EditableMapEditor<K, Coll
 	private final BiFunction<String, Collection<T>, Editor<Collection<T>>> valueEditor;
 
 	public EditableMapCollectionEditor(final String name, final String keyTitle, final String valueTitle, final String addButtonName, final Map<K, ? extends Collection<T>> initialValue, final BiFunction<String, K, Editor<K>> keyEditor, final BiFunction<String, Collection<T>, Editor<Collection<T>>> valueEditor) {
-		super(name, null, null, initialValue);
+		super(name, null, null);
 
 		setAddButtonName(addButtonName);
 
@@ -23,7 +23,11 @@ public class EditableMapCollectionEditor<K, T> extends EditableMapEditor<K, Coll
 		this.keyEditor = keyEditor;
 		this.valueEditor = valueEditor;
 
-		setVgap(8);
+		if (initialValue != null) {
+			initialValue.forEach((k, v) -> {
+				addMapRow(makeRow(k, v));
+			});
+		}
 	}
 
 	public EditableMapCollectionEditor(final String name, final String keyTitle, final String valueTitle, final Map<K, ? extends Collection<T>> initialValue, final BiFunction<String, K, Editor<K>> keyEditor, final BiFunction<String, Collection<T>, Editor<Collection<T>>> valueEditor) {
@@ -43,6 +47,7 @@ public class EditableMapCollectionEditor<K, T> extends EditableMapEditor<K, Coll
 				ret.put(key, value);
 			}
 		});
+		System.out.println(ret);
 		return ret;
 	}
 
@@ -50,7 +55,7 @@ public class EditableMapCollectionEditor<K, T> extends EditableMapEditor<K, Coll
 	protected MapRow<K, Collection<T>> makeRow(final K initialKey, final Collection<T> initialValue) {
 		final Editor<K> key = keyEditor.apply(keyTitle, initialKey);
 		final Editor<Collection<T>> value = valueEditor.apply(valueTitle, initialValue);
-		return new MapRow<K, Collection<T>>(key, value, key::getValue, value::getValue, true);
+		return new MapRow<>(key, value, key::getValue, value::getValue, true);
 	}
 
 }

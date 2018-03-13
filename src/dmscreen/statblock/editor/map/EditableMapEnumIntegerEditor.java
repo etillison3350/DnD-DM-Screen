@@ -2,10 +2,10 @@ package dmscreen.statblock.editor.map;
 
 import java.util.Map;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Spinner;
 import dmscreen.statblock.editor.EnumEditor;
 import dmscreen.statblock.editor.IntegerEditor;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Spinner;
 
 public class EditableMapEnumIntegerEditor<T extends Enum<?>> extends EditableMapEditor<T, Integer> {
 
@@ -13,12 +13,18 @@ public class EditableMapEnumIntegerEditor<T extends Enum<?>> extends EditableMap
 	private final int min, max, step;
 
 	public EditableMapEnumIntegerEditor(final Class<T> clazz, final String name, final String keyTitle, final String valueTitle, final int min, final int max, final int step, final Map<T, Integer> initialValue) {
-		super(name, keyTitle, valueTitle, initialValue);
+		super(name, keyTitle, valueTitle);
 
 		this.clazz = clazz;
 		this.min = min;
 		this.max = max;
 		this.step = step;
+
+		if (initialValue != null) {
+			initialValue.forEach((k, v) -> {
+				addMapRow(makeRow(k, v));
+			});
+		}
 	}
 
 	public EditableMapEnumIntegerEditor(final Class<T> clazz, final String name, final String keyTitle, final String valueTitle, final int min, final int max, final Map<T, Integer> initialValue) {

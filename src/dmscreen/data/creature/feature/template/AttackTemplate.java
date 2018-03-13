@@ -24,7 +24,7 @@ public class AttackTemplate extends Template<Attack> {
 				new TemplateField("attackModifier", FieldType.INTEGER, -10, 20), //
 				new TemplateField("params", "Range/Targets", FieldType.STRING), //
 				new TemplateField("damage", FieldType.MAP, FieldType.DAMAGE_TYPE, "Damage Type", FieldType.DICE_ROLL, null, "Amount", true) //
-				), fields.stream()).collect(Collectors.toList()));
+		), fields.stream()).collect(Collectors.toList()));
 
 		this.descFormat = descFormat;
 	}

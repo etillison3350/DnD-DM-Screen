@@ -66,7 +66,7 @@ public class DiceRoll {
 		if (matcher.find()) {
 			return new DiceRoll(Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(3)), matcher.group(4) == null ? 0 : Integer.parseInt(matcher.group(4)), Integer.parseInt(matcher.group(1)));
 		}
-	
+
 		return null;
 	}
 

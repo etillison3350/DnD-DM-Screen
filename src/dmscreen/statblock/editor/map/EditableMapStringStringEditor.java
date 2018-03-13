@@ -7,7 +7,13 @@ import javafx.scene.control.TextField;
 public class EditableMapStringStringEditor extends EditableMapEditor<String, String> {
 
 	public EditableMapStringStringEditor(final String name, final String keyTitle, final String valueTitle, final Map<String, String> initialValue) {
-		super(name, keyTitle, valueTitle, initialValue);
+		super(name, keyTitle, valueTitle);
+
+		if (initialValue != null) {
+			initialValue.forEach((k, v) -> {
+				addMapRow(makeRow(k, v));
+			});
+		}
 	}
 
 	@Override

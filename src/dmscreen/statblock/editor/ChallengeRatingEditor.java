@@ -30,13 +30,15 @@ public class ChallengeRatingEditor extends Editor<Integer> {
 
 				int cr = Integer.MIN_VALUE;
 				int xp = Integer.MIN_VALUE;
-				if (noSp.matches("[\\d\\/\\,]+\\(.+?\\)")) { // If the value has numbers and parentheses
+				if (noSp.matches("[\\d\\/\\,]+\\(.+?\\)")) { // If the value has numbers and
+																// parentheses
 					final String crStr = noSp.substring(0, noSp.indexOf('('));
 					try {
 						// Find the value of the string before the parentheses
 						final int i = Integer.parseUnsignedInt(crStr);
 						if (i <= 30) { // If the value is in CR range
-							if (i == 0) { // If the CR is 0, it could either be 0 (0 XP) or 0 (10 XP)
+							if (i == 0) { // If the CR is 0, it could either be 0 (0 XP) or 0 (10
+											// XP)
 								if (noSp.contains("(10"))
 									cr = -3;
 								else
@@ -61,7 +63,8 @@ public class ChallengeRatingEditor extends Editor<Integer> {
 								case 8:
 									cr = -2;
 									break;
-								default: // If the denominator is not 2, 4, or 8, the string is invalid.
+								default: // If the denominator is not 2, 4, or 8, the string is
+											// invalid.
 									throw e;
 							}
 						} else { // Or it could have commas in it, in which case it's definitely XP
@@ -71,7 +74,8 @@ public class ChallengeRatingEditor extends Editor<Integer> {
 				} else if (noSp.endsWith("XP") || noSp.contains(",")) {
 					// If it ends with 'XP' or has commas, it's XP
 					xp = Integer.parseUnsignedInt(noSp.replaceAll("[,XP]+", ""));
-				} else if (noSp.startsWith("1/")) { // If it's a standalone fraction, parse it as above
+				} else if (noSp.startsWith("1/")) { // If it's a standalone fraction, parse it as
+													// above
 					final int recip = Integer.parseUnsignedInt(noSp.substring(2));
 					switch (recip) {
 						case 2:

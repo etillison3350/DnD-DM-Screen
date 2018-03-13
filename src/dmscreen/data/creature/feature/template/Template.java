@@ -55,6 +55,7 @@ public abstract class Template<T> {
 							try {
 								ret.append(engine.eval(script.toString()));
 							} catch (final ScriptException e) {
+								e.printStackTrace();
 								ret.append("[ERROR]");
 							}
 						}

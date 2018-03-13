@@ -1,6 +1,7 @@
 package dmscreen.data.creature.feature.template;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -39,9 +40,16 @@ public class JavaScript {
 		return engine;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static ScriptEngine getEngine(final Map<String, Object> variables) {
 		final ScriptEngine engine = getEngine();
-		variables.forEach(engine::put);
+		variables.forEach((n, v) -> {
+			if (v instanceof Collection) {
+				engine.put(n, ((Collection) v).toArray());
+			} else {
+				engine.put(n, v);
+			}
+		});
 		return engine;
 	}
 

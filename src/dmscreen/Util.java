@@ -30,14 +30,17 @@ public class Util {
 	}
 
 	/**
-	 * Applies a case rule (uppercase, lowercase, sentence case, or title case) on {@code string} based on {@code source}.<br>
+	 * Applies a case rule (uppercase, lowercase, sentence case, or title case) on {@code string}
+	 * based on {@code source}.<br>
 	 * <ul>
 	 * <li>If {@code source} is entirely uppercase, returns an uppercase string.</li>
 	 * <li>If {@code source} is entirely lowercase, returns an lowercase string.</li>
-	 * <li>If the first and second word of {@code source} begin with an uppercase letter (i.e. the first character and the
-	 * character after the first underscore are both uppercase), returns a title case string (as by {@link #titleCase(String)})</li>
-	 * <li>If the first character of {@code source} is uppercase, and {@code source} either has one word, or has a second word
-	 * that begins with a lowercase letter, returns a sentence case string, as by {@link #sentenceCase(String)}</li>
+	 * <li>If the first and second word of {@code source} begin with an uppercase letter (i.e. the
+	 * first character and the character after the first underscore are both uppercase), returns a
+	 * title case string (as by {@link #titleCase(String)})</li>
+	 * <li>If the first character of {@code source} is uppercase, and {@code source} either has one
+	 * word, or has a second word that begins with a lowercase letter, returns a sentence case
+	 * string, as by {@link #sentenceCase(String)}</li>
 	 * <li>If none of the above conditions are met, the original string is returned.
 	 * </ul>
 	 */
@@ -123,8 +126,8 @@ public class Util {
 	}
 
 	/**
-	 * Attempts to cast <code>t</code> to <code>clazz</code>. If this is not possible, or if <code>t</code> is <code>null</code>
-	 * , returns <code>def</code> instead.
+	 * Attempts to cast <code>t</code> to <code>clazz</code>. If this is not possible, or if
+	 * <code>t</code> is <code>null</code> , returns <code>def</code> instead.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T castOrDefault(final Class<T> clazz, final Object t, final T def) {
