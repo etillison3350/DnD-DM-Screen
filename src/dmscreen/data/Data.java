@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -38,10 +41,10 @@ import dmscreen.data.creature.feature.template.Template;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.SpellFeature;
 import dmscreen.data.spell.SpellParagraph;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 
-public class Data {
+public final class Data {
+
+	private Data() {}
 
 	public static final Gson GSON;
 
@@ -72,7 +75,7 @@ public class Data {
 		GSON = new GsonBuilder().registerTypeAdapterFactory(featureAdapter).registerTypeAdapterFactory(actionAdapter).registerTypeAdapterFactory(spellAdapter).registerTypeAdapterFactory(templateAdapter).create();
 	}
 
-	private final Map<String, DataSet> data = new TreeMap<>((o1, o2) -> {
+	private static final Map<String, DataSet> data = new TreeMap<>((o1, o2) -> {
 		if (o1.equalsIgnoreCase("source")) {
 			if (o2.equalsIgnoreCase("source")) return 0;
 			return -1;
@@ -82,7 +85,7 @@ public class Data {
 		return o1.compareToIgnoreCase(o2);
 	});
 
-	public Data(final Path root) throws IOException {
+	public static final void init(final Path root) throws IOException {
 		final Map<String, Exception> errors = new HashMap<>();
 		Files.walk(root).filter(path -> !Files.isDirectory(path) && path.getFileName().toString().endsWith(".json")).forEach(path -> {
 			final String setName = path.getParent().getFileName().toString();
@@ -125,7 +128,7 @@ public class Data {
 		}
 	}
 
-	public Map<String, DataSet> getData() {
+	public static Map<String, DataSet> getData() {
 		return data;
 	}
 

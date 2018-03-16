@@ -5,11 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -17,21 +15,12 @@ import java.util.stream.Stream;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -40,18 +29,15 @@ import javafx.scene.text.TextFlow;
 import dmscreen.Screen;
 import dmscreen.Util;
 import dmscreen.data.base.Ability;
-import dmscreen.data.base.BlockEntry;
 import dmscreen.data.base.DamageType;
 import dmscreen.data.base.Skill;
 import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.Creature;
 import dmscreen.data.creature.MovementType;
 import dmscreen.data.creature.feature.template.Template;
-import dmscreen.data.creature.feature.template.TemplateField;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellParagraph;
-import dmscreen.statblock.editor.Editor;
 
 public class StatBlock {
 
@@ -254,45 +240,7 @@ public class StatBlock {
 
 		children.add(new Text(" "));
 
-		children.add(smallCaps("Preview", "header-small"));
-		children.add(new Separator());
-
-		final StackPane preview = new StackPane();
-		preview.setBorder(new Border(new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-		preview.setPadding(new Insets(4));
-		children.add(preview);
-
-		final Map<String, Editor> editors = new HashMap<>();
-
-		final Button update = new Button("Update");
-		update.setOnAction(event -> {
-			preview.getChildren().clear();
-
-			try {
-				final Map<String, Object> values = new HashMap<>();
-				editors.forEach((s, e) -> values.put(s, e.getValue()));
-
-				final Object result = template.make(values);
-				if (result instanceof BlockEntry) {
-					preview.getChildren().add(((BlockEntry) result).getNode());
-				} else {
-					preview.getChildren().add(getStatBlock(result));
-				}
-			} catch (final Exception e) {
-				e.printStackTrace();
-				preview.getChildren().add(dataLine("[ERROR]", null));
-			}
-		});
-		children.add(update);
-
-		template.getFields().forEach((Consumer<TemplateField>) f -> {
-			final Editor e = TemplateField.getEditor(f);
-			System.out.println(e.getClass());
-			editors.put(f.name, e);
-			children.add(e);
-		});
-
-		update.fire();
+		children.add(new TemplateEditor(template, true));
 
 		return statBlock;
 	}

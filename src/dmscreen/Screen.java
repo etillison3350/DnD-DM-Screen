@@ -2,6 +2,7 @@ package dmscreen;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -14,10 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import dmscreen.data.Data;
-import dmscreen.data.base.DataSet;
-import dmscreen.statblock.StatBlock;
-import dmscreen.statblock.StatBlockEditor;
 import javafx.animation.PauseTransition;
 import javafx.animation.Transition;
 import javafx.application.Application;
@@ -43,6 +40,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import dmscreen.data.Data;
+import dmscreen.data.base.DataSet;
+import dmscreen.statblock.StatBlock;
+import dmscreen.statblock.StatBlockEditor;
 
 public class Screen extends Application {
 
@@ -54,10 +55,13 @@ public class Screen extends Application {
 			Font.loadFont(new FileInputStream(Paths.get("Cormorant_Garamond/CormorantGaramond-Bold.ttf").toFile()), 12);
 		} catch (final FileNotFoundException e) {}
 
+		try {
+			Data.init(Paths.get("resources"));
+		} catch (final IOException e) {}
+
 		Application.launch(args);
 	}
 
-	private Data data;
 	private StackPane blockPane;
 	private TreeView<Object> dataTree;
 	private final Map<TreeItem<Object>, TreeItem<Object>> parents = new LinkedHashMap<>();
@@ -72,8 +76,6 @@ public class Screen extends Application {
 
 	@Override
 	public void start(final Stage stage) throws Exception {
-		data = new Data(Paths.get("resources"));
-
 		dataTree = createTree();
 		searchBar = createSearchBar();
 
@@ -222,7 +224,7 @@ public class Screen extends Application {
 		parents.clear();
 
 		final TreeItem<Object> treeRoot = new TreeItem<>();
-		data.getData().forEach((name, dataSet) -> {
+		Data.getData().forEach((name, dataSet) -> {
 			final TreeItem<Object> setRoot = new TreeItem<>(dataSet);
 			parents.put(setRoot, treeRoot);
 

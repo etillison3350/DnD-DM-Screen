@@ -18,6 +18,9 @@ import dmscreen.data.creature.Creature;
 import dmscreen.data.creature.CreatureType;
 import dmscreen.data.creature.MovementType;
 import dmscreen.data.creature.VisionType;
+import dmscreen.data.creature.feature.Action;
+import dmscreen.data.creature.feature.Feature;
+import dmscreen.data.creature.feature.LegendaryAction;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellType;
 import dmscreen.statblock.editor.BooleanEditor;
@@ -28,6 +31,7 @@ import dmscreen.statblock.editor.EnumEditor;
 import dmscreen.statblock.editor.IntegerEditor;
 import dmscreen.statblock.editor.SpellDescriptionEditor;
 import dmscreen.statblock.editor.StringEditor;
+import dmscreen.statblock.editor.collection.BlockEntryCollectionEditor;
 import dmscreen.statblock.editor.collection.CollectionEnumEditor;
 import dmscreen.statblock.editor.collection.CollectionStringEditor;
 import dmscreen.statblock.editor.map.EditableMapCollectionEditor;
@@ -121,7 +125,12 @@ public class StatBlockEditor<T> extends VBox {
 		final CollectionStringEditor languages = new CollectionStringEditor("Languages", creature.languages);
 		final ChallengeRatingEditor challengeRating = new ChallengeRatingEditor("Challenge Rating", creature.challengeRating);
 
-		editor.getChildren().addAll(name, shortName, size, type, subtype, alignment, ac, armorNote, hitDice, speed, speeds, abilityScores, savingThrows, skills, vulnerabilities, resistances, immunities, conditionImmunities, senses, languages, challengeRating);
+		final BlockEntryCollectionEditor<Feature> features = new BlockEntryCollectionEditor<Feature>(Feature.class, "Features", creature.features);
+		final BlockEntryCollectionEditor<Action> actions = new BlockEntryCollectionEditor<>(Action.class, "Actions", creature.actions);
+		final BlockEntryCollectionEditor<Action> reactions = new BlockEntryCollectionEditor<>(Action.class, "Reactions", creature.reactions);
+		final BlockEntryCollectionEditor<LegendaryAction> legendaryActions = new BlockEntryCollectionEditor<LegendaryAction>(LegendaryAction.class, "Legendary Actions", creature.legendaryActions);
+
+		editor.getChildren().addAll(name, shortName, size, type, subtype, alignment, ac, armorNote, hitDice, speed, speeds, abilityScores, savingThrows, skills, vulnerabilities, resistances, immunities, conditionImmunities, senses, languages, challengeRating, features, actions, reactions, legendaryActions);
 
 		editor.newValueGetter = () -> {
 			final Creature newCreature = new Creature();
@@ -160,6 +169,10 @@ public class StatBlockEditor<T> extends VBox {
 			newCreature.senses = senses.getValue();
 			newCreature.languages = new TreeSet<>(languages.getValue());
 			newCreature.challengeRating = challengeRating.getValue();
+			newCreature.features = features.getValue();
+			newCreature.actions = actions.getValue();
+			newCreature.reactions = reactions.getValue();
+			newCreature.legendaryActions = legendaryActions.getValue();
 
 			return newCreature;
 		};
