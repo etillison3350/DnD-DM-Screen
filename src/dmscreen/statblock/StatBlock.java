@@ -271,7 +271,6 @@ public class StatBlock {
 			try {
 				final Map<String, Object> values = new HashMap<>();
 				editors.forEach((s, e) -> values.put(s, e.getValue()));
-				System.out.println(values);
 
 				final Object result = template.make(values);
 				if (result instanceof BlockEntry) {
