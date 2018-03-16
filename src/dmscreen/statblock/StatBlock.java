@@ -13,6 +13,18 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import dmscreen.Screen;
+import dmscreen.Util;
+import dmscreen.data.base.Ability;
+import dmscreen.data.base.DamageType;
+import dmscreen.data.base.Skill;
+import dmscreen.data.creature.Condition;
+import dmscreen.data.creature.Creature;
+import dmscreen.data.creature.MovementType;
+import dmscreen.data.creature.feature.template.Template;
+import dmscreen.data.spell.Bullet;
+import dmscreen.data.spell.Spell;
+import dmscreen.data.spell.SpellParagraph;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
@@ -26,22 +38,12 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import dmscreen.Screen;
-import dmscreen.Util;
-import dmscreen.data.base.Ability;
-import dmscreen.data.base.DamageType;
-import dmscreen.data.base.Skill;
-import dmscreen.data.creature.Condition;
-import dmscreen.data.creature.Creature;
-import dmscreen.data.creature.MovementType;
-import dmscreen.data.creature.feature.template.Template;
-import dmscreen.data.spell.Bullet;
-import dmscreen.data.spell.Spell;
-import dmscreen.data.spell.SpellParagraph;
 
 public class StatBlock {
 
 	public static final Pattern SMALL_CAPS = Pattern.compile("([^a-z]+)|(?:[^A-Z]+)");
+	public static final String TITLE_STYLE_CLASS = "block-title";
+	public static final String HEADER_STYLE_CLASS = "header";
 
 	private StatBlock() {}
 
@@ -66,7 +68,7 @@ public class StatBlock {
 
 			final String name = Util.getName(obj);
 
-			children.add(smallCaps(Util.titleCase(name), "title"));
+			children.add(smallCaps(Util.titleCase(name), TITLE_STYLE_CLASS));
 
 			for (final Field field : obj.getClass().getFields()) {
 				try {
@@ -97,7 +99,7 @@ public class StatBlock {
 		final VBox statBlock = new VBox(2);
 		final ObservableList<Node> children = statBlock.getChildren();
 
-		children.add(smallCaps(Util.titleCase(condition.name()), "title"));
+		children.add(smallCaps(Util.titleCase(condition.name()), TITLE_STYLE_CLASS));
 
 		for (final String d : condition.descriptions) {
 			children.add(dataLine("", d));
@@ -110,7 +112,7 @@ public class StatBlock {
 		final VBox statBlock = new VBox(2);
 		final ObservableList<Node> children = statBlock.getChildren();
 
-		children.add(smallCaps(creature.name, "title"));
+		children.add(smallCaps(creature.name, TITLE_STYLE_CLASS));
 
 		final Text subtitle = new Text(String.format("%s %s, %s", Util.titleCase(creature.size.name()), creature.type.name().toLowerCase() + (creature.subtype == null || creature.subtype.isEmpty() ? "" : " (" + creature.subtype + ")"), creature.alignment.name().toLowerCase().replace('_', ' ')));
 		subtitle.getStyleClass().add("subtitle");
@@ -176,19 +178,19 @@ public class StatBlock {
 		creature.features.forEach(f -> children.add(f.getNode()));
 
 		if (!creature.actions.isEmpty()) {
-			children.add(smallCaps("Actions", "header"));
+			children.add(smallCaps("Actions", HEADER_STYLE_CLASS));
 			children.add(separator());
 			creature.actions.forEach(a -> children.add(a.getNode()));
 		}
 
 		if (!creature.reactions.isEmpty()) {
-			children.add(smallCaps("Reactions", "header"));
+			children.add(smallCaps("Reactions", HEADER_STYLE_CLASS));
 			children.add(separator());
 			creature.reactions.forEach(a -> children.add(a.getNode()));
 		}
 
 		if (!creature.legendaryActions.isEmpty()) {
-			children.add(smallCaps("Legendary Actions", "header"));
+			children.add(smallCaps("Legendary Actions", HEADER_STYLE_CLASS));
 			children.add(separator());
 			children.add(dataLine("", String.format("%1$s can take 3 legendary actions, choosing from the options below. Only one legendary action option can be used at a time and only at the end of another creature's turn. %1$s regains spent legendary actions at the start of its turn.%n", Character.toUpperCase(creature.shortName.charAt(0)) + creature.shortName.substring(1).toLowerCase())));
 			creature.legendaryActions.forEach(l -> children.add(l.getNode()));
@@ -201,7 +203,7 @@ public class StatBlock {
 		final VBox statBlock = new VBox(2);
 		final ObservableList<Node> children = statBlock.getChildren();
 
-		children.add(smallCaps(spell.name, "title"));
+		children.add(smallCaps(spell.name, TITLE_STYLE_CLASS));
 
 		final Text subtitle = new Text(spell.level <= 0 ? String.format("%s cantrip\n", Util.titleCase(spell.type.name())) : String.format("%d%s-level %s%s\n", spell.level, Util.ordinal(spell.level), spell.type.name().toLowerCase(), spell.ritual ? " (ritual)" : ""));
 		subtitle.getStyleClass().add("subtitle");
@@ -228,7 +230,7 @@ public class StatBlock {
 		final VBox statBlock = new VBox(2);
 		final ObservableList<Node> children = statBlock.getChildren();
 
-		children.add(smallCaps(template.name, "title"));
+		children.add(smallCaps(template.name, TITLE_STYLE_CLASS));
 
 		String typeName = "";
 		try {

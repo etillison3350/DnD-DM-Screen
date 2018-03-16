@@ -10,22 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javafx.scene.Node;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.control.Separator;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import dmscreen.Util;
 import dmscreen.data.Data;
 import dmscreen.data.base.BlockEntry;
@@ -33,16 +17,33 @@ import dmscreen.data.creature.feature.template.Template;
 import dmscreen.statblock.StatBlock;
 import dmscreen.statblock.TemplateEditor;
 import dmscreen.statblock.editor.Editor;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.scene.Node;
+import javafx.scene.control.Accordion;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Separator;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Collection<T>> {
 
 	public final Class<T> clazz;
 
-	private final LinkedHashMap<T, Node> values = new LinkedHashMap<>();
+	private final Accordion accordion;
+	private final LinkedHashMap<T, TitledPane> values = new LinkedHashMap<>();
 
 	private final Hyperlink add;
-
-	private int minRow = 0;
 
 	private TemplateEditor<T> activeEditor;
 
@@ -51,11 +52,16 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 
 		this.clazz = clazz;
 
-		this.add(StatBlock.smallCaps(name, "header-small"), 0, minRow++, 2, 1);
-		this.add(new Separator(), 0, minRow++, 2, 1);
+		setPadding(new Insets(8, 0, 8, 0));
+
+		this.add(StatBlock.smallCaps(name, "header-small"), 0, 0, 2, 1);
+		this.add(new Separator(), 0, 1, 2, 1);
+
+		this.accordion = new Accordion();
+		add(accordion, 0, 2, 2, 1);
 
 		add = new Hyperlink(addButtonName);
-		add(add, 0, minRow, 2, 1);
+		add(add, 0, 3, 2, 1);
 		add.setOnAction(event -> {
 			add.setVisited(false);
 
@@ -71,13 +77,34 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 	}
 
 	private void addRow(final T obj) {
-		GridPane.setRowIndex(add, minRow + 1);
-		final ScrollPane node = new ScrollPane(obj.getNode());
-		node.setFitToWidth(true);
-		node.setHbarPolicy(ScrollBarPolicy.NEVER);
-		node.setVbarPolicy(ScrollBarPolicy.NEVER);
-		addRow(minRow++, node);
-		values.put(obj, node);
+		final FitPane content = new FitPane(obj.getNode());
+		final TitledPane pane = new TitledPane(Util.getName(obj), content);
+		// pane.setContentDisplay(ContentDisplay.RIGHT);
+		// pane.setGraphic(new Button("Test"));
+		accordion.getPanes().add(pane);
+		values.put(obj, pane);
+		pane.expandedProperty().addListener((obs, oldV, newV) -> {
+			System.out.println(content.getWidth());
+			System.out.println(pane.getWidth());
+		});
+		// GridPane.setRowIndex(add, minRow + 1);
+		// final TextFlow node = new TextFlow(new Text(Util.getName(obj)));
+		// final Tooltip tooltip = new Tooltip();
+		// tooltip.setGraphic(new StackPane(obj.getNode()));
+		// Tooltip.install(node, tooltip);
+		// // final StackPane node = new StackPane(obj.getNode());
+		// // node.setMaxHeight(48);
+		// // node.setMinHeight(48);
+		// // node.setAlignment(Pos.TOP_LEFT);
+		// // final ScrollPane node = new ScrollPane(obj.getNode());
+		// // node.setFitToWidth(true);
+		// // node.setHbarPolicy(ScrollBarPolicy.NEVER);
+		// // node.setVbarPolicy(ScrollBarPolicy.NEVER);
+		// // node.setMaxHeight(48);
+		// // node.setMinHeight(48);
+		// // node.setBorder(null);
+		// add(node, 0, minRow++, 2, 1);
+		// values.put(obj, node);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -124,14 +151,14 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 		});
 		searchBar.setText("");
 
-		final TreeView<Object> treeView = new TreeView<Object>(rootItem);
+		final TreeView<Object> treeView = new TreeView<>(rootItem);
 
 		final StackPane editorPane = new StackPane();
 
 		treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			final Object value = newValue.getValue();
 			if (value instanceof Template) {
-				activeEditor = new TemplateEditor<T>((Template<T>) value, true);
+				activeEditor = new TemplateEditor<>((Template<T>) value, true);
 				editorPane.getChildren().clear();
 				editorPane.getChildren().add(activeEditor);
 			}
@@ -153,6 +180,9 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 			}
 		});
 
+		dialog.setWidth(640);
+		dialog.setHeight(480);
+
 		final Optional<T> ret = dialog.showAndWait();
 
 		if (ret.isPresent()) return ret.get();
@@ -162,6 +192,61 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 	@Override
 	public List<T> getValue() {
 		return new ArrayList<>(values.keySet());
+	}
+
+	private static class FitPane extends Pane {
+
+		private final Node fitTo;
+
+		public FitPane(final Node fitTo) {
+			getChildren().add(fitTo);
+
+			this.fitTo = fitTo;
+		}
+
+		@Override
+		public Orientation getContentBias() {
+			return Orientation.VERTICAL;
+		}
+
+		@Override
+		protected double computeMaxHeight(final double width) {
+			return fitTo.maxHeight(width);
+		}
+
+		@Override
+		protected double computeMaxWidth(final double height) {
+			return fitTo.maxWidth(height);
+		}
+
+		@Override
+		protected double computeMinHeight(final double width) {
+			return fitTo.minHeight(width);
+		}
+
+		@Override
+		protected double computeMinWidth(final double height) {
+			return fitTo.minWidth(height);
+		}
+
+		@Override
+		protected double computePrefHeight(final double width) {
+			return fitTo.prefHeight(width);
+		}
+
+		@Override
+		protected double computePrefWidth(final double height) {
+			return fitTo.prefWidth(height);
+		}
+
+		@Override
+		protected void layoutChildren() {
+			for (final Node child : children) {
+				child.relocate(0, 0);
+				child.resize(getWidth(), getHeight());
+			}
+		}
+
 	}
 
 }
