@@ -85,6 +85,7 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 		values.put(obj, pane);
 		pane.expandedProperty().addListener((obs, oldV, newV) -> {
 			System.out.println(content.getWidth());
+			System.out.println(content.fitTo.prefHeight(content.getWidth()));
 			System.out.println(pane.getWidth());
 		});
 		// GridPane.setRowIndex(add, minRow + 1);
@@ -241,7 +242,7 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 
 		@Override
 		protected void layoutChildren() {
-			for (final Node child : children) {
+			for (final Node child : getChildren()) {
 				child.relocate(0, 0);
 				child.resize(getWidth(), getHeight());
 			}
