@@ -222,6 +222,7 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 
 		@Override
 		protected double computeMinHeight(final double width) {
+			System.out.println(width + "!!");
 			return fitTo.minHeight(width);
 		}
 
@@ -232,6 +233,7 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 
 		@Override
 		protected double computePrefHeight(final double width) {
+			System.out.println(width + "!");
 			return fitTo.prefHeight(width);
 		}
 
