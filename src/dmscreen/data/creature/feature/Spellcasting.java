@@ -55,12 +55,18 @@ public class Spellcasting extends InnateSpellcasting {
 			final Iterator<String> iter = spells.iterator();
 
 			while (iter.hasNext()) {
-				final String spell = iter.next();
-				final Text spellText = new Text(spell);
+				final String spellName = iter.next();
+
+				final Text spellText = new Text(spellName);
 				spellText.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontPosture.ITALIC, Font.getDefault().getSize()));
+
+				try {
+					InnateSpellcasting.addPopup(spellText, getSpellFromName(spellName));
+				} catch (final IllegalArgumentException e) {}
+
 				line.getChildren().add(spellText);
 
-				final String note = map.get(spell);
+				final String note = map.get(spellName);
 				if (iter.hasNext() || note != null && !note.isEmpty()) line.getChildren().add(new Text(note == null || note.isEmpty() ? ", " : String.format(" (%s)%s", note, iter.hasNext() ? ", " : "")));
 			}
 		});

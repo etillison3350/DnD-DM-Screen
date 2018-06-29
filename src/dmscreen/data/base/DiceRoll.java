@@ -53,6 +53,9 @@ public class DiceRoll {
 
 	@Override
 	public String toString() {
+		if (Math.abs(die) <= 1) {
+			return String.format("%d%s", die == 0 ? modifier : number * die, die == 0 || modifier == 0 ? "" : modifier > 0 ? String.format(" + %d", modifier) : String.format(" - %d", -modifier));
+		}
 		return String.format("%dd%d%s", number, die, modifier == 0 ? "" : modifier > 0 ? String.format(" + %d", modifier) : String.format(" - %d", -modifier));
 	}
 

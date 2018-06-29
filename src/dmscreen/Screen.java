@@ -15,6 +15,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import dmscreen.data.Data;
+import dmscreen.data.base.DataSet;
+import dmscreen.statblock.StatBlock;
+import dmscreen.statblock.StatBlockEditor;
 import javafx.animation.PauseTransition;
 import javafx.animation.Transition;
 import javafx.application.Application;
@@ -40,14 +44,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-import dmscreen.data.Data;
-import dmscreen.data.base.DataSet;
-import dmscreen.statblock.StatBlock;
-import dmscreen.statblock.StatBlockEditor;
 
 public class Screen extends Application {
 
-	public static final String DEFAULT_FONT_NAME = "Avenir";
+	public static final String DEFAULT_FONT_NAME = "System";
 
 	public static void main(final String[] args) {
 		try {
@@ -58,6 +58,69 @@ public class Screen extends Application {
 		try {
 			Data.init(Paths.get("resources"));
 		} catch (final IOException e) {}
+
+		// final Pattern savePattern = Pattern.compile("(\\S+)\\s*saving throw");
+		// final Pattern rollPattern = Pattern.compile("\\d+d\\d+");
+		//
+		// final List<String> output = new ArrayList<>();
+		//
+		// for (final DataSet d : Data.getData().values()) {
+		// for (final Spell spell : d.spells.toArray(new Spell[d.spells.size()])) {
+		// final String desc =
+		// spell.description.stream().map(SpellParagraph::getText).collect(Collectors.joining("\n"));
+		//
+		// final Matcher save = savePattern.matcher(desc);
+		//
+		// Ability savingThrow = null;
+		//
+		// if (save.find()) {
+		// String s = save.group(1);
+		// if (s.equalsIgnoreCase("isdom")) s = "Wisdom";
+		//
+		// try {
+		// savingThrow = Ability.valueOf(s.toUpperCase());
+		// } catch (final IllegalArgumentException e) {}
+		// }
+		//
+		// final Matcher m = rollPattern.matcher(desc);
+		// if (!m.find()) {
+		// d.spells.remove(spell);
+		// }
+		// }
+		// }
+		// Data.getData().values().stream().map(d -> d.spells).collect(() -> new HashSet<Spell>(),
+		// (o, s) -> o.addAll(s), (s1, s2) -> s1.addAll(s2)).stream().map(spell -> {
+		// final String desc =
+		// spell.description.stream().map(SpellParagraph::getText).collect(Collectors.joining("\n"));
+		//
+		// final Matcher save = savePattern.matcher(desc);
+		//
+		// Ability savingThrow = null;
+		//
+		// if (save.find()) {
+		// String s = save.group(1);
+		// if (s.equalsIgnoreCase("isdom")) s = "Wisdom";
+		//
+		// try {
+		// savingThrow = Ability.valueOf(s.toUpperCase());
+		// } catch (final IllegalArgumentException e) {}
+		// }
+		//
+		// final Matcher m = rollPattern.matcher(desc);
+		// if (m.find()) {
+		// return "\n\"" + desc + "\"\n";
+		// } else {
+		//
+		// }
+		//
+		// return savingThrow;
+		// }).forEach(System.out::println);
+		// .map(Pattern.compile("\\S+\\s*saving throw")::matcher).map(m -> {
+		// if (m.find())
+		// return m.group();
+		// else
+		// return "";
+		// }).forEach(System.out::println);
 
 		Application.launch(args);
 	}

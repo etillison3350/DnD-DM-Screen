@@ -1,15 +1,15 @@
 package dmscreen.data.creature.feature;
 
+import dmscreen.Screen;
+import dmscreen.Util;
+import dmscreen.data.base.DamageType;
+import dmscreen.data.base.DiceRoll;
 import javafx.scene.Node;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import dmscreen.Screen;
-import dmscreen.Util;
-import dmscreen.data.base.DamageType;
-import dmscreen.data.base.DiceRoll;
 
 public class Attack extends Action {
 
@@ -77,7 +77,7 @@ public class Attack extends Action {
 		titleText.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.BOLD, FontPosture.ITALIC, Font.getDefault().getSize()));
 		line.getChildren().add(titleText);
 
-		final Text attackType = new Text(Util.titleCase(type.name()) + " Attack: ");
+		final Text attackType = new Text(Util.titleCase(type.name()).replace("Or", "or") + " Attack: ");
 		attackType.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.NORMAL, FontPosture.ITALIC, Font.getDefault().getSize()));
 		line.getChildren().add(attackType);
 
@@ -98,7 +98,9 @@ public class Attack extends Action {
 		MELEE_WEAPON,
 		MELEE_SPELL,
 		RANGED_WEAPON,
-		RANGED_SPELL;
+		RANGED_SPELL,
+		MELEE_OR_RANGED_WEAPON,
+		MELEE_OR_RANGED_SPELL;
 	}
 
 	public static class Damage {
