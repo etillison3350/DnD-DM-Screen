@@ -9,7 +9,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import dmscreen.Util;
 import dmscreen.data.base.Ability;
 import dmscreen.data.base.DamageType;
 import dmscreen.data.base.Size;
@@ -20,6 +19,7 @@ import dmscreen.data.creature.CreatureType;
 import dmscreen.data.creature.MovementType;
 import dmscreen.data.creature.VisionType;
 import dmscreen.data.spell.SpellType;
+import dmscreen.util.Util;
 
 public class JavaScript {
 

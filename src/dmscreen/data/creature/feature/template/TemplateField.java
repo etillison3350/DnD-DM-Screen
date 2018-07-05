@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import dmscreen.Util;
 import dmscreen.data.base.DiceRoll;
 import dmscreen.statblock.editor.BooleanEditor;
 import dmscreen.statblock.editor.DiceRollEditor;
@@ -22,6 +21,7 @@ import dmscreen.statblock.editor.map.EditableMapEnumIntegerEditor;
 import dmscreen.statblock.editor.map.EditableMapCollectionEditor;
 import dmscreen.statblock.editor.map.EditableMapStringStringEditor;
 import dmscreen.statblock.editor.map.MapEnumIntegerEditor;
+import dmscreen.util.Util;
 
 public class TemplateField {
 

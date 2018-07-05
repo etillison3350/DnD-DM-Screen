@@ -1,9 +1,9 @@
 package dmscreen.data.creature.feature;
 
 import dmscreen.Screen;
-import dmscreen.Util;
 import dmscreen.data.base.DamageType;
 import dmscreen.data.base.DiceRoll;
+import dmscreen.util.Util;
 import javafx.scene.Node;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;

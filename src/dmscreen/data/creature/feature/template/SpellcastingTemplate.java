@@ -2,9 +2,9 @@ package dmscreen.data.creature.feature.template;
 
 import java.util.Map;
 
-import dmscreen.Util;
 import dmscreen.data.base.Ability;
 import dmscreen.data.creature.feature.Spellcasting;
+import dmscreen.util.Util;
 
 public class SpellcastingTemplate extends InnateSpellcastingTemplate {
 

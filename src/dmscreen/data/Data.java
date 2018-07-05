@@ -14,16 +14,12 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 
-import dmscreen.Util;
 import dmscreen.data.base.DataSet;
 import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.feature.Action;
@@ -41,6 +37,9 @@ import dmscreen.data.creature.feature.template.Template;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.SpellFeature;
 import dmscreen.data.spell.SpellParagraph;
+import dmscreen.util.Util;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 public final class Data {
 
@@ -124,6 +123,7 @@ public final class Data {
 		if (!errors.isEmpty()) {
 			final Alert alert = new Alert(AlertType.ERROR);
 			alert.setContentText("Error while loading JSON:\n\n" + errors.keySet().stream().map(s -> String.format(" \u2022  %s.json: %s", s, errors.get(s))).collect(Collectors.joining("\n")) + "\n\nThese files will not be loaded.");
+			System.err.println(alert.getContentText());
 			alert.showAndWait();
 		}
 	}

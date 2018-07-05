@@ -8,8 +8,8 @@ import java.util.function.Consumer;
 
 import javafx.scene.control.Spinner;
 import javafx.scene.text.Text;
-import dmscreen.Util;
 import dmscreen.statblock.editor.IntegerEditor;
+import dmscreen.util.Util;
 
 public class MapEnumIntegerEditor<T extends Enum<?>> extends MapEditor<T, Integer> {
 

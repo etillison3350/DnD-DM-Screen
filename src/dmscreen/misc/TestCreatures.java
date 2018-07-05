@@ -647,7 +647,7 @@ public class TestCreatures {
 
 		final Map<String, String> efreeti1Day = new HashMap<>();
 		Stream.of("gaseous form", "invisibility", "major image", "plane shift", "wall of fire").forEach(s -> efreeti1Day.put(s, ""));
-		efreeti1Day.put("fire elemental only", "conjure elemental");
+		efreeti1Day.put("conjure elemental", "fire elemental only");
 		efreetiSpells.put("1/day each", efreeti1Day);
 
 		efreeti.features = Arrays.asList(new Feature("Elemental Demise", "If the efreeti dies, its body disintegrates in a flash of fire and puff of smoke, leaving behind only equipment the efreeti was wearing or carrying."), //
@@ -655,7 +655,6 @@ public class TestCreatures {
 		efreeti.actions = Arrays.asList(new Action("Multiattack", "The efreeti makes two scimitar attacks or uses its Hurl Flame twice."), //
 				new Attack("Scimitar", Type.MELEE_WEAPON, 10, "reach 5 ft., one target", null, new Attack.Damage(new DiceRoll(2, 6, 6), DamageType.SLASHING), new Attack.Damage(new DiceRoll(2, 6), DamageType.FIRE)), //
 				new Attack("Hurl Flame", Type.RANGED_SPELL, 7, "range 120 ft., one target", null, new Attack.Damage(new DiceRoll(5, 6), DamageType.FIRE)));
-
 	}
 
 }

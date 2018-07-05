@@ -5,9 +5,10 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import dmscreen.Screen;
-import dmscreen.Util;
 import dmscreen.data.base.Ability;
 import dmscreen.statblock.StatBlock;
+import dmscreen.util.NameLookup;
+import dmscreen.util.Util;
 import javafx.scene.Node;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -61,7 +62,7 @@ public class Spellcasting extends InnateSpellcasting {
 				spellText.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontPosture.ITALIC, Font.getDefault().getSize()));
 
 				try {
-					InnateSpellcasting.addPopup(spellText, getSpellFromName(spellName));
+					StatBlock.addTooltip(spellText, NameLookup.spellFromName(spellName));
 				} catch (final IllegalArgumentException e) {}
 
 				line.getChildren().add(spellText);

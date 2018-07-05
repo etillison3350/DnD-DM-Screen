@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import dmscreen.Screen;
-import dmscreen.Util;
+import dmscreen.data.adventure.RandomEncounter;
 import dmscreen.data.base.Ability;
 import dmscreen.data.base.DamageType;
 import dmscreen.data.base.Skill;
@@ -25,19 +25,37 @@ import dmscreen.data.creature.feature.template.Template;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellParagraph;
+import dmscreen.util.PopupManager;
+import dmscreen.util.Util;
+import javafx.animation.PauseTransition;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Separator;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Popup;
+import javafx.util.Duration;
 
 public class StatBlock {
 
@@ -245,6 +263,99 @@ public class StatBlock {
 		children.add(new TemplateEditor(template, true));
 
 		return statBlock;
+	}
+
+	public static Pane getStatBlock(final RandomEncounter encounter) {
+		final VBox statBlock = new VBox(2);
+		final ObservableList<Node> children = statBlock.getChildren();
+
+		children.add(smallCaps(encounter.name, TITLE_STYLE_CLASS));
+
+		final Text subtitle = new Text("Random encounter");
+		subtitle.getStyleClass().add("subtitle");
+		children.add(subtitle);
+
+		final GridPane table = new GridPane();
+		table.setPadding(new Insets(10, 0, 10, 0));
+		table.setHgap(12);
+		table.setVgap(2);
+		final ColumnConstraints cc = new ColumnConstraints();
+		cc.setFillWidth(true);
+		cc.setHalignment(HPos.CENTER);
+		table.getColumnConstraints().add(cc);
+		table.setAlignment(Pos.TOP_LEFT);
+
+		final Text diceRollText = new Text(encounter.getDiceRoll().toString());
+		final Text encounterHeader = new Text("Encounter");
+		diceRollText.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.BOLD, 12));
+		encounterHeader.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.BOLD, 12));
+		table.addRow(0, diceRollText, encounterHeader);
+
+		final RowConstraints rc = new RowConstraints();
+		rc.setValignment(VPos.TOP);
+		table.getRowConstraints().add(rc);
+
+		final int[] ranges = encounter.getEncounterRanges();
+		for (int i = 0, row = 1; i < ranges.length - 1; i++) {
+			String rangeStr;
+			if (ranges[i] < ranges[i + 1] - 1) {
+				rangeStr = String.format("%d - %d", ranges[i], ranges[i + 1] - 1);
+			} else if (ranges[i] == ranges[i + 1] - 1) {
+				rangeStr = Integer.toString(ranges[i]);
+			} else {
+				continue;
+			}
+			final Text rangeText = new Text(rangeStr);
+			rangeText.setTextAlignment(TextAlignment.CENTER);
+			table.add(rangeText, 0, row);
+			table.add(encounter.encounters.get(i).getNode(), 1, row++);
+
+			table.getRowConstraints().add(rc);
+		}
+		children.add(table);
+
+		children.add(smallCaps("Roll", HEADER_STYLE_CLASS));
+		children.add(separator());
+		final BorderPane rollPane = new BorderPane(encounter.roll());
+		children.add(rollPane);
+		final Hyperlink reroll = new Hyperlink("Re-roll");
+		reroll.setOnAction(event -> {
+			rollPane.setCenter(encounter.roll());
+		});
+		children.add(reroll);
+
+		return statBlock;
+	}
+
+	public static void addTooltip(final Node node, final Object info) {
+		final PauseTransition pt = new PauseTransition(Duration.seconds(1));
+		pt.setOnFinished(event -> {
+			final Bounds screenBounds = node.localToScreen(node.getBoundsInLocal());
+
+			try {
+				final Popup popup = PopupManager.getPopup();
+				popup.setAnchorX(screenBounds.getMinX());
+				popup.setAnchorY(screenBounds.getMinY());
+				final BorderPane content = new BorderPane(StatBlock.getStatBlock(info));
+				content.setTop(new Pane());
+				content.setPadding(new Insets(8));
+				content.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(4), Insets.EMPTY)));
+				content.setOnMouseExited(e -> {
+					PopupManager.releasePopup();
+				});
+				content.setMaxWidth(384);
+				popup.getContent().add(content);
+				popup.show(node.getScene().getWindow());
+			} catch (final IllegalStateException e) {}
+		});
+
+		node.hoverProperty().addListener((ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
+			if (newValue) {
+				pt.play();
+			} else {
+				pt.stop();
+			}
+		});
 	}
 
 	public static String componentsString(final boolean verbal, final boolean somatic, final String materialComponents) {

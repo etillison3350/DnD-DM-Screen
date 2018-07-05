@@ -15,13 +15,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import dmscreen.Util;
 import dmscreen.data.Data;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellFeature;
 import dmscreen.data.spell.SpellParagraph;
 import dmscreen.data.spell.SpellType;
+import dmscreen.util.Util;
 
 public class SpellLoader {
 

@@ -3,9 +3,9 @@ package dmscreen.statblock.editor;
 import javafx.scene.control.Spinner;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
-import dmscreen.Util;
 import dmscreen.data.creature.Creature;
 import dmscreen.statblock.StatBlock;
+import dmscreen.util.Util;
 
 public class ChallengeRatingEditor extends Editor<Integer> {
 

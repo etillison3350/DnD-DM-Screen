@@ -10,13 +10,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import dmscreen.Util;
 import dmscreen.data.Data;
 import dmscreen.data.base.BlockEntry;
 import dmscreen.data.creature.feature.template.Template;
 import dmscreen.statblock.StatBlock;
 import dmscreen.statblock.TemplateEditor;
 import dmscreen.statblock.editor.Editor;
+import dmscreen.util.Util;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;

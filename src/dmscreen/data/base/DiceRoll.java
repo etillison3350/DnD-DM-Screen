@@ -51,12 +51,46 @@ public class DiceRoll {
 		return ret + modifier;
 	}
 
+	public int min() {
+		return number + modifier;
+	}
+
+	public int max() {
+		return number * die + modifier;
+	}
+
 	@Override
 	public String toString() {
 		if (Math.abs(die) <= 1) {
 			return String.format("%d%s", die == 0 ? modifier : number * die, die == 0 || modifier == 0 ? "" : modifier > 0 ? String.format(" + %d", modifier) : String.format(" - %d", -modifier));
 		}
 		return String.format("%dd%d%s", number, die, modifier == 0 ? "" : modifier > 0 ? String.format(" + %d", modifier) : String.format(" - %d", -modifier));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + die;
+		result = prime * result + (expected == null ? 0 : expected.hashCode());
+		result = prime * result + modifier;
+		result = prime * result + number;
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		final DiceRoll other = (DiceRoll) obj;
+		if (die != other.die) return false;
+		if (expected == null) {
+			if (other.expected != null) return false;
+		} else if (!expected.equals(other.expected)) return false;
+		if (modifier != other.modifier) return false;
+		if (number != other.number) return false;
+		return true;
 	}
 
 	public static DiceRoll fromString(final String value) {

@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import dmscreen.Util;
 import dmscreen.data.base.DamageType;
 import dmscreen.data.base.DiceRoll;
 import dmscreen.data.creature.feature.Attack;
+import dmscreen.util.Util;
 
 public class AttackTemplate extends Template<Attack> {
 

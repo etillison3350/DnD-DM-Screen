@@ -2,7 +2,7 @@ package dmscreen.statblock.editor;
 
 import java.lang.reflect.InvocationTargetException;
 
-import dmscreen.Util;
+import dmscreen.util.Util;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.text.Text;

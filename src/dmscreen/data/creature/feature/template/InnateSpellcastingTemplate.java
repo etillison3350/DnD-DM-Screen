@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import dmscreen.Util;
 import dmscreen.data.base.Ability;
 import dmscreen.data.creature.feature.InnateSpellcasting;
+import dmscreen.util.Util;
 
 public class InnateSpellcastingTemplate extends Template<InnateSpellcasting> {
 

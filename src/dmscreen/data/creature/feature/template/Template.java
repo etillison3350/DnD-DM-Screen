@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
-import dmscreen.Util;
+import dmscreen.util.Util;
 
 public abstract class Template<T> {
 

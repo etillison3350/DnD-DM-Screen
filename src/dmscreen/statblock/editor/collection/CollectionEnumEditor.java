@@ -3,8 +3,8 @@ package dmscreen.statblock.editor.collection;
 import java.util.Collection;
 
 import javafx.scene.control.ComboBox;
-import dmscreen.Util;
 import dmscreen.statblock.editor.EnumEditor;
+import dmscreen.util.Util;
 
 public class CollectionEnumEditor<T extends Enum<?>> extends CollectionEditor<T> {
 

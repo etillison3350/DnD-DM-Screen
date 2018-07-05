@@ -17,6 +17,9 @@ import java.util.stream.Stream;
 
 import dmscreen.Screen;
 import dmscreen.data.Data;
+import dmscreen.data.adventure.CreatureSet;
+import dmscreen.data.adventure.Encounter;
+import dmscreen.data.adventure.RandomEncounter;
 import dmscreen.data.base.Ability;
 import dmscreen.data.base.DamageType;
 import dmscreen.data.base.DiceRoll;
@@ -44,31 +47,42 @@ public class DeadInThayGenerator {
 		try {
 			Files.createDirectories(Paths.get("resources/dead_in_thay/"));
 
-			final List<Object> toJson = new ArrayList<>();
+			final List<Object> creatures = new ArrayList<>();
 			for (final Field field : DeadInThayGenerator.class.getDeclaredFields()) {
-				if (Modifier.isStatic(field.getModifiers())) {
+				if (Modifier.isStatic(field.getModifiers()) && field.getType().isAssignableFrom(Creature.class)) {
 					try {
-						toJson.add(field.get(null));
+						creatures.add(field.get(null));
 					} catch (IllegalArgumentException | IllegalAccessException e) {}
 				}
 			}
-			toJson.add(TestCreatures.zombie);
-			toJson.add(TestCreatures.ogreZombie);
-			toJson.add(TestCreatures.otyugh);
-			toJson.add(TestCreatures.grick);
-			toJson.add(TestCreatures.grell);
-			toJson.add(TestCreatures.gibberingMouther);
-			toJson.add(TestCreatures.orc);
-			toJson.add(TestCreatures.gnoll);
-			toJson.add(TestCreatures.troll);
-			toJson.add(TestCreatures.wight);
-			toJson.add(TestCreatures.skeleton);
-			toJson.add(TestCreatures.behir);
-			toJson.add(TestCreatures.peryton);
-			toJson.add(TestCreatures.gelatinousCube);
-			toJson.add(TestCreatures.efreeti);
+			creatures.add(TestCreatures.zombie);
+			creatures.add(TestCreatures.ogreZombie);
+			creatures.add(TestCreatures.otyugh);
+			creatures.add(TestCreatures.grick);
+			creatures.add(TestCreatures.grell);
+			creatures.add(TestCreatures.gibberingMouther);
+			creatures.add(TestCreatures.orc);
+			creatures.add(TestCreatures.gnoll);
+			creatures.add(TestCreatures.troll);
+			creatures.add(TestCreatures.wight);
+			creatures.add(TestCreatures.skeleton);
+			creatures.add(TestCreatures.behir);
+			creatures.add(TestCreatures.peryton);
+			creatures.add(TestCreatures.gelatinousCube);
+			creatures.add(TestCreatures.efreeti);
 
-			Files.write(Paths.get("resources/dead_in_thay/creatures.json"), Data.GSON.toJson(toJson).getBytes());
+			Files.write(Paths.get("resources/dead_in_thay/creatures.json"), Data.GSON.toJson(creatures).getBytes());
+
+			final List<Object> encounters = new ArrayList<>();
+			for (final Field field : DeadInThayGenerator.class.getDeclaredFields()) {
+				if (Modifier.isStatic(field.getModifiers()) && field.getType().isAssignableFrom(RandomEncounter.class)) {
+					try {
+						encounters.add(field.get(null));
+					} catch (IllegalArgumentException | IllegalAccessException e) {}
+				}
+			}
+
+			Files.write(Paths.get("resources/dead_in_thay/encounters.json"), Data.GSON.toJson(encounters).getBytes());
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
@@ -76,10 +90,92 @@ public class DeadInThayGenerator {
 		Screen.main(args);
 	}
 
+	private static final RandomEncounter minor, dreadLegion, thayan, abyssalPrisons, bloodPens, mastersDomain, farRealmCysts, forestsOfSlaughter, oozeGrottos, predatorPools, golemLabs;
+
 	private static final Creature thalaxia, aboleth, unarmedSkeleton, youngOtyugh, thayanWarrior, thayanApprentice, evoker, dreadWarrior, necromancer, deathlockWight, wight31, choker, leucrotta, perytonYoung, transmuter, //
-			vampiricMist, fourArmedGargoyle, conjurer;
+			vampiricMist, fourArmedGargoyle, conjurer, lumalia;
 
 	static {
+		minor = new RandomEncounter();
+		minor.name = "Minor Encounter";
+		minor.encounters.add(new Encounter(1, new CreatureSet("Thayan apprentice"), new CreatureSet(new DiceRoll(4, 1), "Thayan warrior", "Thayan warriors"), new CreatureSet(new DiceRoll(2, 4), "commoner", "prisoners (commoners)")));
+		minor.encounters.add(new Encounter(2, new CreatureSet("wight")));
+		final Map<String, String> skeletonZombie = new HashMap<>();
+		skeletonZombie.put("skeleton", "skeletons");
+		skeletonZombie.put("zombie", "zombies");
+		minor.encounters.add(new Encounter(1, new CreatureSet("wight"), new CreatureSet(new DiceRoll(2, 4), skeletonZombie)));
+
+		dreadLegion = new RandomEncounter();
+		dreadLegion.name = "Dread Legion Patrol";
+		dreadLegion.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(2, 4), "gnoll", "gnolls")));
+		dreadLegion.encounters.add(new Encounter(1, new CreatureSet("dread warrior"), new CreatureSet(new DiceRoll(2, 6), "zombie", "zombies")));
+		dreadLegion.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(2, 4), "orc", "orcs")));
+		dreadLegion.encounters.add(new Encounter(1, new CreatureSet("troll")));
+
+		thayan = new RandomEncounter();
+		thayan.name = "Thayan Patrol";
+		thayan.encounters.add(new Encounter(1, new CreatureSet("deathlock wight"), new CreatureSet(new DiceRoll(2, 4), "thayan warrior", "Thayan warriors"), new CreatureSet(new DiceRoll(2, 4), "commoner", "prisoners (commoners)")));
+		thayan.encounters.add(new Encounter(2, new CreatureSet("deathlock wight"), new CreatureSet(new DiceRoll(1, 3), "thayan apprentice", "Thayan apprentices"), new CreatureSet(new DiceRoll(2, 4), "thayan warrior", "Thayan warriors")));
+		thayan.encounters.add(new Encounter(2, new CreatureSet("evoker", "Red Wizard evoker"), new CreatureSet("thayan apprentice"), new CreatureSet(new DiceRoll(1, 4), "dread warrior", "dread warriors")));
+		thayan.encounters.add(new Encounter(2, new CreatureSet("wight"), new CreatureSet(new DiceRoll(1, 4), "dread warrior", "dread warriors")));
+		thayan.diceRoll = new DiceRoll(2, 4);
+
+		final CreatureSet accompanyingApprentice = new CreatureSet("thayan apprentice");
+		final CreatureSet accompanyingWarriors = new CreatureSet(new DiceRoll(2, 4), "thayan warrior", "thayan warriors");
+
+		abyssalPrisons = new RandomEncounter();
+		abyssalPrisons.name = "Sector: Abyssal Prisons";
+		abyssalPrisons.encounters.add(new Encounter(1, new CreatureSet("reduced-threat hezrou"), accompanyingApprentice, accompanyingWarriors));
+		abyssalPrisons.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(2, 8), "mane", "manes"), accompanyingApprentice, accompanyingWarriors));
+		abyssalPrisons.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(1, 4), "quasit", "quasits"), accompanyingApprentice, accompanyingWarriors));
+		abyssalPrisons.encounters.add(new Encounter(1, new CreatureSet("reduced-threat vrock"), accompanyingApprentice, accompanyingWarriors));
+
+		bloodPens = new RandomEncounter();
+		bloodPens.name = "Sector: Blood Pens";
+		bloodPens.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(2, 6), "giant centipede", "giant centipedes")));
+		bloodPens.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(2, 6), "giant spider", "giant spiders")));
+		bloodPens.encounters.add(new Encounter(1, "Thayan Patrol (roll on the Thayan Patrol table)"));
+		bloodPens.encounters.add(new Encounter(1, new CreatureSet("shambling mound"), accompanyingApprentice, accompanyingWarriors));
+
+		mastersDomain = new RandomEncounter();
+		mastersDomain.name = "Sector: Master's Domain";
+		mastersDomain.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(1, 4), "shadow", "shadows")));
+		mastersDomain.encounters.add(new Encounter(3, "Dread Legion Patrol (roll on the Dread Legion Patrol table)"));
+
+		farRealmCysts = new RandomEncounter();
+		farRealmCysts.name = "Sector: Far Realm Cysts";
+		farRealmCysts.encounters.add(new Encounter(1, new CreatureSet("gibbering mouther"), accompanyingApprentice, accompanyingWarriors));
+		farRealmCysts.encounters.add(new Encounter(1, new CreatureSet("grell"), accompanyingApprentice, accompanyingWarriors));
+		farRealmCysts.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(1, 4), "grick", "gricks"), accompanyingApprentice, accompanyingWarriors));
+		farRealmCysts.encounters.add(new Encounter(1, new CreatureSet("otyugh"), accompanyingApprentice, accompanyingWarriors));
+
+		forestsOfSlaughter = new RandomEncounter();
+		forestsOfSlaughter.name = "Sector: Forests of Slaughter";
+		forestsOfSlaughter.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(1, 4), "hook horror", "hook horrors"), accompanyingApprentice, accompanyingWarriors));
+		forestsOfSlaughter.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(1, 4), "cockatrice", "cockatrices"), accompanyingApprentice, accompanyingWarriors));
+		forestsOfSlaughter.encounters.add(new Encounter(1, new CreatureSet("displacer beast"), accompanyingApprentice, accompanyingWarriors));
+		forestsOfSlaughter.encounters.add(new Encounter(1, new CreatureSet("troll"), accompanyingApprentice, accompanyingWarriors));
+
+		oozeGrottos = new RandomEncounter();
+		oozeGrottos.name = "Sector: Ooze Grottos";
+		oozeGrottos.encounters.add(new Encounter(1, new CreatureSet("black pudding"), accompanyingApprentice, accompanyingWarriors));
+		oozeGrottos.encounters.add(new Encounter(1, new CreatureSet("gelatinous cube"), accompanyingApprentice, accompanyingWarriors));
+		oozeGrottos.encounters.add(new Encounter(2, new CreatureSet(new DiceRoll(1, 4), "gray ooze", "gray oozes"), accompanyingApprentice, accompanyingWarriors));
+
+		predatorPools = new RandomEncounter();
+		predatorPools.name = "Sector: Predator Pools";
+		predatorPools.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(2, 4), "giant crab", "giant crabs"), accompanyingApprentice, accompanyingWarriors));
+		predatorPools.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(2, 4), "kuo-toa")));
+		predatorPools.encounters.add(new Encounter(1, new CreatureSet(new DiceRoll(1, 2), "merrow", "merrow (in water globes)"), accompanyingApprentice, accompanyingWarriors));
+		predatorPools.encounters.add(new Encounter(1, new CreatureSet("troll"), accompanyingApprentice, accompanyingWarriors));
+
+		golemLabs = new RandomEncounter();
+		golemLabs.name = "Sector: Golem Laboratories";
+		golemLabs.encounters.add(new Encounter(1, new CreatureSet("reduced-threat flesh golem"), accompanyingApprentice, accompanyingWarriors));
+		golemLabs.encounters.add(new Encounter(1, new CreatureSet("flesh golem"), accompanyingApprentice, accompanyingWarriors));
+		golemLabs.encounters.add(new Encounter(1, new CreatureSet("reduced-threat clay golem"), accompanyingApprentice, accompanyingWarriors));
+		golemLabs.encounters.add(new Encounter(1, new CreatureSet("clay golem"), accompanyingApprentice, accompanyingWarriors));
+
 		thalaxia = new Creature();
 		thalaxia.name = "Thalaxia, the Beholder";
 		thalaxia.shortName = "Thalaxia";
@@ -751,6 +847,53 @@ public class DeadInThayGenerator {
 				new Feature("Benign Transposition", "Recharges after the Conjurer Casts a Conjuration Spell of 1st Level or Higher", "As a bonus action, the conjurer teleports up to 30 feet to an unoccupied space that it can see. If it instead chooses a space within range that is occupied by a willing Small or Medium creature, they both teleport, swapping places."));
 		conjurer.actions = Arrays.asList(new Attack("Dagger", Type.MELEE_OR_RANGED_WEAPON, 4, "reach 5 ft. or range 20/60 ft., one target", null, new Attack.Damage(new DiceRoll(1, 4, 2), DamageType.PIERCING)));
 
+		lumalia = new Creature();
+		lumalia.name = "Lumalia, the Deva";
+		lumalia.shortName = "Lumalia";
+		lumalia.size = Size.MEDIUM;
+		lumalia.type = CreatureType.CELESTIAL;
+		lumalia.alignment = Alignment.CHAOTIC_GOOD;
+		lumalia.ac = 17;
+		lumalia.armorNote = "natural armor";
+		lumalia.hitDice = new DiceRoll(16, 8, 64);
+		lumalia.speed = 30;
+		lumalia.speeds.put(MovementType.FLY, 90);
+		lumalia.abilityScores.put(Ability.STRENGTH, 18);
+		lumalia.abilityScores.put(Ability.DEXTERITY, 18);
+		lumalia.abilityScores.put(Ability.CONSTITUTION, 18);
+		lumalia.abilityScores.put(Ability.INTELLIGENCE, 17);
+		lumalia.abilityScores.put(Ability.WISDOM, 20);
+		lumalia.abilityScores.put(Ability.CHARISMA, 20);
+		lumalia.savingThrows.put(Ability.WISDOM, 9);
+		lumalia.savingThrows.put(Ability.CHARISMA, 9);
+		lumalia.skills.put(Skill.INSIGHT, 7);
+		lumalia.skills.put(Skill.PERCEPTION, 9);
+		lumalia.resistances.put(null, new HashSet<>(Arrays.asList(DamageType.RADIANT)));
+		lumalia.resistances.put("from nonmagical weapons", new HashSet<>(Arrays.asList(DamageType.BLUDGEONING, DamageType.PIERCING, DamageType.SLASHING)));
+		lumalia.conditionImmunities.add(Condition.CHARMED);
+		lumalia.conditionImmunities.add(Condition.EXHAUSTION);
+		lumalia.conditionImmunities.add(Condition.FRIGHTENED);
+		lumalia.languages.add("all");
+		lumalia.languages.add("telepathy 120 ft.");
+		lumalia.challengeRating = 10;
+
+		final Map<String, Map<String, String>> lumaliaSpells = new LinkedHashMap<>();
+
+		final Map<String, String> lumaliaAtWill = new HashMap<>();
+		Stream.of("detect evil and good").forEach(s -> lumaliaAtWill.put(s, ""));
+		lumaliaSpells.put("At will", lumaliaAtWill);
+
+		final Map<String, String> lumalia1Day = new HashMap<>();
+		Stream.of("commune", "raise dead").forEach(s -> lumalia1Day.put(s, ""));
+		lumaliaSpells.put("1/day each", lumalia1Day);
+
+		lumalia.features = Arrays.asList(new Feature("Angelic Weapons", "Lumalia's weapon attacks are magical. When Lumalia hits with any weapon, the attack deals an extra 4d8 radiant damage (included in the attack)."), //
+				new InnateSpellcasting(null, "Lumalia", Ability.CHARISMA, 17, Integer.MIN_VALUE, "she", null, lumaliaSpells), //
+				new Feature("Magic Resistance", "Lumalia has advantage on saving throws against spells and other magical effects."));
+		lumalia.actions = Arrays.asList(new Action("Multiattack", "Lumalia makes two melee attacks."), //
+				new Attack("Mace", Type.MELEE_WEAPON, 8, "reach 5 ft., one target", null, new Attack.Damage(new DiceRoll(1, 6, 4), DamageType.BLUDGEONING), new Attack.Damage(new DiceRoll(4, 8), DamageType.RADIANT)), //
+				new Action("Healing Touch", "3/Day", "Lumalia touches another creature. The target magically regains 20 (4d8 + 2) hit points and is freed from any curse, disease, poison, blindness, or deafness."), new Action("Change Shape",
+						"Lumalia magically polymorphs into a humanoid or beast that has a challenge rating equal to or less than her own, or back into her true form. She reverts to her true form if she dies. Any equipment she is wearing or carrying is absorbed or borne by the new form (Lumalia's choice).\n    In a new form, Lumalia retains her game statistics and ability to speak, but her AC, movement modes, Strength, Dexterity, and special senses are replaced by those of the new form, and she gains any statistics and capabilities (except class features, legendary actions, and lair actions) that the new form has but that she lacks."));
 	}
 
 }

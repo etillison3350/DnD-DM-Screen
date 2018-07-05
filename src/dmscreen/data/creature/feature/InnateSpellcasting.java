@@ -5,29 +5,15 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import dmscreen.Screen;
-import dmscreen.Util;
-import dmscreen.data.Data;
 import dmscreen.data.base.Ability;
-import dmscreen.data.base.DataSet;
-import dmscreen.data.spell.Spell;
 import dmscreen.statblock.StatBlock;
-import javafx.animation.PauseTransition;
-import javafx.beans.value.ChangeListener;
-import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
+import dmscreen.util.NameLookup;
+import dmscreen.util.Util;
 import javafx.scene.Node;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import javafx.stage.Popup;
-import javafx.util.Duration;
 
 public class InnateSpellcasting extends Feature {
 
@@ -103,7 +89,7 @@ public class InnateSpellcasting extends Feature {
 				spellText.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontPosture.ITALIC, Font.getDefault().getSize()));
 
 				try {
-					InnateSpellcasting.addPopup(spellText, getSpellFromName(spellName));
+					StatBlock.addTooltip(spellText, NameLookup.spellFromName(spellName));
 				} catch (final IllegalArgumentException e) {}
 
 				line.getChildren().add(spellText);
@@ -115,47 +101,6 @@ public class InnateSpellcasting extends Feature {
 		line.getChildren().add(new Text("\n"));
 
 		return line;
-	}
-
-	protected static Spell getSpellFromName(final String spellName) {
-		for (final DataSet dataSet : Data.getData().values()) {
-			for (final Spell sp : dataSet.spells) {
-				if (sp.name.equalsIgnoreCase(spellName.replaceAll("[^A-Za-z\\s\'\\/]", ""))) {
-					return sp;
-				}
-			}
-		}
-		throw new IllegalArgumentException("No spell with the name \"" + spellName + "\" could be found.");
-	}
-
-	protected static void addPopup(final Text spellText, final Spell spell) {
-		final Popup popup = new Popup();
-		final PauseTransition pt = new PauseTransition(Duration.seconds(1));
-		pt.setOnFinished(event -> {
-			final Bounds screenBounds = spellText.localToScreen(spellText.getBoundsInLocal());
-
-			popup.setAnchorX(screenBounds.getMinX());
-			popup.setAnchorY(screenBounds.getMinY());
-			popup.getContent().clear();
-			final BorderPane content = new BorderPane(StatBlock.getStatBlock(spell));
-			content.setTop(new Pane());
-			content.setPadding(new Insets(8));
-			content.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(4), Insets.EMPTY)));
-			content.setOnMouseExited(e -> {
-				popup.hide();
-			});
-			content.setMaxWidth(384);
-			popup.getContent().add(content);
-			popup.show(spellText.getScene().getWindow());
-		});
-
-		spellText.hoverProperty().addListener((ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
-			if (newValue) {
-				pt.play();
-			} else {
-				pt.stop();
-			}
-		});
 	}
 
 }

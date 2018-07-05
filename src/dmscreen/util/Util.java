@@ -1,4 +1,4 @@
-package dmscreen;
+package dmscreen.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.DecimalFormat;
