@@ -3,6 +3,7 @@ package dmscreen.data.creature.feature;
 import dmscreen.Screen;
 import dmscreen.data.base.DamageType;
 import dmscreen.data.base.DiceRoll;
+import dmscreen.statblock.StatBlock;
 import dmscreen.util.Util;
 import javafx.scene.Node;
 import javafx.scene.text.Font;
@@ -88,8 +89,7 @@ public class Attack extends Action {
 		hit.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.NORMAL, FontPosture.ITALIC, Font.getDefault().getSize()));
 		line.getChildren().add(hit);
 
-		final Text onHit = new Text(getOnHit() + "\n");
-		line.getChildren().add(onHit);
+		line.getChildren().addAll(StatBlock.conditionTooltips(getOnHit() + "\n"));
 
 		return line;
 	}

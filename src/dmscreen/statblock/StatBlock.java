@@ -4,7 +4,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -177,6 +180,17 @@ public class StatBlock {
 
 		if (creature.conditionImmunities != null && !creature.conditionImmunities.isEmpty()) children.add(dataLine("Condition Immunities", creature.conditionImmunities.stream().sorted().map(condition -> condition.name().toLowerCase()).collect(Collectors.joining(", "))));
 
+		// if (creature.conditionImmunities != null && !creature.conditionImmunities.isEmpty()) {
+		// final TextFlow conditionImmunities = dataLine("Condition Immunities", null);
+		// creature.conditionImmunities.stream().sorted().forEach(condition -> {
+		// final Text text = new Text(condition.name().toLowerCase());
+		// addTooltip(text, condition);
+		// conditionImmunities.getChildren().addAll(text, new Text(", "));
+		// });
+		// conditionImmunities.getChildren().remove(conditionImmunities.getChildren().size() - 1);
+		// children.add(conditionImmunities);
+		// }
+
 		Integer passivePerception = creature.skills.get(Skill.PERCEPTION);
 		if (passivePerception == null)
 			passivePerception = creature.abilityScores.get(Ability.WISDOM) / 2 + 5;
@@ -285,7 +299,7 @@ public class StatBlock {
 		table.getColumnConstraints().add(cc);
 		table.setAlignment(Pos.TOP_LEFT);
 
-		final Text diceRollText = new Text(encounter.getDiceRoll().toString());
+		final Text diceRollText = new Text(encounter.getDiceRoll().toString().replaceAll("^1(?=d)", ""));
 		final Text encounterHeader = new Text("Encounter");
 		diceRollText.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.BOLD, 12));
 		encounterHeader.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.BOLD, 12));
@@ -423,6 +437,57 @@ public class StatBlock {
 		}
 
 		return line;
+	}
+
+	private static final Pattern CONDITION_PATTERN = Pattern.compile(String.format("\\b(?:%s)\\b", Arrays.stream(Condition.values()).map(Condition::name).collect(Collectors.joining("|"))), Pattern.CASE_INSENSITIVE);
+
+	/**
+	 * @return a {@link TextFlow} of a stat block data line, with the given title and text.
+	 *         {@link Condition}s in the text will display a tooltip with that condition's
+	 *         description on hover.
+	 */
+	public static TextFlow conditionAltDataLine(final String title, final String text) {
+		return conditionAltDataLine(title, text, false);
+	}
+
+	/**
+	 * @return a {@link TextFlow} of a stat block data line, with the given title and text.
+	 *         {@link Condition}s in the text will display a tooltip with that condition's
+	 *         description on hover.
+	 */
+	public static TextFlow conditionAltDataLine(final String title, final String text, final boolean feature) {
+		final TextFlow line = new TextFlow();
+
+		if (title != null && !title.isEmpty()) {
+			final Text titleText = new Text(title + " ");
+			titleText.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.BOLD, feature ? FontPosture.ITALIC : FontPosture.REGULAR, Font.getDefault().getSize()));
+			line.getChildren().add(titleText);
+		}
+
+		line.getChildren().addAll(conditionTooltips(text));
+
+		return line;
+	}
+
+	public static Collection<Text> conditionTooltips(final String text) {
+		final List<Text> ret = new ArrayList<>();
+
+		if (text != null && !text.isEmpty()) {
+			final Matcher m = CONDITION_PATTERN.matcher(text);
+
+			int endLast = 0;
+			while (m.find()) {
+				ret.add(new Text(text.substring(endLast, m.start())));
+				endLast = m.end();
+				final Text condition = new Text(m.group());
+				StatBlock.addTooltip(condition, Condition.valueOf(m.group().toUpperCase()));
+				ret.add(condition);
+			}
+
+			ret.add(new Text(text.substring(endLast)));
+		}
+
+		return ret;
 	}
 
 	public static TextFlow smallCaps(final String text, final String styleClass) {

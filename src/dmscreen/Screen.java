@@ -56,73 +56,6 @@ public class Screen extends Application {
 			Font.loadFont(new FileInputStream(Paths.get("Cormorant_Garamond/CormorantGaramond-Bold.ttf").toFile()), 12);
 		} catch (final FileNotFoundException e) {}
 
-		try {
-			Data.init(Paths.get("resources"));
-		} catch (final IOException e) {}
-
-		// final Pattern savePattern = Pattern.compile("(\\S+)\\s*saving throw");
-		// final Pattern rollPattern = Pattern.compile("\\d+d\\d+");
-		//
-		// final List<String> output = new ArrayList<>();
-		//
-		// for (final DataSet d : Data.getData().values()) {
-		// for (final Spell spell : d.spells.toArray(new Spell[d.spells.size()])) {
-		// final String desc =
-		// spell.description.stream().map(SpellParagraph::getText).collect(Collectors.joining("\n"));
-		//
-		// final Matcher save = savePattern.matcher(desc);
-		//
-		// Ability savingThrow = null;
-		//
-		// if (save.find()) {
-		// String s = save.group(1);
-		// if (s.equalsIgnoreCase("isdom")) s = "Wisdom";
-		//
-		// try {
-		// savingThrow = Ability.valueOf(s.toUpperCase());
-		// } catch (final IllegalArgumentException e) {}
-		// }
-		//
-		// final Matcher m = rollPattern.matcher(desc);
-		// if (!m.find()) {
-		// d.spells.remove(spell);
-		// }
-		// }
-		// }
-		// Data.getData().values().stream().map(d -> d.spells).collect(() -> new HashSet<Spell>(),
-		// (o, s) -> o.addAll(s), (s1, s2) -> s1.addAll(s2)).stream().map(spell -> {
-		// final String desc =
-		// spell.description.stream().map(SpellParagraph::getText).collect(Collectors.joining("\n"));
-		//
-		// final Matcher save = savePattern.matcher(desc);
-		//
-		// Ability savingThrow = null;
-		//
-		// if (save.find()) {
-		// String s = save.group(1);
-		// if (s.equalsIgnoreCase("isdom")) s = "Wisdom";
-		//
-		// try {
-		// savingThrow = Ability.valueOf(s.toUpperCase());
-		// } catch (final IllegalArgumentException e) {}
-		// }
-		//
-		// final Matcher m = rollPattern.matcher(desc);
-		// if (m.find()) {
-		// return "\n\"" + desc + "\"\n";
-		// } else {
-		//
-		// }
-		//
-		// return savingThrow;
-		// }).forEach(System.out::println);
-		// .map(Pattern.compile("\\S+\\s*saving throw")::matcher).map(m -> {
-		// if (m.find())
-		// return m.group();
-		// else
-		// return "";
-		// }).forEach(System.out::println);
-
 		Application.launch(args);
 	}
 
@@ -140,6 +73,10 @@ public class Screen extends Application {
 
 	@Override
 	public void start(final Stage stage) throws Exception {
+		try {
+			Data.init(Paths.get("resources"));
+		} catch (final IOException e) {}
+
 		dataTree = createTree();
 		searchBar = createSearchBar();
 

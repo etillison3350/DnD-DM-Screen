@@ -48,7 +48,7 @@ public class Spellcasting extends InnateSpellcasting {
 	public Node getNode() {
 		final boolean noDescription = getDescription() == null || getDescription().isEmpty();
 		final TextFlow line = StatBlock.dataLine(getTitle() + ".", String.format("%s is a %d%s level spellcaster. %s spellcasting ability is %s (save DC %d%s)%s. %1$s has %s %s spells prepared%s\n", Util.sentenceCase(getShortName()), level, Util.ordinal(level), Util.sentenceCase(getPronoun()), Util.sentenceCase(getAbility().name()), getSaveDC(), getAttackModifier() > Integer.MIN_VALUE ? String.format(", %+d to hit with spell attacks", getAttackModifier()) : "",
-				extra == null || extra.isEmpty() ? "" : " " + extra, noDescription ? "the following" : "a number of", spellcastingClass, noDescription ? ":" : ". " + getDescription()), true);
+				extra == null || extra.isEmpty() ? "" : (extra.matches("^[\\.\\,\\:][\\s\\S]*$") ? "" : " ") + extra, noDescription ? "the following" : "a number of", spellcastingClass, noDescription ? ":" : ". " + getDescription()), true);
 
 		getSpells().forEach((s, map) -> {
 			line.getChildren().add(new Text("\n" + s + ": "));

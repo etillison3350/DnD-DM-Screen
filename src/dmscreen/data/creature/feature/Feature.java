@@ -36,7 +36,7 @@ public class Feature implements BlockEntry {
 
 	@Override
 	public Node getNode() {
-		return StatBlock.dataLine(getTitle() + ".", description + "\n", true);
+		return StatBlock.conditionAltDataLine(getTitle() + ".", description + "\n", true);
 	}
 
 }
