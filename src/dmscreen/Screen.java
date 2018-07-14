@@ -17,33 +17,20 @@ import java.util.function.Consumer;
 
 import dmscreen.data.Data;
 import dmscreen.data.base.DataSet;
-import dmscreen.statblock.StatBlock;
-import dmscreen.statblock.StatBlockEditor;
 import dmscreen.util.Util;
-import javafx.animation.PauseTransition;
-import javafx.animation.Transition;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.CacheHint;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTreeCell;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 public class Screen extends Application {
@@ -51,6 +38,7 @@ public class Screen extends Application {
 	public static final String DEFAULT_FONT_NAME = "System";
 
 	public static void main(final String[] args) {
+
 		try {
 			Font.loadFont(new FileInputStream(Paths.get("Cormorant_Garamond/CormorantGaramond-Medium.ttf").toFile()), 12);
 			Font.loadFont(new FileInputStream(Paths.get("Cormorant_Garamond/CormorantGaramond-Bold.ttf").toFile()), 12);
@@ -64,12 +52,6 @@ public class Screen extends Application {
 	private final Map<TreeItem<Object>, TreeItem<Object>> parents = new LinkedHashMap<>();
 	private TextField searchBar;
 	private SplitPane rootPane;
-	private Button editButton;
-	private BorderPane editPane;
-	private ScrollPane editScroll;
-	private boolean isEditing = false;
-	private ScrollPane scroll;
-	private StatBlockEditor<? extends Object> currentEditor;
 
 	@Override
 	public void start(final Stage stage) throws Exception {
@@ -80,24 +62,10 @@ public class Screen extends Application {
 		dataTree = createTree();
 		searchBar = createSearchBar();
 
-		blockPane = new StackPane();
-		blockPane.setPadding(new Insets(8));
-		scroll = new ScrollPane(blockPane);
-		scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
-		scroll.setFitToWidth(true);
+		blockPane = new StackPane(new Pane());
 
-		rootPane = new SplitPane(new BorderPane(dataTree, searchBar, null, null, null), new StackPane(), scroll);
+		rootPane = new SplitPane(new BorderPane(dataTree, searchBar, null, null, null), new StackPane(), blockPane);
 		rootPane.setDividerPositions(0.25, 0.625);
-
-		editButton = new Button("Edit");
-		editButton.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-		editButton.setOnAction(event -> setEditing(true));
-
-		editScroll = new ScrollPane();
-		editScroll.setHbarPolicy(ScrollBarPolicy.NEVER);
-		editScroll.setFitToWidth(true);
-		editPane = new BorderPane(editScroll);
-		editPane.setBottom(createEditButtonsPane());
 
 		final Scene scene = new Scene(rootPane, 768, 960);
 		scene.getStylesheets().add("dmscreen/statblock/statBlock.css");
@@ -111,42 +79,6 @@ public class Screen extends Application {
 			if (!newValue) // If the main window is closed, close the player window
 				playerStage.hide();
 		});
-		// playerStage.show();
-	}
-
-	private HBox createEditButtonsPane() {
-		final HBox buttonPane = new HBox(8);
-		buttonPane.setPadding(new Insets(8));
-
-		final Button save = new Button("Save");
-		save.setOnAction(saveEvent -> {
-			try {
-				final TreeItem<Object> selection = dataTree.getSelectionModel().getSelectedItem();
-				final Field type = (Field) selection.getParent().getValue();
-				final DataSet dataSet = (DataSet) selection.getParent().getParent().getValue();
-
-				type.getType().getMethod("remove", Object.class).invoke(type.get(dataSet), currentEditor.getOriginalValue());
-				final Object newValue = currentEditor.getNewValue();
-				type.getType().getMethod("add", Object.class).invoke(type.get(dataSet), newValue);
-				selection.setValue(newValue);
-				Collections.sort(selection.getParent().getChildren(), (o1, o2) -> Util.getName(o1.getValue()).compareToIgnoreCase(Util.getName(o2.getValue())));
-				setStatBlock(newValue);
-				dataTree.getSelectionModel().select(selection);
-				dataTree.scrollTo(dataTree.getSelectionModel().getSelectedIndex());
-			} catch (final NullPointerException | ClassCastException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				e.printStackTrace();
-			}
-			setEditing(false);
-		});
-		buttonPane.getChildren().add(save);
-
-		final Button cancel = new Button("Cancel");
-		cancel.setOnAction(cancelEvent -> {
-			setEditing(false);
-		});
-		buttonPane.getChildren().add(cancel);
-
-		return buttonPane;
 	}
 
 	private TextField createSearchBar() {
@@ -179,46 +111,47 @@ public class Screen extends Application {
 		final TreeItem<Object> treeRoot = constructTreeValues();
 		final TreeView<Object> dataTree = new TreeView<>(treeRoot);
 		dataTree.setShowRoot(false);
-		dataTree.setCellFactory(param -> new TextFieldTreeCell<>(new StringConverter<Object>() {
+		dataTree.setCellFactory(param -> {
+			final TextFieldTreeCell<Object> cell = new TextFieldTreeCell<>(new StringConverter<Object>() {
 
-			@Override
-			public String toString(final Object object) {
-				final String name = Util.getName(object);
+				@Override
+				public String toString(final Object object) {
+					final String name = Util.getName(object);
 
-				if (object instanceof Enum<?>) return Util.titleCase(name);
-				if (object instanceof AccessibleObject) return Util.titleCaseFromCamelCase(name);
+					if (object instanceof Enum<?>) return Util.titleCase(name);
+					if (object instanceof AccessibleObject) return Util.titleCaseFromCamelCase(name);
 
-				return name;
-			}
+					return name;
+				}
 
-			@Override
-			public Object fromString(final String string) {
-				return new Object();
-			}
+				@Override
+				public Object fromString(final String string) {
+					return new Object();
+				}
 
-		}));
-		dataTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue != null && !parents.containsValue(newValue)) {
-				setEditing(false);
+			});
 
-				setStatBlock(newValue.getValue());
-			}
+			cell.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
+					final TreeItem<Object> value = cell.getTreeItem();
+					if (value != null && !parents.containsValue(value)) {
+						final BlockPane<Object> pane = new BlockPane<Object>(value.getValue(), (DataSet) value.getParent().getParent().getValue());
+						blockPane.getChildren().set(0, pane);
+						pane.setOnEditSaved((observable, oldValue, newValue) -> {
+							value.setValue(newValue);
+							Collections.sort(value.getParent().getChildren(), (o1, o2) -> Util.getName(o1.getValue()).compareToIgnoreCase(Util.getName(o2.getValue())));
+							dataTree.getSelectionModel().select(value);
+							dataTree.scrollTo(dataTree.getSelectionModel().getSelectedIndex());
+						});
+					}
+				}
+			});
+
+			return cell;
 		});
 		dataTree.setStyle("-fx-focus-color: transparent;");
 
 		return dataTree;
-	}
-
-	public void setStatBlock(final Object obj) {
-		blockPane.getChildren().clear();
-		final Pane statBlock = StatBlock.getStatBlock(obj);
-		if (StatBlockEditor.isEditable(obj)) {
-			final Node topNode = statBlock.getChildren().isEmpty() ? new Pane() : statBlock.getChildren().remove(0);
-			final HBox top = new HBox(8, topNode, editButton);
-			HBox.setHgrow(topNode, Priority.ALWAYS);
-			statBlock.getChildren().add(0, top);
-		}
-		blockPane.getChildren().add(statBlock);
 	}
 
 	private TreeItem<Object> constructTreeValues() {
@@ -251,72 +184,6 @@ public class Screen extends Application {
 		// playerStage.show();
 
 		return playerStage;
-	}
-
-	public boolean setEditing(final boolean isEditing) {
-		if (this.isEditing != isEditing) {
-			this.isEditing = isEditing;
-			if (this.isEditing) {
-				final Object item = dataTree.getSelectionModel().getSelectedItem().getValue();
-				if (!StatBlockEditor.isEditable(item)) {
-					this.isEditing = false;
-					return false;
-				}
-
-				currentEditor = StatBlockEditor.getEditor(item);
-				editScroll.setContent(currentEditor);
-				rootPane.getItems().add(editPane);
-				rootPane.setDividerPosition(2, 1.0);
-
-				scroll.setCacheHint(CacheHint.SPEED);
-
-				final double[] divs = rootPane.getDividerPositions();
-				final Transition openPane = new Transition() {
-					{
-						setCycleDuration(Duration.millis(300));
-						setOnFinished(event -> {
-							rootPane.getItems().remove(2);
-							scroll.setCacheHint(CacheHint.QUALITY);
-						});
-					}
-
-					@Override
-					protected void interpolate(final double pct) {
-						rootPane.setDividerPosition(2, 1 - pct + pct * divs[1]);
-					}
-				};
-				openPane.play();
-			} else {
-				final double[] divs = rootPane.getDividerPositions();
-				rootPane.getItems().add(2, scroll);
-
-				editScroll.setCacheHint(CacheHint.SPEED);
-
-				final PauseTransition pt = new PauseTransition(Duration.seconds(1));
-				pt.setOnFinished(event -> {
-					rootPane.setDividerPositions(divs[0], divs[1], divs[1]);
-				});
-				pt.play();
-				final Transition closePane = new Transition() {
-					{
-						setCycleDuration(Duration.millis(300));
-						setOnFinished(event -> {
-							rootPane.getItems().remove(3);
-							editScroll.setCacheHint(CacheHint.QUALITY);
-						});
-					}
-
-					@Override
-					protected void interpolate(final double pct) {
-						rootPane.setDividerPosition(1, divs[1]);
-						rootPane.setDividerPosition(2, pct + (1 - pct) * divs[1]);
-					}
-				};
-				closePane.play();
-			}
-		}
-
-		return this.isEditing;
 	}
 
 }

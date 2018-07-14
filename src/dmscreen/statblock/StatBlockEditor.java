@@ -6,8 +6,6 @@ import java.util.TreeSet;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import javafx.geometry.Insets;
-import javafx.scene.layout.VBox;
 import dmscreen.data.base.Ability;
 import dmscreen.data.base.DamageType;
 import dmscreen.data.base.Size;
@@ -37,6 +35,8 @@ import dmscreen.statblock.editor.collection.CollectionStringEditor;
 import dmscreen.statblock.editor.map.EditableMapCollectionEditor;
 import dmscreen.statblock.editor.map.EditableMapEnumIntegerEditor;
 import dmscreen.statblock.editor.map.MapEnumIntegerEditor;
+import javafx.geometry.Insets;
+import javafx.scene.layout.VBox;
 
 public class StatBlockEditor<T> extends VBox {
 
@@ -85,11 +85,12 @@ public class StatBlockEditor<T> extends VBox {
 		}
 	}
 
-	public static StatBlockEditor<? extends Object> getEditor(final Object obj) {
+	@SuppressWarnings("unchecked")
+	public static <T> StatBlockEditor<? extends T> getEditor(final T obj) {
 		try {
 			if (obj == null || obj.getClass() == Object.class) return new StatBlockEditor<>(null);
 
-			return (StatBlockEditor<?>) StatBlockEditor.class.getMethod("getEditor", obj.getClass()).invoke(null, obj);
+			return (StatBlockEditor<? extends T>) StatBlockEditor.class.getMethod("getEditor", obj.getClass()).invoke(null, obj);
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 			return new StatBlockEditor<>(null);
