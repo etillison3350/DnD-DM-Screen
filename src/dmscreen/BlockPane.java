@@ -8,16 +8,23 @@ import java.lang.reflect.Type;
 import dmscreen.data.base.DataSet;
 import dmscreen.statblock.StatBlock;
 import dmscreen.statblock.StatBlockEditor;
+import dmscreen.util.Util;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.BorderPane;
@@ -42,6 +49,7 @@ public class BlockPane<T> extends StackPane {
 	private StatBlockEditor<? extends T> currentEditor;
 
 	private final ObjectProperty<ChangeListener<T>> onEditSavedProperty = new SimpleObjectProperty<>(null);
+	private final ReadOnlyStringWrapper titleProperty = new ReadOnlyStringWrapper();
 
 	private final DoubleProperty animationProgress = new SimpleDoubleProperty(0);
 
@@ -79,7 +87,8 @@ public class BlockPane<T> extends StackPane {
 			editPane = null;
 		}
 
-		update();
+		updateBlockPane();
+		setEditing(false);
 	}
 
 	private HBox createEditButtonsPane() {
@@ -88,31 +97,7 @@ public class BlockPane<T> extends StackPane {
 
 		final Button save = new Button("Save");
 		save.setOnAction(saveEvent -> {
-			try {
-				for (final Field field : DataSet.class.getFields()) {
-					System.out.println(field.getName());
-					if (field.getGenericType() instanceof ParameterizedType) {
-						Type t = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-						if (t instanceof ParameterizedType) t = ((ParameterizedType) t).getRawType();
-
-						System.out.println(t + ", " + info.getClass());
-
-						if (((Class<?>) t).isAssignableFrom(info.getClass())) {
-							final T originalValue = currentEditor.getOriginalValue();
-							field.getType().getMethod("remove", Object.class).invoke(field.get(source), originalValue);
-							info = currentEditor.getNewValue();
-							field.getType().getMethod("add", Object.class).invoke(field.get(source), info);
-							blockPane.getChildren().set(0, StatBlock.getStatBlock(info));
-
-							onEditSavedProperty.get().changed(null, originalValue, info);
-						}
-					}
-				}
-
-			} catch (final NullPointerException | ClassCastException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				e.printStackTrace();
-			}
-			setEditing(false);
+			save();
 		});
 		buttonPane.getChildren().add(save);
 
@@ -123,6 +108,38 @@ public class BlockPane<T> extends StackPane {
 		buttonPane.getChildren().add(cancel);
 
 		return buttonPane;
+	}
+
+	public T save() {
+		if (!isEditing) return null;
+
+		final T original = info;
+		try {
+			for (final Field field : DataSet.class.getFields()) {
+				if (field.getGenericType() instanceof ParameterizedType) {
+					Type t = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+					if (t instanceof ParameterizedType) t = ((ParameterizedType) t).getRawType();
+
+					if (((Class<?>) t).isAssignableFrom(info.getClass())) {
+						final T originalValue = currentEditor.getOriginalValue();
+						field.getType().getMethod("remove", Object.class).invoke(field.get(source), originalValue);
+						info = currentEditor.getNewValue();
+						field.getType().getMethod("add", Object.class).invoke(field.get(source), info);
+						blockPane.getChildren().set(0, StatBlock.getStatBlock(info));
+
+						onEditSavedProperty.get().changed(null, originalValue, info);
+					}
+				}
+			}
+
+		} catch (final NullPointerException | ClassCastException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+		}
+		setEditing(false);
+
+		if (info != original) return info;
+
+		return null;
 	}
 
 	private boolean setEditing(final boolean editing) {
@@ -168,10 +185,30 @@ public class BlockPane<T> extends StackPane {
 			}
 		}
 
+		final String name = Util.getName(info);
+		titleProperty.set(info instanceof Enum<?> ? Util.titleCase(name) : name + (isEditing ? "*" : ""));
+
 		return this.isEditing;
 	}
 
-	private void update() {
+	private static final ButtonType SAVE = new ButtonType("Save", ButtonData.YES);
+	private static final ButtonType DISCARD = new ButtonType("Discard", ButtonData.NO);
+
+	public boolean confirmClose() {
+		if (!isEditing) return true;
+
+		final Alert alert = new Alert(AlertType.NONE, String.format("\"%s\" has been modified. Save changes?", Util.getName(info)), SAVE, DISCARD, ButtonType.CANCEL);
+
+		final ButtonType response = alert.showAndWait().orElse(ButtonType.CANCEL);
+		if (response == ButtonType.CANCEL) {
+			return false;
+		} else {
+			if (response == SAVE) save();
+			return true;
+		}
+	}
+
+	private void updateBlockPane() {
 		blockPane.getChildren().clear();
 		final Pane statBlock = StatBlock.getStatBlock(info);
 		if (StatBlockEditor.isEditable(info)) {
@@ -197,6 +234,14 @@ public class BlockPane<T> extends StackPane {
 
 	public ChangeListener<T> getOnEditSaved() {
 		return onEditSavedProperty.get();
+	}
+
+	public ReadOnlyStringProperty titleProperty() {
+		return titleProperty.getReadOnlyProperty();
+	}
+
+	public String getTitle() {
+		return titleProperty.get();
 	}
 
 }

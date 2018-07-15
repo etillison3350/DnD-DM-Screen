@@ -19,6 +19,7 @@ import dmscreen.data.Data;
 import dmscreen.data.base.DataSet;
 import dmscreen.util.Util;
 import javafx.application.Application;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -64,6 +65,8 @@ public class Screen extends Application {
 		searchBar = createSearchBar();
 
 		tabPane = new TabPane();
+		tabPane.setTabMaxWidth(96);
+		tabPane.setSide(Side.RIGHT);
 
 		rootPane = new SplitPane(new BorderPane(dataTree, searchBar, null, null, null), new StackPane(), tabPane);
 		rootPane.setDividerPositions(0.25, 0.625);
@@ -138,11 +141,14 @@ public class Screen extends Application {
 					if (value != null && !parents.containsValue(value)) {
 						final BlockPane<Object> pane = new BlockPane<Object>(value.getValue(), (DataSet) value.getParent().getParent().getValue());
 						final Tab tab = new Tab(Util.getName(value.getValue()), pane);
+						tab.textProperty().bind(pane.titleProperty());
+						tab.setOnCloseRequest(e -> {
+							if (!pane.confirmClose()) e.consume();
+						});
 						tabPane.getTabs().add(tab);
 						tabPane.getSelectionModel().select(tabPane.getTabs().size() - 1);
 						pane.setOnEditSaved((observable, oldValue, newValue) -> {
 							value.setValue(newValue);
-							tab.setText(Util.getName(newValue));
 							Collections.sort(value.getParent().getChildren(), (o1, o2) -> Util.getName(o1.getValue()).compareToIgnoreCase(Util.getName(o2.getValue())));
 							dataTree.getSelectionModel().select(value);
 							dataTree.scrollTo(dataTree.getSelectionModel().getSelectedIndex());
