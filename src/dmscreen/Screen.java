@@ -21,13 +21,14 @@ import dmscreen.util.Util;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -47,10 +48,10 @@ public class Screen extends Application {
 		Application.launch(args);
 	}
 
-	private StackPane blockPane;
 	private TreeView<Object> dataTree;
 	private final Map<TreeItem<Object>, TreeItem<Object>> parents = new LinkedHashMap<>();
 	private TextField searchBar;
+	private TabPane tabPane;
 	private SplitPane rootPane;
 
 	@Override
@@ -62,9 +63,9 @@ public class Screen extends Application {
 		dataTree = createTree();
 		searchBar = createSearchBar();
 
-		blockPane = new StackPane(new Pane());
+		tabPane = new TabPane();
 
-		rootPane = new SplitPane(new BorderPane(dataTree, searchBar, null, null, null), new StackPane(), blockPane);
+		rootPane = new SplitPane(new BorderPane(dataTree, searchBar, null, null, null), new StackPane(), tabPane);
 		rootPane.setDividerPositions(0.25, 0.625);
 
 		final Scene scene = new Scene(rootPane, 768, 960);
@@ -136,9 +137,12 @@ public class Screen extends Application {
 					final TreeItem<Object> value = cell.getTreeItem();
 					if (value != null && !parents.containsValue(value)) {
 						final BlockPane<Object> pane = new BlockPane<Object>(value.getValue(), (DataSet) value.getParent().getParent().getValue());
-						blockPane.getChildren().set(0, pane);
+						final Tab tab = new Tab(Util.getName(value.getValue()), pane);
+						tabPane.getTabs().add(tab);
+						tabPane.getSelectionModel().select(tabPane.getTabs().size() - 1);
 						pane.setOnEditSaved((observable, oldValue, newValue) -> {
 							value.setValue(newValue);
+							tab.setText(Util.getName(newValue));
 							Collections.sort(value.getParent().getChildren(), (o1, o2) -> Util.getName(o1.getValue()).compareToIgnoreCase(Util.getName(o2.getValue())));
 							dataTree.getSelectionModel().select(value);
 							dataTree.scrollTo(dataTree.getSelectionModel().getSelectedIndex());
