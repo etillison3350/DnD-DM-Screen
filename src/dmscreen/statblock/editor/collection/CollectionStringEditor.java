@@ -13,7 +13,10 @@ public class CollectionStringEditor extends CollectionEditor<String> {
 
 		editor = new TextField();
 		if (prompt != null) editor.setPromptText(prompt);
-		editor.setOnAction(getOnAddAction());
+		editor.setOnAction(e -> {
+			if (!editor.getText().isEmpty()) getOnAddAction().handle(e);
+		});
+		editor.textProperty().addListener((observable, oldValue, newValue) -> setAddDisable(newValue == null || newValue.isEmpty()));
 		setEditor(editor);
 	}
 

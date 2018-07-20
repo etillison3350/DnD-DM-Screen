@@ -89,7 +89,7 @@ public class Attack extends Action {
 		hit.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontWeight.NORMAL, FontPosture.ITALIC, Font.getDefault().getSize()));
 		line.getChildren().add(hit);
 
-		line.getChildren().addAll(StatBlock.conditionTooltips(getOnHit() + "\n"));
+		line.getChildren().addAll(StatBlock.formattedSegments(getOnHit() + "\n"));
 
 		return line;
 	}

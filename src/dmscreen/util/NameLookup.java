@@ -5,6 +5,7 @@ import java.util.Map;
 
 import dmscreen.data.Data;
 import dmscreen.data.base.DataSet;
+import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.Creature;
 import dmscreen.data.spell.Spell;
 
@@ -14,6 +15,27 @@ public final class NameLookup {
 
 	private static final Map<String, Creature> creatures = new HashMap<>();
 	private static final Map<String, Spell> spells = new HashMap<>();
+
+	public static Object objectFromName(final String name) {
+		Object o = creatures.get(name);
+		if (o != null) return o;
+		o = spells.get(name);
+		if (o != null) return o;
+
+		try {
+			return Condition.valueOf(name.toUpperCase());
+		} catch (final IllegalArgumentException e1) {
+			try {
+				return creatureFromName(name);
+			} catch (final IllegalArgumentException e2) {
+				try {
+					return spellFromName(name);
+				} catch (final IllegalArgumentException e3) {}
+			}
+		}
+
+		throw new IllegalArgumentException("No object with the name \"" + name + "\" could be found.");
+	}
 
 	public static Creature creatureFromName(final String name) {
 		final Creature c = creatures.get(name);

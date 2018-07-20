@@ -1,5 +1,6 @@
 package dmscreen.statblock.editor.collection;
 
+import java.lang.reflect.AccessibleObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,15 +27,19 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.util.StringConverter;
 
 public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Collection<T>> {
 
@@ -73,7 +78,7 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 	}
 
 	public BlockEntryCollectionEditor(final Class<T> clazz, final String name, final Collection<? extends T> initialValue) {
-		this(clazz, name, String.format("Add %s", clazz.getSimpleName()), initialValue);
+		this(clazz, name, String.format("Add %s", Util.titleCaseFromCamelCase(clazz.getSimpleName())), initialValue);
 	}
 
 	private void addRow(final T obj) {
@@ -83,11 +88,13 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 		// pane.setGraphic(new Button("Test"));
 		accordion.getPanes().add(pane);
 		values.put(obj, pane);
-		pane.expandedProperty().addListener((obs, oldV, newV) -> {
-			System.out.println(content.getWidth());
-			System.out.println(content.fitTo.prefHeight(content.getWidth()));
-			System.out.println(pane.getWidth());
-		});
+
+		// pane.expandedProperty().addListener((obs, oldV, newV) -> {
+		// System.out.println(content.getWidth());
+		// System.out.println(content.fitTo.prefHeight(content.getWidth()));
+		// System.out.println(pane.getWidth());
+		// });
+
 		// GridPane.setRowIndex(add, minRow + 1);
 		// final TextFlow node = new TextFlow(new Text(Util.getName(obj)));
 		// final Tooltip tooltip = new Tooltip();
@@ -111,6 +118,7 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 	@SuppressWarnings("unchecked")
 	private T getFromDialog() {
 		final Dialog<T> dialog = new Dialog<>();
+		dialog.setTitle("Choose a template...");
 
 		final DialogPane dialogPane = new DialogPane();
 
@@ -119,7 +127,6 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 
 		Data.getData().forEach((name, set) -> {
 			final TreeItem<Object> setItem = new TreeItem<>(set);
-			parents.put(setItem, rootItem);
 			set.templates.forEach(template -> {
 				try {
 					if (clazz.isAssignableFrom(template.getClass().getMethod("make", Map.class).getReturnType())) {
@@ -128,6 +135,7 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 					}
 				} catch (final Exception e) {}
 			});
+			if (parents.containsValue(setItem)) parents.put(setItem, rootItem);
 		});
 
 		final TextField searchBar = new TextField("-");
@@ -153,8 +161,10 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 		searchBar.setText("");
 
 		final TreeView<Object> treeView = new TreeView<>(rootItem);
+		treeView.setShowRoot(false);
 
 		final StackPane editorPane = new StackPane();
+		editorPane.setPadding(new Insets(8));
 
 		treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			final Object value = newValue.getValue();
@@ -164,10 +174,32 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 				editorPane.getChildren().add(activeEditor);
 			}
 		});
+		treeView.setCellFactory(param -> new TextFieldTreeCell<>(new StringConverter<Object>() {
 
-		final SplitPane root = new SplitPane(new BorderPane(treeView, searchBar, null, null, null), editorPane);
+			@Override
+			public String toString(final Object object) {
+				final String name = Util.getName(object);
+
+				if (object instanceof Enum<?>) return Util.titleCase(name);
+				if (object instanceof AccessibleObject) return Util.titleCaseFromCamelCase(name);
+
+				return name;
+			}
+
+			@Override
+			public Object fromString(final String string) {
+				return new Object();
+			}
+
+		}));
+
+		final ScrollPane scroll = new ScrollPane(editorPane);
+		scroll.setFitToWidth(true);
+		scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
+		final SplitPane root = new SplitPane(new BorderPane(treeView, searchBar, null, null, null), scroll);
 
 		dialogPane.setContent(root);
+		dialogPane.setPrefWidth(640);
 
 		dialogPane.getButtonTypes().add(new ButtonType("Add", ButtonData.OK_DONE));
 		dialogPane.getButtonTypes().add(new ButtonType("Cancel", ButtonData.CANCEL_CLOSE));
@@ -223,6 +255,9 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 		@Override
 		protected double computeMinHeight(final double width) {
 			System.out.println(width + "!!");
+			System.out.println(getWidth());
+			System.out.println(fitTo.minHeight(width));
+			System.out.println(fitTo.prefHeight(width));
 			return fitTo.minHeight(width);
 		}
 
@@ -234,6 +269,7 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 		@Override
 		protected double computePrefHeight(final double width) {
 			System.out.println(width + "!");
+			System.out.println(fitTo.prefHeight(width));
 			return fitTo.prefHeight(width);
 		}
 

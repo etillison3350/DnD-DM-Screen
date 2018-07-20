@@ -2,9 +2,9 @@ package dmscreen.statblock.editor.collection;
 
 import java.util.Collection;
 
-import javafx.scene.control.ComboBox;
 import dmscreen.statblock.editor.EnumEditor;
 import dmscreen.util.Util;
+import javafx.scene.control.ComboBox;
 
 public class CollectionEnumEditor<T extends Enum<?>> extends CollectionEditor<T> {
 
@@ -14,6 +14,7 @@ public class CollectionEnumEditor<T extends Enum<?>> extends CollectionEditor<T>
 		super(name, initialValue);
 
 		this.editor = EnumEditor.createEditorComboBox(clazz, null);
+		editor.valueProperty().addListener((observable, oldValue, newValue) -> setAddDisable(newValue == null));
 		setEditor(editor);
 	}
 

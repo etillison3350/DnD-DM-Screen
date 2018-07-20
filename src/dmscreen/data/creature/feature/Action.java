@@ -36,7 +36,7 @@ public class Action implements BlockEntry {
 
 	@Override
 	public Node getNode() {
-		return StatBlock.conditionAltDataLine(getTitle() + ".", description + "\n", true);
+		return StatBlock.formattedDataLine(getTitle() + ".", description + "\n", true);
 	}
 
 }

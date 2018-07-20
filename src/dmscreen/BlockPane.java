@@ -125,7 +125,7 @@ public class BlockPane<T> extends StackPane {
 						field.getType().getMethod("remove", Object.class).invoke(field.get(source), originalValue);
 						info = currentEditor.getNewValue();
 						field.getType().getMethod("add", Object.class).invoke(field.get(source), info);
-						blockPane.getChildren().set(0, StatBlock.getStatBlock(info));
+						updateBlockPane();
 
 						onEditSavedProperty.get().changed(null, originalValue, info);
 					}

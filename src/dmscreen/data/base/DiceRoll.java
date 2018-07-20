@@ -15,7 +15,7 @@ public class DiceRoll {
 
 	public static final Pattern VALUE_DIE_ROLL = Pattern.compile("^(\\d+)\\((\\d+)d(\\d+)([+\\-]\\d+)?\\)$");
 
-	public static final Pattern DIE_ROLL = Pattern.compile("^(\\d+)d(\\d+)([+\\-]\\d+)?$");
+	public static final Pattern DIE_ROLL = Pattern.compile("^(\\d+)(?:d(\\d+)([+\\-]\\d+)?)?$");
 
 	public DiceRoll(final int number, final int die) {
 		this(number, die, 0);
@@ -97,6 +97,7 @@ public class DiceRoll {
 		final String formatted = value.toLowerCase().replaceAll("[^\\dd+\\-\\(\\)]+", "");
 		Matcher matcher = DIE_ROLL.matcher(formatted);
 		if (matcher.find()) {
+			if (!matcher.group().contains("d")) return new DiceRoll(Integer.parseInt(matcher.group()), 1);
 			return new DiceRoll(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), matcher.group(3) == null ? 0 : Integer.parseInt(matcher.group(3)));
 		}
 		matcher = VALUE_DIE_ROLL.matcher(formatted);

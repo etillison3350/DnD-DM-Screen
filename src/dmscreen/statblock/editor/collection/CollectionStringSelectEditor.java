@@ -13,6 +13,7 @@ public class CollectionStringSelectEditor extends CollectionEditor<String> {
 
 		editor = new ComboBox<String>();
 		editor.getItems().addAll(possibleValues);
+		editor.valueProperty().addListener((observable, oldValue, newValue) -> setAddDisable(newValue == null));
 		setEditor(editor);
 	}
 

@@ -30,14 +30,14 @@ public class Subfeatures extends Feature {
 
 	@Override
 	public Node getNode() {
-		final TextFlow node = StatBlock.conditionAltDataLine(getTitle() + ".", getDescription(), true);
+		final TextFlow node = StatBlock.formattedDataLine(getTitle() + ".", getDescription(), true);
 
 		subfeatures.forEach((name, desc) -> {
 			final Text title = new Text("\n   " + name + ". ");
 			title.setFont(Font.font(Screen.DEFAULT_FONT_NAME, FontPosture.ITALIC, Font.getDefault().getSize()));
 			node.getChildren().add(title);
 
-			node.getChildren().addAll(StatBlock.conditionTooltips(desc));
+			node.getChildren().addAll(StatBlock.formattedSegments(desc));
 		});
 		node.getChildren().add(new Text("\n"));
 

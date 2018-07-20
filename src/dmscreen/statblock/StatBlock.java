@@ -20,6 +20,7 @@ import dmscreen.Screen;
 import dmscreen.data.adventure.RandomEncounter;
 import dmscreen.data.base.Ability;
 import dmscreen.data.base.DamageType;
+import dmscreen.data.base.DiceRoll;
 import dmscreen.data.base.Skill;
 import dmscreen.data.creature.Condition;
 import dmscreen.data.creature.Creature;
@@ -28,6 +29,7 @@ import dmscreen.data.creature.feature.template.Template;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.Spell;
 import dmscreen.data.spell.SpellParagraph;
+import dmscreen.util.NameLookup;
 import dmscreen.util.PopupManager;
 import dmscreen.util.Util;
 import javafx.animation.PauseTransition;
@@ -439,23 +441,13 @@ public class StatBlock {
 		return line;
 	}
 
-	private static final Pattern CONDITION_PATTERN = Pattern.compile(String.format("\\b(?:%s)\\b", Arrays.stream(Condition.values()).map(Condition::name).collect(Collectors.joining("|"))), Pattern.CASE_INSENSITIVE);
+	private static final Pattern FORMAT_PATTERN = Pattern.compile(String.format("(?:\\b(%s)|(\\d+d\\d+(?:\\s*[+\\-]\\s*\\d+)?)\\b)|(\\[([\\s\\S]+?)\\](?:\\((.*?)\\))?)|(([_\\*])\\7?)", Arrays.stream(Condition.values()).map(Condition::name).collect(Collectors.joining("|"))), Pattern.CASE_INSENSITIVE);
 
-	/**
-	 * @return a {@link TextFlow} of a stat block data line, with the given title and text.
-	 *         {@link Condition}s in the text will display a tooltip with that condition's
-	 *         description on hover.
-	 */
-	public static TextFlow conditionAltDataLine(final String title, final String text) {
-		return conditionAltDataLine(title, text, false);
+	public static TextFlow formattedDataLine(final String title, final String text) {
+		return formattedDataLine(title, text, false);
 	}
 
-	/**
-	 * @return a {@link TextFlow} of a stat block data line, with the given title and text.
-	 *         {@link Condition}s in the text will display a tooltip with that condition's
-	 *         description on hover.
-	 */
-	public static TextFlow conditionAltDataLine(final String title, final String text, final boolean feature) {
+	public static TextFlow formattedDataLine(final String title, final String text, final boolean feature) {
 		final TextFlow line = new TextFlow();
 
 		if (title != null && !title.isEmpty()) {
@@ -464,30 +456,111 @@ public class StatBlock {
 			line.getChildren().add(titleText);
 		}
 
-		line.getChildren().addAll(conditionTooltips(text));
+		line.getChildren().addAll(formattedSegments(text));
 
 		return line;
 	}
 
-	public static Collection<Text> conditionTooltips(final String text) {
+	/**
+	 * Searches the given text for objects to add tooltips to, and returns an ordered
+	 * {@link Collection} of {@link Text} objects representing the string, with appropriate tooltips
+	 * on their corresponding text segments.<br>
+	 * Tooltips are added to:
+	 * <ul>
+	 * <li>{@link Condition}s</li>
+	 * <li>{@link DiceRoll}s</li>
+	 * </ul>
+	 * @param text - The text to search
+	 * @return An ordered collection of {@code Text} nodes representing the given text with tooltips
+	 *         added.
+	 */
+	public static Collection<Text> formattedSegments(final String text) {
 		final List<Text> ret = new ArrayList<>();
 
 		if (text != null && !text.isEmpty()) {
-			final Matcher m = CONDITION_PATTERN.matcher(text);
+			final Matcher m = FORMAT_PATTERN.matcher(text);
+
+			int italic = 0, bold = 0;
 
 			int endLast = 0;
 			while (m.find()) {
-				ret.add(new Text(text.substring(endLast, m.start())));
+				final Text t = new Text(text.substring(endLast, m.start()));
+				setStyle(t, bold, italic);
+				ret.add(t);
+
 				endLast = m.end();
-				final Text condition = new Text(m.group());
-				StatBlock.addTooltip(condition, Condition.valueOf(m.group().toUpperCase()));
-				ret.add(condition);
+				if (m.group(1) != null) { // Tooltips on conditions
+					final Text condition = new Text(m.group());
+					StatBlock.addTooltip(condition, Condition.valueOf(m.group().toUpperCase()));
+					setStyle(condition, bold, italic);
+					ret.add(condition);
+				} else if (m.group(2) != null) { // Tooltips on dice rolls
+					final String roll = m.group();
+					final Text diceRoll = new Text(roll);
+					diceRoll.setOnMouseClicked(event -> {
+						final Bounds screenBounds = diceRoll.localToScreen(diceRoll.getBoundsInLocal());
+
+						try {
+							final Popup popup = PopupManager.getPopup();
+							popup.setAnchorX(event.getScreenX() - 4);
+							popup.setAnchorY(event.getScreenY() - screenBounds.getHeight() - 4);
+							final TextFlow content = new TextFlow(new Text(String.format("%s: %d", roll, DiceRoll.fromString(diceRoll.getText()).roll())));
+							content.setPadding(new Insets(4));
+							content.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(4), Insets.EMPTY)));
+							content.setOnMouseExited(e -> {
+								final PauseTransition pt = new PauseTransition(Duration.millis(500));
+								pt.setOnFinished(f -> PopupManager.releasePopup());
+								pt.play();
+							});
+							content.setMaxWidth(384);
+							popup.getContent().add(content);
+							popup.show(diceRoll.getScene().getWindow());
+						} catch (final IllegalStateException e) {}
+					});
+					setStyle(diceRoll, bold, italic);
+					ret.add(diceRoll);
+				} else if (m.group(3) != null) { // Inline tooltips
+					final String lookup = m.group(m.group(5) == null ? 4 : 5);
+					try {
+						final Object value = NameLookup.objectFromName(lookup);
+						final Text object = new Text(m.group(4));
+						StatBlock.addTooltip(object, value);
+						setStyle(object, value instanceof Creature ? 1 : bold, value instanceof Spell ? 1 : italic);
+						ret.add(object);
+					} catch (final IllegalArgumentException e) {}
+				} else if (m.group(6) != null) { // Bold/italic codes
+					final String code = m.group(6);
+					final int c = code.charAt(0);
+
+					if (code.length() == 1) {
+						System.out.println(italic + ", " + c);
+						if (italic == 0 || italic == c) {
+							italic = c - italic;
+						} else {
+							final Text i = new Text(code);
+							setStyle(i, bold, italic);
+							ret.add(i);
+						}
+					} else {
+						if (bold == 0 || bold == c) {
+							bold = c - bold;
+						} else {
+							final Text b = new Text(code);
+							setStyle(b, bold, italic);
+							ret.add(b);
+						}
+					}
+				}
 			}
 
 			ret.add(new Text(text.substring(endLast)));
 		}
 
 		return ret;
+	}
+
+	private static void setStyle(final Text text, final int bold, final int italic) {
+		text.setFont(Font.font(Screen.DEFAULT_FONT_NAME, bold == 0 ? FontWeight.NORMAL : FontWeight.BOLD, italic == 0 ? FontPosture.REGULAR : FontPosture.ITALIC, 12));
 	}
 
 	public static TextFlow smallCaps(final String text, final String styleClass) {

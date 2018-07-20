@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -25,6 +26,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTreeCell;
@@ -53,6 +55,7 @@ public class Screen extends Application {
 	private final Map<TreeItem<Object>, TreeItem<Object>> parents = new LinkedHashMap<>();
 	private TextField searchBar;
 	private TabPane tabPane;
+	private final Map<Object, Tab> openTabs = new HashMap<>();
 	private SplitPane rootPane;
 
 	@Override
@@ -139,20 +142,27 @@ public class Screen extends Application {
 				if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
 					final TreeItem<Object> value = cell.getTreeItem();
 					if (value != null && !parents.containsValue(value)) {
-						final BlockPane<Object> pane = new BlockPane<Object>(value.getValue(), (DataSet) value.getParent().getParent().getValue());
-						final Tab tab = new Tab(Util.getName(value.getValue()), pane);
-						tab.textProperty().bind(pane.titleProperty());
-						tab.setOnCloseRequest(e -> {
-							if (!pane.confirmClose()) e.consume();
-						});
-						tabPane.getTabs().add(tab);
-						tabPane.getSelectionModel().select(tabPane.getTabs().size() - 1);
-						pane.setOnEditSaved((observable, oldValue, newValue) -> {
-							value.setValue(newValue);
-							Collections.sort(value.getParent().getChildren(), (o1, o2) -> Util.getName(o1.getValue()).compareToIgnoreCase(Util.getName(o2.getValue())));
-							dataTree.getSelectionModel().select(value);
-							dataTree.scrollTo(dataTree.getSelectionModel().getSelectedIndex());
-						});
+						if (openTabs.containsKey(value.getValue())) {
+							tabPane.getSelectionModel().select(openTabs.get(value.getValue()));
+						} else {
+							final BlockPane<Object> pane = new BlockPane<Object>(value.getValue(), (DataSet) value.getParent().getParent().getValue());
+							final Tab tab = new Tab(Util.getName(value.getValue()), pane);
+							tab.setTooltip(new Tooltip(tab.getText()));
+							tab.textProperty().bind(pane.titleProperty());
+							tab.setOnCloseRequest(e -> {
+								if (!pane.confirmClose()) e.consume();
+							});
+							tab.setOnClosed(e -> openTabs.remove(value.getValue()));
+							openTabs.put(value.getValue(), tab);
+							tabPane.getTabs().add(tab);
+							tabPane.getSelectionModel().select(tabPane.getTabs().size() - 1);
+							pane.setOnEditSaved((observable, oldValue, newValue) -> {
+								value.setValue(newValue);
+								Collections.sort(value.getParent().getChildren(), (o1, o2) -> Util.getName(o1.getValue()).compareToIgnoreCase(Util.getName(o2.getValue())));
+								dataTree.getSelectionModel().select(value);
+								dataTree.scrollTo(dataTree.getSelectionModel().getSelectedIndex());
+							});
+						}
 					}
 				}
 			});

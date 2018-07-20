@@ -6,15 +6,33 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Util {
 
 	public static final NumberFormat COMMA_SEPARATED = new DecimalFormat("#,###");
 
+	public static final Pattern TITLE_LOWERCASE = Pattern.compile("a(?:nd?|[st])?|b(?:ut|y)|[io]f|o(?:[nr]|ff)|f(?:or|rom)|in(?:to)?|like|near|nor|on(?:ce|to)|over|past|so|t(?:h(?:e|a[nt])|o|ill)|up(?:on)?|w(?:ith|hen)|yet|down", Pattern.CASE_INSENSITIVE);
+
 	private Util() {}
 
 	public static String titleCase(final String string) {
+		if (string == null || string.isEmpty()) return "";
+		final StringBuffer ret = new StringBuffer();
+		final String[] words = string.split("[_ ]");
+		for (int i = 0; i < words.length; i++) {
+			if (i == 0 || i == words.length - 1 || !TITLE_LOWERCASE.matcher(words[i]).find()) {
+				ret.append(Util.sentenceCase(words[i]));
+			} else {
+				ret.append(words[i].toLowerCase());
+			}
+			if (i != words.length - 1) ret.append(' ');
+		}
+		return ret.toString();
+	}
+
+	public static String rawTitleCase(final String string) {
 		if (string == null || string.isEmpty()) return "";
 		return Arrays.stream(string.split("[_ ]")).map(Util::sentenceCase).collect(Collectors.joining(" "));
 	}
@@ -25,6 +43,21 @@ public class Util {
 	}
 
 	public static String titleCaseFromCamelCase(final String camelCase) {
+		if (camelCase == null || camelCase.isEmpty()) return "";
+		final StringBuffer ret = new StringBuffer();
+		final String[] words = camelCase.split("(?=[A-Z])");
+		for (int i = 0; i < words.length; i++) {
+			if (i == 0 || i == words.length - 1 || !TITLE_LOWERCASE.matcher(words[i]).find()) {
+				ret.append(Util.sentenceCase(words[i]));
+			} else {
+				ret.append(words[i].toLowerCase());
+			}
+			if (i != words.length - 1) ret.append(' ');
+		}
+		return ret.toString();
+	}
+
+	public static String rawTitleCaseFromCamelCase(final String camelCase) {
 		if (camelCase == null || camelCase.isEmpty()) return "";
 		return Character.toUpperCase(camelCase.charAt(0)) + camelCase.substring(1).replaceAll("[A-Z]", " $0");
 	}
