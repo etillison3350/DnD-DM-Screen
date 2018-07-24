@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
 import dmscreen.data.spell.Bullet;
 import dmscreen.data.spell.SpellFeature;
 import dmscreen.data.spell.SpellParagraph;
 import dmscreen.statblock.StatBlock;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 
 public class SpellDescriptionEditor extends Editor<List<? extends SpellParagraph>> {
 
@@ -25,15 +25,7 @@ public class SpellDescriptionEditor extends Editor<List<? extends SpellParagraph
 
 		setPadding(new Insets(8, 0, 8, 0));
 
-		value = new TextArea(initialValue.stream().map(sp -> {
-			if (sp instanceof Bullet) {
-				return " - " + sp.getText();
-			} else if (sp instanceof SpellFeature) {
-				return " # " + ((SpellFeature) sp).getTitle() + ". " + sp.getText();
-			} else {
-				return sp.getText();
-			}
-		}).collect(Collectors.joining("\n\n")));
+		value = new TextArea(paragraphsToString(initialValue));
 		value.setWrapText(true);
 
 		final Button help = new Button("?");
@@ -44,6 +36,18 @@ public class SpellDescriptionEditor extends Editor<List<? extends SpellParagraph
 		getColumnConstraints().get(1).setHalignment(HPos.RIGHT);
 		addRow(0, StatBlock.smallCaps(name, "header-small"), help);
 		this.add(value, 0, 1, 2, 1);
+	}
+
+	private static String paragraphsToString(final Collection<? extends SpellParagraph> value) {
+		return value.stream().map(sp -> {
+			if (sp instanceof Bullet) {
+				return " - " + sp.getText();
+			} else if (sp instanceof SpellFeature) {
+				return " # " + ((SpellFeature) sp).getTitle() + ". " + sp.getText();
+			} else {
+				return sp.getText();
+			}
+		}).collect(Collectors.joining("\n\n"));
 	}
 
 	@Override
@@ -66,5 +70,10 @@ public class SpellDescriptionEditor extends Editor<List<? extends SpellParagraph
 		}
 
 		return ret;
+	}
+
+	@Override
+	public void setValue(final List<? extends SpellParagraph> value) {
+		this.value.setText(paragraphsToString(value));
 	}
 }

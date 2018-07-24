@@ -686,7 +686,7 @@ public class DeadInThayGenerator {
 		leucrotta.features = Arrays.asList(new Feature("Keen Smell", "The leucrotta has advantage on Wisdom (Perception) checks that rely on smell."), //
 				new Feature("Kicking Retreat", "If the leucrotta attacks with its hooves, it can take the Disengage action as a bonus action."), //
 				new Feature("Mimicry", "The leucrotta can mimic animal sounds and homainoid voices. A creature that hears the sounds can tell they are imitations with a successful DC 14 Wisdom (Insight) check."), //
-				new Feature("Rampage", "When the leucrotta reduces a creature t 0 hit points with a melee attack on its turn, it can take a bonus action to move up to half its speed and make an attack with its hooves."));
+				new Feature("Rampage", "When the leucrotta reduces a creature to 0 hit points with a melee attack on its turn, it can take a bonus action to move up to half its speed and make an attack with its hooves."));
 		leucrotta.actions = Arrays.asList(new Action("Multiattack", "The leucrotta makes two attacks: one with its bite, and one with its hooves."), //
 				new Attack("Bite", Type.MELEE_WEAPON, 6, "reach 5 ft., one target", ". If the leucrotta scores a critical hit, it rolls the damage dice three times, instead of twice.", new Attack.Damage(new DiceRoll(1, 8, 4), DamageType.PIERCING)), //
 				new Attack("Hooves", Type.MELEE_WEAPON, 6, "reach 5 ft., one target", null, new Attack.Damage(new DiceRoll(2, 6, 4), DamageType.BLUDGEONING)));

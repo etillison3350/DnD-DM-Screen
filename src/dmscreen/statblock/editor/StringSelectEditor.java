@@ -23,4 +23,9 @@ public class StringSelectEditor extends Editor<String> {
 		return value.getValue();
 	}
 
+	@Override
+	public void setValue(final String value) {
+		this.value.setValue(value);
+	}
+
 }

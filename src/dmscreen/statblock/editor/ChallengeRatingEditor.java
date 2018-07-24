@@ -1,11 +1,11 @@
 package dmscreen.statblock.editor;
 
-import javafx.scene.control.Spinner;
-import javafx.scene.text.Text;
-import javafx.util.StringConverter;
 import dmscreen.data.creature.Creature;
 import dmscreen.statblock.StatBlock;
 import dmscreen.util.Util;
+import javafx.scene.control.Spinner;
+import javafx.scene.text.Text;
+import javafx.util.StringConverter;
 
 public class ChallengeRatingEditor extends Editor<Integer> {
 
@@ -150,6 +150,11 @@ public class ChallengeRatingEditor extends Editor<Integer> {
 	public Integer getValue() {
 		final int v = value.getValue();
 		return v < 1 ? v - 1 : v;
+	}
+
+	@Override
+	public void setValue(final Integer value) {
+		this.value.getValueFactory().setValue(value == 0 || value < -5 ? -4 : value < 0 ? value - 1 : value > 30 ? 30 : value);
 	}
 
 }

@@ -186,7 +186,7 @@ public class BlockPane<T> extends StackPane {
 		}
 
 		final String name = Util.getName(info);
-		titleProperty.set(info instanceof Enum<?> ? Util.titleCase(name) : name + (isEditing ? "*" : ""));
+		titleProperty.set(info instanceof Enum<?> ? Util.titleCase(name) : (isEditing ? "*" : "") + name);
 
 		return this.isEditing;
 	}

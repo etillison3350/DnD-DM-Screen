@@ -1,5 +1,6 @@
 package dmscreen.data.adventure;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,6 +62,18 @@ public class CreatureSet {
 		}
 
 		return false;
+	}
+
+	public Collection<String> getCreatures() {
+		return new ArrayList<>(amounts.keySet());
+	}
+
+	public DiceRoll getAmount(final String creature) {
+		return amounts.get(creature);
+	}
+
+	public String getDisplayName(final String creature) {
+		return names.get(creature);
 	}
 
 }

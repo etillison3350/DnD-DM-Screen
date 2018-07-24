@@ -24,6 +24,11 @@ public class EnumEditor<T extends Enum<?>> extends Editor<T> {
 		return value.getValue();
 	}
 
+	@Override
+	public void setValue(final T value) {
+		this.value.setValue(value);
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <E extends Enum<?>> ComboBox<E> createEditorComboBox(final Class<E> clazz, final E initialValue) {
 		final ComboBox<E> ret = new ComboBox<>();

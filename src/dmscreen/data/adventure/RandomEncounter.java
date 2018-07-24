@@ -30,7 +30,6 @@ public class RandomEncounter {
 	}
 
 	public Node roll() {
-
 		final int total = getTotalWeight();
 		final int roll = diceRoll == null ? DiceRoll.rand.nextInt(total) : diceRoll.roll() - diceRoll.min();
 

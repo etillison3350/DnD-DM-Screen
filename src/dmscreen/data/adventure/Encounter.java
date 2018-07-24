@@ -174,4 +174,8 @@ public class Encounter {
 		this.description = description;
 	}
 
+	public List<CreatureSet> getCreatures() {
+		return new ArrayList<>(creatures);
+	}
+
 }

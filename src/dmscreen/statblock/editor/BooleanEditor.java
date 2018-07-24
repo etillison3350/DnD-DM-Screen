@@ -23,4 +23,9 @@ public class BooleanEditor extends Editor<Boolean> {
 		return value.isSelected();
 	}
 
+	@Override
+	public void setValue(final Boolean value) {
+		this.value.setSelected(value);
+	}
+
 }

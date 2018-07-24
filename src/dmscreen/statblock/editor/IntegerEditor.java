@@ -24,6 +24,12 @@ public class IntegerEditor extends Editor<Integer> {
 		return value.getValue();
 	}
 
+	@Override
+	public void setValue(final Integer value) {
+		this.value.getValueFactory().setValue(value);
+		this.value.increment(0);
+	}
+
 	public static Spinner<Integer> createEditorSpinner(final int min, final int max, final int value, final int step) {
 		final Spinner<Integer> ret = new Spinner<>(min, max, value, step);
 		ret.setEditable(true);

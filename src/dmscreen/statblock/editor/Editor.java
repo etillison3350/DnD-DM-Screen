@@ -26,6 +26,8 @@ public abstract class Editor<T> extends GridPane {
 
 	public abstract T getValue();
 
+	public abstract void setValue(T value);
+
 	public final String getName() {
 		return name;
 	}

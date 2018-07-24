@@ -59,6 +59,11 @@ public abstract class MapEditor<K, V> extends Editor<Map<K, V>> {
 		return ret;
 	}
 
+	@Override
+	public void setValue(final Map<K, V> value) {
+		throw new IllegalStateException("Cannot set value of MapEditors");
+	}
+
 	protected int getMinRow() {
 		return minRow;
 	}

@@ -6,8 +6,10 @@ import java.util.TreeSet;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+import dmscreen.data.adventure.RandomEncounter;
 import dmscreen.data.base.Ability;
 import dmscreen.data.base.DamageType;
+import dmscreen.data.base.DiceRoll;
 import dmscreen.data.base.Size;
 import dmscreen.data.base.Skill;
 import dmscreen.data.creature.Alignment;
@@ -32,6 +34,7 @@ import dmscreen.statblock.editor.StringEditor;
 import dmscreen.statblock.editor.collection.BlockEntryCollectionEditor;
 import dmscreen.statblock.editor.collection.CollectionEnumEditor;
 import dmscreen.statblock.editor.collection.CollectionStringEditor;
+import dmscreen.statblock.editor.encounter.EncounterCollectionEditor;
 import dmscreen.statblock.editor.map.EditableMapCollectionEditor;
 import dmscreen.statblock.editor.map.EditableMapEnumIntegerEditor;
 import dmscreen.statblock.editor.map.MapEnumIntegerEditor;
@@ -216,6 +219,27 @@ public class StatBlockEditor<T> extends VBox {
 
 			return newSpell;
 		};
+		return editor;
+	}
+
+	public static StatBlockEditor<RandomEncounter> getEditor(final RandomEncounter encounter) {
+		final StatBlockEditor<RandomEncounter> editor = new StatBlockEditor<RandomEncounter>(encounter);
+
+		final StringEditor name = new StringEditor("Name", encounter.name);
+		final DiceRollEditor diceRoll = new DiceRollEditor("Dice Roll (Optional)", encounter.diceRoll);
+		final EncounterCollectionEditor encounters = new EncounterCollectionEditor("Encounters", encounter.encounters);
+
+		editor.getChildren().addAll(name, diceRoll, encounters);
+
+		editor.newValueGetter = () -> {
+			final RandomEncounter newEncounter = new RandomEncounter(name.getValue(), encounters.getValue());
+
+			final DiceRoll roll = diceRoll.getValue();
+			if (roll != null) newEncounter.diceRoll = roll;
+
+			return newEncounter;
+		};
+
 		return editor;
 	}
 }

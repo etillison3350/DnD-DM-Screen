@@ -227,6 +227,13 @@ public class BlockEntryCollectionEditor<T extends BlockEntry> extends Editor<Col
 		return new ArrayList<>(values.keySet());
 	}
 
+	@Override
+	public void setValue(final Collection<T> value) {
+		values.clear();
+		accordion.getPanes().clear();
+		value.forEach(this::addRow);
+	}
+
 	private static class FitPane extends Pane {
 
 		private final Node fitTo;

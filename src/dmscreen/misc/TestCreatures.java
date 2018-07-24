@@ -236,7 +236,7 @@ public class TestCreatures {
 						"The demilich targets one creature that it can see within 30 feet of it. The target must make a DC 19 Charisma saving throw. On a failed save, the target's soul is magically trapped inside one of the demilich's gems. While the soul is trapped, the target's body and all the equipment it is carrying cease to exist. On a successful save, the target takes 24 (7d6) necrotic damage, and if this damage reduces the target to 0 hit points, its soul is trapped as if it failed the saving throw. A soul trapped in a gem for 24 hours is devoured and ceases to exist.\nlfthe demilich drops to 0 hit points, it is destroyed and turns to powder, leaving behind its gems. Crushing a gem releases any soul trapped within, at which point the target's body re-forms in an unoccupied space nearest to the gem and in the same state as when it was trapped."));
 		demilich.legendaryActions = Arrays.asList(new LegendaryAction("Flight", "The demilich flies up to half its movement speed."), //
 				new LegendaryAction("Cloud of Dust", "The demilich magically swirls its dusty remains. Each creature within 10 feet of the demilich, including around a corner, must succeed on a DC 15 Constitution saving throw or be blinded until the end of the demilich's next turn. A creature that succeeds on the saving throw is immune to this effect until the end of the demilich's next turn."), //
-				new LegendaryAction("Energy Drain", 2, "Each creature with in 30 feet of the demilich must make a DC 15 Constitution saving throw. On a failed save, the creature's hit point maximum is magically reduced by 10 (3d6). If a creature's hit point maximum is reduced to 0 by this effect, the creature dies. A creature's hit point maximum can be restored with the greater restoration spell or similar magic."), //
+				new LegendaryAction("Energy Drain", 2, "Each creature with in 30 feet of the demilich must make a DC 15 Constitution saving throw. On a failed save, the creature's hit point maximum is magically reduced by 10 (3d6). If a creature's hit point maximum is reduced to 0 by this effect, the creature dies. A creature's hit point maximum can be restored with the [greater restoration] spell or similar magic."), //
 				new LegendaryAction("Vile Curse", 3, "The demilich targets one creature it can see within 30 feet of it. The target must succeed on a DC 15 Wisdom saving throw or be magically cursed. Until the curse ends, the target has disadvantage on attack rolls and saving throws. The target can repeat the saving throw at the end of each of its turns, ending the curse on a success."));
 
 		zombie = new Creature();
@@ -705,7 +705,7 @@ public class TestCreatures {
 		gorgon.features = Arrays.asList(new Feature("Trampling Charge", "If the gorgon moves at least 20 feet straight toward a creature and then hits it with a gore attack on the same turn, the target must succeed on a DC 16 Strength saving throw or be knocked prone. If the target is prone, the gorgon can make one attack with its hooves against it as a bonus action."));
 		gorgon.actions = Arrays.asList(new Attack("Gore", Type.MELEE_WEAPON, 8, "reach 5 ft., one target", null, new Attack.Damage(new DiceRoll(2, 12, 5), DamageType.PIERCING)), //
 				new Attack("Hooves", Type.MELEE_WEAPON, 8, "reach 5 ft., one target", null, new Attack.Damage(new DiceRoll(2, 10, 5), DamageType.BLUDGEONING)), //
-				new Action("Petrifying Breath", "Recharge 5-6", "The gorgon exhales petrifying gas in a 30-foot cone. Each creature in that area must succeed on a DC 13 Constitu tion saving throw. On a failed save, a target begins to turn to stone and is restrained. The restrained target must repeat the saving throw at the end of its next turn. On a success, the effect ends on the target. On a failure, the target is petrified until freed by the greater restoration spell or other magic."));
+				new Action("Petrifying Breath", "Recharge 5-6", "The gorgon exhales petrifying gas in a 30-foot cone. Each creature in that area must succeed on a DC 13 Constitu tion saving throw. On a failed save, a target begins to turn to stone and is restrained. The restrained target must repeat the saving throw at the end of its next turn. On a success, the effect ends on the target. On a failure, the target is petrified until freed by the [greater restoration] spell or other magic."));
 
 		helmedHorror = new Creature();
 		helmedHorror.name = "Helmed Horror";
@@ -1075,7 +1075,7 @@ public class TestCreatures {
 				new Feature("Magic Resistance", "The golem has advantage on saving throws against spells and other magical effects."), //
 				new Feature("Magic Weapons", "The golem's attacks are magical."));
 		clayGolem.actions = Arrays.asList(new Action("Multiattack", "The golem makes two slam attacks."), //
-				new Attack("Slam", Type.MELEE_WEAPON, 8, "reach 5 ft., one target", ". If the target is a creature, it must succeed on a DC 15 Constitution saving throw or have its hit point maximum reduced by an amount equal to the damage taken. The target dies if this attack reduces its hit point maximum to 0. The reduction lasts until removed by the greater restoration spell or other magic.", new Attack.Damage(new DiceRoll(2, 10, 5), DamageType.BLUDGEONING)), //
+				new Attack("Slam", Type.MELEE_WEAPON, 8, "reach 5 ft., one target", ". If the target is a creature, it must succeed on a DC 15 Constitution saving throw or have its hit point maximum reduced by an amount equal to the damage taken. The target dies if this attack reduces its hit point maximum to 0. The reduction lasts until removed by the [greater restoration] spell or other magic.", new Attack.Damage(new DiceRoll(2, 10, 5), DamageType.BLUDGEONING)), //
 				new Action("Haste", "Recharge 5-6", "Until the end of its next turn, the golem magically gains a +2 bonus to its AC, has advantage on Dexterity saving throws, and can use its slam attack as a bonus action."));
 
 		fleshGolem = new Creature();
@@ -1099,7 +1099,7 @@ public class TestCreatures {
 		fleshGolem.senses.put(VisionType.BLINDSIGHT, 60);
 		fleshGolem.languages.add("understands the languages of its creator but can't speak");
 		fleshGolem.challengeRating = 5;
-		fleshGolem.features = Arrays.asList(new Feature("Berserk", "Whenever the golem starts its turn with 40 hit points or fewer, roll a d6. On a 6, the golem goes berserk. On each of its turns while berserk, the golem attacks the nearest creature it can see. If no creature is near enough to move to and attack, the golem attacks an object, with a preference for an object smaller than itself. Once the golem goes berserk, it continues to do so until it is dedstroyed or regains all its hit points."), //
+		fleshGolem.features = Arrays.asList(new Feature("Berserk", "Whenever the golem starts its turn with 40 hit points or fewer, roll a d6. On a 6, the golem goes berserk. On each of its turns while berserk, the golem attacks the nearest creature it can see. If no creature is near enough to move to and attack, the golem attacks an object, with a preference for an object smaller than itself. Once the golem goes berserk, it continues to do so until it is destroyed or regains all its hit points."), //
 				new Feature("Aversion of Fire", "Whenever the golem takes fire damage, it has disadvantage on attack rolls and ability checks until the end of its next turn."), //
 				new Feature("Immutable Form", "The golem is immune to any spell or effect that would alter its form."), //
 				new Feature("Lightning Absorbtion", "Whenever the golem is subjected to lightning damage, it takes no damage and instead regains a number of hit points equal to the lightning damage dealt."), //
@@ -1164,7 +1164,7 @@ public class TestCreatures {
 		wraith.features = Arrays.asList(new Feature("Incorporeal Movement", "The wraith can move through objects and other creatures as if they were difficult terrain. It takes 5 (1d10) force damage if it ends its turn inside an object."), //
 				new Feature("Sunlight Sensitivity", "While in sunlight, the wraith has disadvantage on attack rolls, as well as Wisdom (Perception) checks that rely on sight."));
 		wraith.actions = Arrays.asList(new Attack("Life Drain", Type.MELEE_SPELL, 4, "reach 5 ft., one creature", ". The target must succeed on a DC 14 Constitution saving throw or its hit point maximum is reduced by an amount equal to the damage taken. This reduction lasts until the creature finishes a long rest. The target dies if this effect reduces its hit point maximum to 0.", new Attack.Damage(new DiceRoll(4, 8, 3), DamageType.NECROTIC)), //
-				new Action("Create Specter", "The wraith targets a humanoid within 10 feet of it that has been dead no longer than 1 minute and died violently. The target's spirit rises as a specter in the space of its corpse or in the nearest unoccupied space. The specter is under the wraith's control. The wraith can have no more than seven specters under its control at one time."));
+				new Action("Create Specter", "The wraith targets a humanoid within 10 feet of it that has been dead no longer than 1 minute and died violently. The target's spirit rises as a [specter] in the space of its corpse or in the nearest unoccupied space. The specter is under the wraith's control. The wraith can have no more than seven specters under its control at one time."));
 
 		succubusIncubus = new Creature();
 		succubusIncubus.name = "Succubus/Incubus";
@@ -1194,7 +1194,7 @@ public class TestCreatures {
 		succubusIncubus.senses.put(VisionType.DARKVISION, 60);
 		succubusIncubus.languages.addAll(Arrays.asList("Abyssal", "Common", "Infernal", "telepathy 60 ft."));
 		succubusIncubus.challengeRating = 4;
-		succubusIncubus.features = Arrays.asList(new Feature("Telepathic Bond", "The fiend ignores the range restriction on its telepathy when co mmunicating with a creature it has charmed. The two don't even need to be on the same plane of existence."), //
+		succubusIncubus.features = Arrays.asList(new Feature("Telepathic Bond", "The fiend ignores the range restriction on its telepathy when communicating with a creature it has charmed. The two don't even need to be on the same plane of existence."), //
 				new Feature("Shapechanger", "The fiend can use its action to polymorph into a Small or Medium humanoid, or back into its true form. Without wings, the fiend loses its flying speed. Other than its size and speed, its statistics are the same in each form. Any equipment it is wearing or carrying isn't transformed. It reverts to its true form if it dies."));
 		succubusIncubus.actions = Arrays.asList(new Attack("Claw", "Fiend Form Only", Type.MELEE_WEAPON, 5, "reach 5 ft., one target", null, new Attack.Damage(new DiceRoll(1, 6, 3), DamageType.SLASHING)), //
 				new Action("Charm",
@@ -1520,7 +1520,7 @@ public class TestCreatures {
 		basilisk.senses.put(VisionType.DARKVISION, 60);
 		basilisk.challengeRating = 3;
 		basilisk.features = Arrays.asList(new Feature("Petrifying Gaze",
-				"If a creature starts its turn within 30 feet of the basilisk and the two of them can see each other, the basilisk can force the creature to make a DC 12 Constitution saving throw if the basilisk isn't incapacitated. On a failed save, the creature magically begins to turn to stone and is restrained. It must repeat the saving throw at the end of its next turn. On a success, the effect ends. On a failure, the creature is petrified until freed by the greater restoration spell or other magic.\n    A creature that isn't surprised can avert its eyes to avoid the saving throw at the start of its turn. If it does so, it can't see the basilisk until the start of its next turn, when it can avert its eyes again. If it looks at the basilisk in the meantime, it must immediately make the save.\n    If the basilisk sees its reflection within 30 feet of it in bright light, it mistakes itself for a rival and targets itself with its gaze."));
+				"If a creature starts its turn within 30 feet of the basilisk and the two of them can see each other, the basilisk can force the creature to make a DC 12 Constitution saving throw if the basilisk isn't incapacitated. On a failed save, the creature magically begins to turn to stone and is restrained. It must repeat the saving throw at the end of its next turn. On a success, the effect ends. On a failure, the creature is petrified until freed by the [greater restoration] spell or other magic.\n    A creature that isn't surprised can avert its eyes to avoid the saving throw at the start of its turn. If it does so, it can't see the basilisk until the start of its next turn, when it can avert its eyes again. If it looks at the basilisk in the meantime, it must immediately make the save.\n    If the basilisk sees its reflection within 30 feet of it in bright light, it mistakes itself for a rival and targets itself with its gaze."));
 		basilisk.actions = Arrays.asList(new Attack("Bite", Type.MELEE_WEAPON, 5, "reach 5 ft., one target", null, new Attack.Damage(new DiceRoll(2, 6, 3), DamageType.PIERCING), new Attack.Damage(new DiceRoll(2, 6), DamageType.POISON)));
 
 		darkmantle = new Creature();
@@ -1777,7 +1777,7 @@ public class TestCreatures {
 		Stream.of("dominate person").forEach(s -> nagaLevel5.put(s, ""));
 		nagaSpells.put("5th level (2 slots)", nagaLevel5);
 
-		spiritNaga.features = Arrays.asList(new Feature("Rejuvenation", "If it dies, the naga returns to life in 1d6 days and regains all its hit points. Only a wish spell can prevent this trait from functioning."), //
+		spiritNaga.features = Arrays.asList(new Feature("Rejuvenation", "If it dies, the naga returns to life in 1d6 days and regains all its hit points. Only a [wish] spell can prevent this trait from functioning."), //
 				new Spellcasting(null, "the naga", 10, Ability.INTELLIGENCE, 14, "it", 6, ", and it needs only verbal components to cast its spells", "wizard", null, nagaSpells));
 		spiritNaga.actions = Arrays.asList(new Attack("Bite", Type.MELEE_WEAPON, 7, "reach 10 ft., one creature", ", and the target must make a DC 13 Constitution saving throw, taking 31 (7d8) poison damage on a failed save, or half as much damage on a successful one.", new Attack.Damage(new DiceRoll(1, 6, 4), DamageType.PIERCING)));
 

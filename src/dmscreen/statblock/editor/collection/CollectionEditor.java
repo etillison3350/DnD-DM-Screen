@@ -151,4 +151,10 @@ public abstract class CollectionEditor<T> extends Editor<Collection<T>> {
 		return new HashSet<>(collection.keySet());
 	}
 
+	@Override
+	public void setValue(final Collection<T> value) {
+		collection.keySet().forEach(t -> values.getChildren().remove(collection.remove(t)));
+		value.forEach(this::add);
+	}
+
 }

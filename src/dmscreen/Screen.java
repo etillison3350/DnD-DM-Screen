@@ -140,30 +140,7 @@ public class Screen extends Application {
 
 			cell.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
-					final TreeItem<Object> value = cell.getTreeItem();
-					if (value != null && !parents.containsValue(value)) {
-						if (openTabs.containsKey(value.getValue())) {
-							tabPane.getSelectionModel().select(openTabs.get(value.getValue()));
-						} else {
-							final BlockPane<Object> pane = new BlockPane<Object>(value.getValue(), (DataSet) value.getParent().getParent().getValue());
-							final Tab tab = new Tab(Util.getName(value.getValue()), pane);
-							tab.setTooltip(new Tooltip(tab.getText()));
-							tab.textProperty().bind(pane.titleProperty());
-							tab.setOnCloseRequest(e -> {
-								if (!pane.confirmClose()) e.consume();
-							});
-							tab.setOnClosed(e -> openTabs.remove(value.getValue()));
-							openTabs.put(value.getValue(), tab);
-							tabPane.getTabs().add(tab);
-							tabPane.getSelectionModel().select(tabPane.getTabs().size() - 1);
-							pane.setOnEditSaved((observable, oldValue, newValue) -> {
-								value.setValue(newValue);
-								Collections.sort(value.getParent().getChildren(), (o1, o2) -> Util.getName(o1.getValue()).compareToIgnoreCase(Util.getName(o2.getValue())));
-								dataTree.getSelectionModel().select(value);
-								dataTree.scrollTo(dataTree.getSelectionModel().getSelectedIndex());
-							});
-						}
-					}
+					openTab(cell.getTreeItem());
 				}
 			});
 
@@ -172,6 +149,32 @@ public class Screen extends Application {
 		dataTree.setStyle("-fx-focus-color: transparent;");
 
 		return dataTree;
+	}
+
+	private void openTab(final TreeItem<Object> value) {
+		if (value != null && !parents.containsValue(value)) {
+			if (openTabs.containsKey(value.getValue())) {
+				tabPane.getSelectionModel().select(openTabs.get(value.getValue()));
+			} else {
+				final BlockPane<Object> pane = new BlockPane<Object>(value.getValue(), (DataSet) value.getParent().getParent().getValue());
+				final Tab tab = new Tab(Util.getName(value.getValue()), pane);
+				tab.setTooltip(new Tooltip(tab.getText()));
+				tab.textProperty().bind(pane.titleProperty());
+				tab.setOnCloseRequest(e -> {
+					if (!pane.confirmClose()) e.consume();
+				});
+				tab.setOnClosed(e -> openTabs.remove(value.getValue()));
+				openTabs.put(value.getValue(), tab);
+				tabPane.getTabs().add(tab);
+				tabPane.getSelectionModel().select(tabPane.getTabs().size() - 1);
+				pane.setOnEditSaved((observable, oldValue, newValue) -> {
+					value.setValue(newValue);
+					Collections.sort(value.getParent().getChildren(), (o1, o2) -> Util.getName(o1.getValue()).compareToIgnoreCase(Util.getName(o2.getValue())));
+					dataTree.getSelectionModel().select(value);
+					dataTree.scrollTo(dataTree.getSelectionModel().getSelectedIndex());
+				});
+			}
+		}
 	}
 
 	private TreeItem<Object> constructTreeValues() {

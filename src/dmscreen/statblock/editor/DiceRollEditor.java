@@ -17,7 +17,7 @@ public class DiceRollEditor extends Editor<DiceRoll> {
 	}
 
 	public static TextField makeEditorField(final DiceRoll initialValue) {
-		final TextField value = new TextField(initialValue == null ? null : String.format(initialValue.overridesExpectedValue() ? "%.0f (%s)" : "%2$s", Math.floor(initialValue.expectedValue()), initialValue.toString()));
+		final TextField value = new TextField(rollToString(initialValue));
 		value.textProperty().addListener((observable, oldValue, newValue) -> {
 			final String text = newValue.toLowerCase().replaceAll("[^\\dd +\\-\\(\\)]+", "");
 			value.setText(text);
@@ -27,9 +27,19 @@ public class DiceRollEditor extends Editor<DiceRoll> {
 		return value;
 	}
 
+	private static String rollToString(final DiceRoll value) {
+		return value == null ? null : String.format(value.overridesExpectedValue() ? "%.0f (%s)" : "%2$s", Math.floor(value.expectedValue()), value.toString());
+	}
+
 	@Override
 	public DiceRoll getValue() {
+		if (value.getText() == null) return null;
 		return DiceRoll.fromString(value.getText());
+	}
+
+	@Override
+	public void setValue(final DiceRoll value) {
+		this.value.setText(rollToString(value));
 	}
 
 }

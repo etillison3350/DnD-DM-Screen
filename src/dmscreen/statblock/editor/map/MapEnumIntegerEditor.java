@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import javafx.scene.control.Spinner;
-import javafx.scene.text.Text;
 import dmscreen.statblock.editor.IntegerEditor;
 import dmscreen.util.Util;
+import javafx.scene.control.Spinner;
+import javafx.scene.text.Text;
 
 public class MapEnumIntegerEditor<T extends Enum<?>> extends MapEditor<T, Integer> {
 
