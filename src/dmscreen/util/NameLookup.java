@@ -17,20 +17,22 @@ public final class NameLookup {
 	private static final Map<String, Spell> spells = new HashMap<>();
 
 	public static Object objectFromName(final String name) {
-		Object o = creatures.get(name);
-		if (o != null) return o;
-		o = spells.get(name);
-		if (o != null) return o;
+		if (name != null && !name.isEmpty()) {
+			Object o = creatures.get(name);
+			if (o != null) return o;
+			o = spells.get(name);
+			if (o != null) return o;
 
-		try {
-			return Condition.valueOf(name.toUpperCase());
-		} catch (final IllegalArgumentException e1) {
 			try {
-				return creatureFromName(name);
-			} catch (final IllegalArgumentException e2) {
+				return Condition.valueOf(name.toUpperCase());
+			} catch (final IllegalArgumentException e1) {
 				try {
-					return spellFromName(name);
-				} catch (final IllegalArgumentException e3) {}
+					return creatureFromName(name);
+				} catch (final IllegalArgumentException e2) {
+					try {
+						return spellFromName(name);
+					} catch (final IllegalArgumentException e3) {}
+				}
 			}
 		}
 

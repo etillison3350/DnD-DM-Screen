@@ -39,6 +39,8 @@ import javafx.util.StringConverter;
 
 public class Screen extends Application {
 
+	private static Screen activeScreen;
+
 	public static final String DEFAULT_FONT_NAME = "System";
 
 	public static void main(final String[] args) {
@@ -60,6 +62,8 @@ public class Screen extends Application {
 
 	@Override
 	public void start(final Stage stage) throws Exception {
+		activeScreen = this;
+
 		try {
 			Data.init(Paths.get("resources"));
 		} catch (final IOException e) {}
@@ -207,6 +211,15 @@ public class Screen extends Application {
 		// playerStage.show();
 
 		return playerStage;
+	}
+
+	public static void openTab(final Object info) {
+		for (final TreeItem<Object> leaf : activeScreen.parents.keySet()) {
+			if (leaf.getChildren().isEmpty() && leaf.getValue() == info) {
+				activeScreen.openTab(leaf);
+				break;
+			}
+		}
 	}
 
 }

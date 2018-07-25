@@ -11,7 +11,7 @@ public class Bullet extends SpellParagraph {
 
 	@Override
 	public Node getNode() {
-		return StatBlock.dataLine("", " \u2022 " + getText());
+		return StatBlock.formattedDataLine("", " \u2022 " + getText());
 	}
 
 }

@@ -125,7 +125,7 @@ public class StatBlock {
 		children.add(smallCaps(Util.titleCase(condition.name()), TITLE_STYLE_CLASS));
 
 		for (final String d : condition.descriptions) {
-			children.add(dataLine("", d));
+			children.add(formattedDataLine("", d.replaceAll("(?i)(" + condition.name() + ")", "[$1]()")));
 		}
 
 		return statBlock;
@@ -343,37 +343,6 @@ public class StatBlock {
 		return statBlock;
 	}
 
-	public static void addTooltip(final Node node, final Object info) {
-		final PauseTransition pt = new PauseTransition(Duration.seconds(1));
-		pt.setOnFinished(event -> {
-			final Bounds screenBounds = node.localToScreen(node.getBoundsInLocal());
-
-			try {
-				final Popup popup = PopupManager.getPopup();
-				popup.setAnchorX(screenBounds.getMinX());
-				popup.setAnchorY(screenBounds.getMinY());
-				final BorderPane content = new BorderPane(StatBlock.getStatBlock(info));
-				content.setTop(new Pane());
-				content.setPadding(new Insets(8));
-				content.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(4), Insets.EMPTY)));
-				content.setOnMouseExited(e -> {
-					PopupManager.releasePopup();
-				});
-				content.setMaxWidth(384);
-				popup.getContent().add(content);
-				popup.show(node.getScene().getWindow());
-			} catch (final IllegalStateException e) {}
-		});
-
-		node.hoverProperty().addListener((ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
-			if (newValue) {
-				pt.play();
-			} else {
-				pt.stop();
-			}
-		});
-	}
-
 	public static String componentsString(final boolean verbal, final boolean somatic, final String materialComponents) {
 		final StringBuffer ret = new StringBuffer();
 		if (verbal) ret.append("V");
@@ -462,17 +431,22 @@ public class StatBlock {
 	}
 
 	/**
-	 * Searches the given text for objects to add tooltips to, and returns an ordered
-	 * {@link Collection} of {@link Text} objects representing the string, with appropriate tooltips
-	 * on their corresponding text segments.<br>
-	 * Tooltips are added to:
+	 * Searches the given text for segments to format, and returns an ordered {@link Collection} of
+	 * {@link Text} objects representing the string, with appropriate formatting.<br>
+	 * Formats applied:
 	 * <ul>
-	 * <li>{@link Condition}s</li>
-	 * <li>{@link DiceRoll}s</li>
+	 * <li>Tooltips added to {@link Condition}s (on hover)</li>
+	 * <li>Tooltips added to {@link DiceRoll}s (on click)</li>
+	 * <li>Tooltips added to objects specified in text, formatted as
+	 * <code>[display name](object name)</code>. Objects are found by name, using
+	 * {@link NameLookup#objectFromName(String)}</li>
+	 * <li>Italics on text surrounded by single underscores ({@code _}) or asterisks
+	 * ({@code *})</li>
+	 * <li>Bold on text surrounded by double underscores ({@code __}) or asterisks ({@code **})</li>
 	 * </ul>
 	 * @param text - The text to search
-	 * @return An ordered collection of {@code Text} nodes representing the given text with tooltips
-	 *         added.
+	 * @return An ordered collection of {@code Text} nodes representing the given text, formatted as
+	 *         above.
 	 */
 	public static Collection<Text> formattedSegments(final String text) {
 		final List<Text> ret = new ArrayList<>();
@@ -490,10 +464,11 @@ public class StatBlock {
 
 				endLast = m.end();
 				if (m.group(1) != null) { // Tooltips on conditions
-					final Text condition = new Text(m.group());
-					StatBlock.addTooltip(condition, Condition.valueOf(m.group().toUpperCase()));
-					setStyle(condition, bold, italic);
-					ret.add(condition);
+					final Condition condition = Condition.valueOf(m.group().toUpperCase());
+					final Text conditionText = new Text(m.group());
+					StatBlock.addTooltip(conditionText, condition);
+					setStyle(conditionText, bold, italic);
+					ret.add(conditionText);
 				} else if (m.group(2) != null) { // Tooltips on dice rolls
 					final String roll = m.group();
 					final Text diceRoll = new Text(roll);
@@ -521,19 +496,21 @@ public class StatBlock {
 					ret.add(diceRoll);
 				} else if (m.group(3) != null) { // Inline tooltips
 					final String lookup = m.group(m.group(5) == null ? 4 : 5);
+					final Text object = new Text(m.group(4));
+					int b = bold, i = italic;
 					try {
 						final Object value = NameLookup.objectFromName(lookup);
-						final Text object = new Text(m.group(4));
 						StatBlock.addTooltip(object, value);
-						setStyle(object, value instanceof Creature ? 1 : bold, value instanceof Spell ? 1 : italic);
-						ret.add(object);
+						b = value instanceof Creature ? 1 : bold;
+						i = value instanceof Spell ? 1 : italic;
 					} catch (final IllegalArgumentException e) {}
+					setStyle(object, b, i);
+					ret.add(object);
 				} else if (m.group(6) != null) { // Bold/italic codes
 					final String code = m.group(6);
 					final int c = code.charAt(0);
 
 					if (code.length() == 1) {
-						System.out.println(italic + ", " + c);
 						if (italic == 0 || italic == c) {
 							italic = c - italic;
 						} else {
@@ -561,6 +538,60 @@ public class StatBlock {
 
 	private static void setStyle(final Text text, final int bold, final int italic) {
 		text.setFont(Font.font(Screen.DEFAULT_FONT_NAME, bold == 0 ? FontWeight.NORMAL : FontWeight.BOLD, italic == 0 ? FontPosture.REGULAR : FontPosture.ITALIC, 12));
+	}
+
+	public static void addTooltip(final Node node, final Object info) {
+		final PauseTransition pt = new PauseTransition(Duration.seconds(1));
+		pt.setOnFinished(event -> {
+			final Bounds screenBounds = node.localToScreen(node.getBoundsInLocal());
+
+			try {
+				final Popup popup = PopupManager.getPopup();
+				popup.setAnchorX(screenBounds.getMinX());
+				popup.setAnchorY(screenBounds.getMinY());
+				final BorderPane content = new BorderPane(StatBlock.getStatBlock(info));
+				content.setTop(new Pane());
+				content.setPadding(new Insets(8));
+				content.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(4), Insets.EMPTY)));
+				content.setOnMouseExited(e -> {
+					PopupManager.releasePopup();
+				});
+				content.setMaxWidth(384);
+				popup.getContent().add(content);
+				popup.show(node.getScene().getWindow());
+			} catch (final IllegalStateException e) {}
+		});
+
+		node.hoverProperty().addListener((ChangeListener<Boolean>) (observable, oldValue, newValue) -> {
+			if (newValue) {
+				pt.play();
+			} else {
+				pt.stop();
+			}
+		});
+
+		if (node instanceof Text) {
+			final Text text = (Text) node;
+
+			text.setOnMouseMoved(move -> {
+				text.getStyleClass().remove("reference");
+				if (move.isControlDown()) {
+					pt.stop();
+					text.getStyleClass().add("reference");
+				}
+			});
+
+			text.setOnMouseExited(exit -> {
+				text.getStyleClass().remove("reference");
+			});
+
+			text.setOnMouseClicked(click -> {
+				if (click.isControlDown()) {
+					PopupManager.releasePopup();
+					Screen.openTab(info);
+				}
+			});
+		}
 	}
 
 	public static TextFlow smallCaps(final String text, final String styleClass) {

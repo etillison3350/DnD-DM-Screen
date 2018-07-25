@@ -19,7 +19,7 @@ public class SpellFeature extends SpellParagraph {
 
 	@Override
 	public Node getNode() {
-		return StatBlock.dataLine(title + ".", getText() + "\n", true);
+		return StatBlock.formattedDataLine(title + ".", getText() + "\n", true);
 	}
 
 }

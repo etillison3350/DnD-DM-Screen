@@ -16,7 +16,7 @@ public class SpellParagraph {
 	}
 
 	public Node getNode() {
-		return StatBlock.dataLine("", text + "\n");
+		return StatBlock.formattedDataLine("", text + "\n");
 	}
 
 }

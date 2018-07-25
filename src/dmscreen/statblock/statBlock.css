@@ -25,3 +25,8 @@
 .subtitle {
 	-fx-font-style: italic;
 }
+
+.reference {
+	-fx-underline: true;
+	-fx-fill: #33CCFF;
+}
